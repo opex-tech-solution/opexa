@@ -8,6 +8,9 @@ class AppRoutes {
   static const String schoolAboutYou = '/school-about-you';
   static const String homeAboutYou = '/home-about-you';
   static const String assessmentIntro = '/assessment-intro';
+  static const String homeCreateAccount = '/home-create-account';
+  static const String homeVerifyCode = '/home-verify-code';
+  static const String schoolCode = '/school-code';
 }
 
 class RouteGenerator {
@@ -28,8 +31,17 @@ class RouteGenerator {
       case AppRoutes.schoolAboutYou:
         return MaterialPageRoute(builder: (_) => const SchoolAboutYouScreen());
       
+      case AppRoutes.schoolCode:
+        return MaterialPageRoute(builder: (_) => const SchoolCodeScreen());
+
       case AppRoutes.homeAboutYou:
         return MaterialPageRoute(builder: (_) => const HomeAboutYouScreen());
+
+      case AppRoutes.homeCreateAccount:
+        return MaterialPageRoute(builder: (_) => const HomeCreateAccountScreen());
+
+      case AppRoutes.homeVerifyCode:
+        return MaterialPageRoute(builder: (_) => const HomeVerifyCodeScreen());
 
       case AppRoutes.assessmentIntro:
         return MaterialPageRoute(builder: (_) => const AssessmentIntroScreen());

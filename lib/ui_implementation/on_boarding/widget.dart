@@ -5,3 +5,5 @@ export 'learning_path.dart';
 export 'profile_and_schools.dart';
 export 'profile_and_home.dart';
 export 'assessment_intro.dart';
+export 'home_signup_flow_screen.dart';
+export 'school_code.dart';
