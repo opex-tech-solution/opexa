@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import '../auth/widget.dart';
+
 import 'widget.dart';
 
+// ==========================================
+// 2. LEARNING PATH SELECTION SCREEN
+// ==========================================
 class LearningPathScreen extends StatefulWidget {
   const LearningPathScreen({super.key});
 
@@ -10,7 +13,28 @@ class LearningPathScreen extends StatefulWidget {
 }
 
 class _LearningPathScreenState extends State<LearningPathScreen> {
-  int _selectedPath = 0; // 0 for School, 1 for Home
+  // 0 = "Through my school" selected, 1 = "I learn at home" selected
+  int _selectedPath = 0;
+
+  void _onContinuePressed() {
+    if (_selectedPath == 0) {
+      // Navigate to School Code input screen
+      Navigator.of(context).pushNamed('/school-about-you');
+
+      // Or if using standard MaterialPageRoute directly:
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(builder: (context) => const SchoolCodeScreen()),
+      // );
+    } else {
+      // Navigate to Home Account Creation screen
+      Navigator.of(context).pushNamed('/home-about-you');
+
+      // Or:
+      // Navigator.of(context).push(
+      //   MaterialPageRoute(builder: (context) => const CreateAccountScreen()),
+      // );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +45,9 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            OpexStepHeader(
-              currentStep: 1,
-              totalSteps: 6,
-            ),
+            // Progress Header (Step 1 of 6)
+            const OpexStepHeader(currentStep: 1, totalSteps: 6),
+
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -52,7 +75,7 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
                     ),
                     const SizedBox(height: 24),
 
-                    // School Option Card
+                    // Option 1: Through my school
                     _buildPathCard(
                       index: 0,
                       icon: Icons.account_balance_outlined,
@@ -63,7 +86,7 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
                     ),
                     const SizedBox(height: 12),
 
-                    // Home Option Card
+                    // Option 2: I learn at home
                     _buildPathCard(
                       index: 1,
                       icon: Icons.home_outlined,
@@ -76,6 +99,8 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
                 ),
               ),
             ),
+
+            // Bottom Button & Footer Link
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
@@ -84,36 +109,23 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: () {
-                        if (_selectedPath == 0) {
-                          // Go to School Code screen
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const SchoolCodeScreen(),
-                            ),
-                          );
-                        } else {
-                          // Go to Home Account Creation screen
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const CreateAccountScreen(),
-                            ),
-                          );
-                        }
-                      },
+                      onPressed: _onContinuePressed,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF24488A),
+                        backgroundColor: Theme.of(context).shadowColor,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
+                      child: Text(
                         'Continue',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.white,
                         ),
                       ),
                     ),
@@ -128,21 +140,20 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
                           color: isDark
                               ? Colors.white60
                               : const Color(0xFF7E7672),
+                          fontSize: 14,
                         ),
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const WelcomeBackScreen(),
-                            ), // or your login screen
-                          );
+                          // Navigate to Login / Welcome Back screen
+                          Navigator.of(context).pushNamed('/login');
                         },
-                        child: const Text(
+                        child: Text(
                           "Log in",
                           style: TextStyle(
-                            color: Color(0xFF0052FF),
+                            color: Theme.of(context).shadowColor,
                             fontWeight: FontWeight.bold,
+                            fontSize: 14,
                           ),
                         ),
                       ),
@@ -157,6 +168,7 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
     );
   }
 
+  // Reusable builder for the selectable cards
   Widget _buildPathCard({
     required int index,
     required IconData icon,
@@ -170,10 +182,14 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isDark ? const Color(0xFF322418) : Colors.white,
+          color: isSelected
+              ? Theme.of(context).shadowColor.withOpacity(0.1)
+              : (isDark ? const Color(0xFF322418) : Colors.white),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? const Color(0xFF0052FF) : Colors.transparent,
+            color: isSelected
+                ? Theme.of(context).shadowColor.withOpacity(0.7)
+                : Colors.transparent,
             width: 2,
           ),
           boxShadow: [
@@ -187,7 +203,14 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF0052FF), size: 28),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Theme.of(context).canvasColor.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: Theme.of(context).splashColor, size: 24),
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -207,14 +230,19 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark ? Colors.white60 : const Color(0xFF7E7672),
+                      height: 1.2,
                     ),
                   ),
                 ],
               ),
             ),
+            const SizedBox(width: 8),
             Icon(
               isSelected ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: isSelected ? const Color(0xFF0052FF) : Colors.grey,
+              color: isSelected
+                  ? Theme.of(context).shadowColor
+                  : Colors.grey.shade400,
+              size: 22,
             ),
           ],
         ),

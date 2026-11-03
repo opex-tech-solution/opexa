@@ -35,7 +35,7 @@ class OpexStepHeader extends StatelessWidget {
                     margin: const EdgeInsets.symmetric(horizontal: 2.5),
                     decoration: BoxDecoration(
                       color: isActive
-                          ? const Color(0xFF0052FF)
+                          ? Theme.of(context).primaryColor
                           : (isDark ? Colors.white24 : Colors.black12),
                       borderRadius: BorderRadius.circular(2),
                     ),

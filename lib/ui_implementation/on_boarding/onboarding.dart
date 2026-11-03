@@ -154,7 +154,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   width: _currentIndex == index ? 24.0 : 8.0,
                   decoration: BoxDecoration(
                     color: _currentIndex == index
-                        ? Theme.of(context).primaryColor
+                        ? Theme.of(context).shadowColor
                         : const Color(0xFFD8D0C7),
                     borderRadius: BorderRadius.circular(4.0),
                   ),
@@ -174,9 +174,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     child: ElevatedButton(
                       onPressed: _onNextPressed,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(
-                          0xFF24488A,
-                        ), // Deep navy blue
+                        backgroundColor: Theme.of(context).shadowColor,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
@@ -190,13 +188,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             _currentIndex == _pages.length - 1
                                 ? 'Get Started'
                                 : 'Next',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
+                              color:
+                                  Theme.of(context).brightness ==
+                                      Brightness.dark
+                                  ? Colors.black
+                                  : Colors.white,
                             ),
                           ),
                           const SizedBox(width: 8),
-                          const Icon(Icons.arrow_forward, size: 18),
+                          Icon(
+                            Icons.arrow_forward,
+                            size: 18,
+                            color:
+                                Theme.of(context).brightness == Brightness.dark
+                                ? Colors.black
+                                : Colors.white,
+                          ),
                         ],
                       ),
                     ),

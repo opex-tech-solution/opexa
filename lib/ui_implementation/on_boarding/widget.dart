@@ -2,5 +2,6 @@ export 'onboarding.dart';
 export 'splash_screen.dart';
 export 'stepper_header.dart';
 export 'learning_path.dart';
-export 'code_screen.dart';
-export 'create_account.dart';
+export 'profile_and_schools.dart';
+export 'profile_and_home.dart';
+export 'assessment_intro.dart';

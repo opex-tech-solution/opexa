@@ -2,14 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'widget.dart'; // Points to your onboarding screen file
 
-class OpexaSplashScreen extends StatefulWidget {
-  const OpexaSplashScreen({super.key});
+class OpexxaSplashScreen extends StatefulWidget {
+  const OpexxaSplashScreen({super.key});
 
   @override
-  State<OpexaSplashScreen> createState() => _OpexaSplashScreenState();
+  State<OpexxaSplashScreen> createState() => _OpexxaSplashScreenState();
 }
 
-class _OpexaSplashScreenState extends State<OpexaSplashScreen>
+class _OpexxaSplashScreenState extends State<OpexxaSplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _fadeAnimation;
