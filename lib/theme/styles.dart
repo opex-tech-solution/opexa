@@ -54,4 +54,24 @@ abstract class Styles {
           : const Color(0xFFDCD2CE),
     );
   }
+
+  /// Theme for the math diagnostic / skills map screens.
+  ///
+  /// Those screens are designed dark-only, so this is always built on the
+  /// dark theme, whatever the phone's light/dark setting is. It also sets a
+  /// ColorScheme (the base theme leaves it at Flutter's default purple), which
+  /// the Material 3 buttons, dialogs, bottom sheets and navigation bar use.
+  static ThemeData mathTheme(BuildContext context) {
+    final base = themeData(true, context);
+    const scaffold = Color(0xFF241A10);
+    const primary = Color(0xFF7EB2FC);
+    return base.copyWith(
+      useMaterial3: true,
+      colorScheme: const ColorScheme.dark(
+        primary: primary,
+        onPrimary: Color(0xFF0F1E38),
+        surface: scaffold,
+      ),
+    );
+  }
 }

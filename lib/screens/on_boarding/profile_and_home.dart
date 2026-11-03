@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import '../common/widget.dart';
+import '../../widgets/widget.dart';
 import 'widget.dart';
 
 // ==========================================
-// 1. "ABOUT YOU" - SCHOOL PATH
-// (Displays after School Code entry)
+// 2. "ABOUT YOU" - HOME LEARNING PATH
 // ==========================================
-class SchoolAboutYouScreen extends StatefulWidget {
-  const SchoolAboutYouScreen({super.key});
+class HomeAboutYouScreen extends StatefulWidget {
+  const HomeAboutYouScreen({super.key});
 
   @override
-  State<SchoolAboutYouScreen> createState() => _SchoolAboutYouScreenState();
+  State<HomeAboutYouScreen> createState() => _HomeAboutYouScreenState();
 }
 
-class _SchoolAboutYouScreenState extends State<SchoolAboutYouScreen> {
-  String? selectedClass = "JSS2";
+class _HomeAboutYouScreenState extends State<HomeAboutYouScreen> {
+  final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _nicknameController = TextEditingController();
+  String? selectedClass = "JSS2";
   // Dropdown open states
   bool _isSchoolSystemOpen = false;
   bool _isToughSubjectsOpen = false;
@@ -46,6 +46,13 @@ class _SchoolAboutYouScreenState extends State<SchoolAboutYouScreen> {
   ];
 
   @override
+  void dispose() {
+    _fullNameController.dispose();
+    _nicknameController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -72,7 +79,7 @@ class _SchoolAboutYouScreenState extends State<SchoolAboutYouScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      "We got your name and class from your school.",
+                      "This helps OpexA talk to you and start at the right level.",
                       style: TextStyle(
                         fontSize: 14,
                         color: isDark
@@ -80,60 +87,57 @@ class _SchoolAboutYouScreenState extends State<SchoolAboutYouScreen> {
                             : const Color(0xFF7E7672),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 24),
 
-                    // School Fetched Card
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF7EB2FC).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(14),
+                    // Full Name Field
+                    const Text(
+                      "Your full name",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
                       ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.check_circle_outline,
-                            color: Color(0xFF7EB2FC),
-                            size: 22,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Amaka Obi",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15,
-                                    color: isDark
-                                        ? Colors.white
-                                        : Colors.black87,
-                                  ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  "JSS2 - Government Secondary School, Garki",
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark
-                                        ? Colors.white60
-                                        : Colors.black54,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                    ),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _fullNameController,
+                      decoration: InputDecoration(
+                        hintText: "e.g. Tobi Adeyemi",
+                        filled: true,
+                        fillColor: isDark
+                            ? const Color(0xFF322418)
+                            : Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 20),
-                    OpexTextField(
-                      label: "What should we call you?",
-                      hintText: "e.g. Tobi",
-                      controller: _nicknameController,
+
+                    // Nickname Field
+                    const Text(
+                      "What should we call you?",
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
+                    TextField(
+                      controller: _nicknameController,
+                      decoration: InputDecoration(
+                        hintText: "e.g. Tobi",
+                        filled: true,
+                        fillColor: isDark
+                            ? const Color(0xFF322418)
+                            : Colors.white,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
                     const Text(
                       "A first name or nickname is fine.",
                       style: TextStyle(fontSize: 11, color: Colors.grey),
@@ -306,7 +310,9 @@ class _SchoolAboutYouScreenState extends State<SchoolAboutYouScreen> {
                               borderRadius: BorderRadius.circular(24),
                               border: Border.all(
                                 color: isSelected
-                                    ? const Color(0xFF7EB2FC)
+                                    ? Theme.of(
+                                        context,
+                                      ).splashColor.withOpacity(0.3)
                                     : (isDark
                                           ? const Color(0xFF75695F)
                                           : Colors.grey.shade300),
@@ -373,11 +379,8 @@ class _SchoolAboutYouScreenState extends State<SchoolAboutYouScreen> {
                                   fontSize: 14,
                                 ),
                               ),
-                              side: BorderSide(
-                                color: Theme.of(context).splashColor,
-                              ),
                               value: isChecked,
-                              activeColor: Theme.of(context).splashColor,
+                              activeColor: const Color(0xFF0052FF),
                               checkboxShape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(4),
                               ),
@@ -415,7 +418,7 @@ class _SchoolAboutYouScreenState extends State<SchoolAboutYouScreen> {
                         onPressed: () {
                           Navigator.of(context).push(
                             MaterialPageRoute(
-                              builder: (context) => const SchoolPrivacyScreen(),
+                              builder: (context) => const HomePrivacyScreen(),
                             ),
                           );
                         },
@@ -453,10 +456,29 @@ class _SchoolAboutYouScreenState extends State<SchoolAboutYouScreen> {
 }
 
 // ==========================================
-// 2. PRIVACY SCREEN - SCHOOL PATH
+// 3. PRIVACY SCREEN - HOME LEARNING PATH (With Guardian Card)
 // ==========================================
-class SchoolPrivacyScreen extends StatelessWidget {
-  const SchoolPrivacyScreen({super.key});
+class HomePrivacyScreen extends StatefulWidget {
+  const HomePrivacyScreen({super.key});
+
+  @override
+  State<HomePrivacyScreen> createState() => _HomePrivacyScreenState();
+}
+
+class _HomePrivacyScreenState extends State<HomePrivacyScreen> {
+  // Toggle state to switch between button view and input form view
+  bool _isAddingGuardian = false;
+
+  final TextEditingController _guardianNameController = TextEditingController();
+  final TextEditingController _guardianPhoneController =
+      TextEditingController();
+
+  @override
+  void dispose() {
+    _guardianNameController.dispose();
+    _guardianPhoneController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -469,7 +491,7 @@ class SchoolPrivacyScreen extends StatelessWidget {
           children: [
             const OpexStepHeader(currentStep: 4, totalSteps: 6),
             Expanded(
-              child: Padding(
+              child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -485,7 +507,7 @@ class SchoolPrivacyScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "You learn through your school, so here is who can see your progress.",
+                      "You learn at home, so you decide who sees your progress.",
                       style: TextStyle(
                         fontSize: 14,
                         color: isDark
@@ -494,25 +516,219 @@ class SchoolPrivacyScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildPrivacyRow(
-                      context,
-                      Icons.visibility_outlined,
-                      "Your teacher and school can see your progress, so they can help you.",
-                      isDark,
-                    ),
-                    const SizedBox(height: 16),
+
+                    // Privacy Bullet 1
                     _buildPrivacyRow(
                       context,
                       Icons.lock_outline,
-                      "Other learners never see your answers or your blocks.",
+                      "Your progress is private to you.",
                       isDark,
                     ),
                     const SizedBox(height: 16),
+
+                    // Privacy Bullet 2
                     _buildPrivacyRow(
                       context,
                       Icons.person_outline,
+                      "If you add a Guardian, they can see your progress and help you.",
+                      isDark,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Privacy Bullet 3
+                    _buildPrivacyRow(
+                      context,
+                      Icons.visibility_outlined,
                       "You can see everything OpexA knows about you in Me.",
                       isDark,
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Add a Guardian Container Box
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: isDark ? const Color(0xFF322418) : Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          if (!isDark)
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 10,
+                              offset: const Offset(0, 4),
+                            ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Add a Guardian (optional)",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          const Text(
+                            "A parent, guardian or tutor who helps you learn. You can also use OpexA completely on your own.",
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.grey,
+                              height: 1.3,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          if (!_isAddingGuardian) ...[
+                            SizedBox(
+                              width: double.infinity,
+                              height: 44,
+                              child: ElevatedButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    _isAddingGuardian = true;
+                                  });
+                                },
+                                icon: Icon(
+                                  Icons.person_add_outlined,
+                                  size: 18,
+                                  color: Theme.of(context).splashColor,
+                                ),
+                                label: Text(
+                                  "Add a Guardian",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Theme.of(context).splashColor,
+                                  ),
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).canvasColor.withOpacity(0.1),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ] else ...[
+                            // Their name field
+                            const Text(
+                              "Their name",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            TextField(
+                              controller: _guardianNameController,
+                              decoration: InputDecoration(
+                                hintText: "e.g. Mrs Adeyemi",
+                                filled: true,
+                                fillColor: isDark
+                                    ? const Color(0xFF241A10)
+                                    : const Color(0xFFFAF6F2),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Their phone number field
+                            const Text(
+                              "Their phone number",
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 14,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: isDark
+                                        ? const Color(0xFF241A10)
+                                        : const Color(0xFFFAF6F2),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Row(
+                                    children: [
+                                      Text("🇳🇬"),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        "+234",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _guardianPhoneController,
+                                    keyboardType: TextInputType.phone,
+                                    decoration: InputDecoration(
+                                      hintText: "803 123 4567",
+                                      filled: true,
+                                      fillColor: isDark
+                                          ? const Color(0xFF241A10)
+                                          : const Color(0xFFFAF6F2),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(12),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+
+                            // Invite them action button
+                            SizedBox(
+                              width: double.infinity,
+                              height: 44,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  // Handle invite submission action
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  elevation: 0,
+                                  backgroundColor: Theme.of(
+                                    context,
+                                  ).canvasColor.withOpacity(0.1),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                child: Text(
+                                  'Invite them',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                    color: Theme.of(context).splashColor,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -540,7 +756,7 @@ class SchoolPrivacyScreen extends StatelessWidget {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Continue',
+                    'Continue on my own',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
@@ -569,7 +785,7 @@ class SchoolPrivacyScreen extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Theme.of(context).canvasColor.withOpacity(0.3),
+            color: Theme.of(context).splashColor.withOpacity(0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: Theme.of(context).splashColor, size: 22),

@@ -2,6 +2,8 @@
 // 4. FINAL SETUP SCREEN: ASSESSMENT INTRO
 // ==========================================
 import 'package:flutter/material.dart';
+import '../../models/model.dart';
+import '../routes/widget.dart';
 import 'widget.dart';
 
 class AssessmentIntroScreen extends StatelessWidget {
@@ -108,6 +110,12 @@ class AssessmentIntroScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         // Action when user clicks to start assessment check
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          AppRoutes.mathDiagnostic,
+                          (route) => false,
+                          arguments: MathFlowArgs(userName: 'Chineche'),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).shadowColor,
