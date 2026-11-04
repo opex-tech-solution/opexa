@@ -1,19 +1,27 @@
 import 'package:flutter/material.dart';
-import '../../models/model.dart';
-import '../../theme/widget.dart';
-import '../../widgets/widget.dart';
-import '../map/widget.dart';
-import 'widget.dart';
+import '../../models/answer_result.dart';
+import '../../models/skill.dart';
+import 'interstitial_screen.dart';
+import 'mcq_screen.dart';
+import 'numeric_screen.dart';
+import 'quick_fix_screen.dart';
+import 'results_screen.dart';
+import 'working_text_screen.dart';
+import '../../theme/app_colors.dart';
+import '../../widgets/bricks.dart';
+import '../../widgets/buttons.dart';
+import '../../widgets/cards.dart';
+import '../../widgets/info_widgets.dart';
 
 /// Called when the student taps "See my full map" / "See what to learn".
-/// Wire this to named routes in your RouteGenerator. When null, the flow
-/// pushes the map screen itself.
-typedef OpenMapCallback = void Function(BuildContext context, bool openLearningList);
+/// Wire this in your router (see AppRouter in app_routes.dart).
+typedef OpenMapCallback =
+    void Function(BuildContext context, bool openLearningList);
 
 class DiagnosticFlow extends StatefulWidget {
-  const DiagnosticFlow({super.key, this.userName, this.onOpenMap});
+  const DiagnosticFlow({super.key, this.userName, required this.onOpenMap});
   final String? userName;
-  final OpenMapCallback? onOpenMap;
+  final OpenMapCallback onOpenMap;
 
   @override
   State<DiagnosticFlow> createState() => _DiagnosticFlowState();
@@ -53,8 +61,14 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
         title: const Text('Leave this check?'),
         content: const Text('Your answers so far won’t be saved.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Keep going')),
-          TextButton(onPressed: () => Navigator.pop(c, true), child: const Text('Leave')),
+          TextButton(
+            onPressed: () => Navigator.pop(c, false),
+            child: const Text('Keep going'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(c, true),
+            child: const Text('Leave'),
+          ),
         ],
       ),
     );
@@ -66,18 +80,8 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
     }
   }
 
-  void _openMap({bool learnList = false}) {
-    final callback = widget.onOpenMap;
-    if (callback != null) {
-      callback(context, learnList);
-      return;
-    }
-    Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
-      builder: (_) => MathThemeScope(
-        child: MapShell(userName: widget.userName, openLearningList: learnList),
-      ),
-    ));
-  }
+  void _openMap({bool learnList = false}) =>
+      widget.onOpenMap(context, learnList);
 
   // Header ---------------------------------------------------------------
 
@@ -86,28 +90,41 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
     if (_step == sMapReady) {
       return const Padding(
         padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text('Done', style: TextStyle(fontSize: 11, color: C.muted)),
-          SizedBox(height: 4),
-          _ProgressBar(1),
-        ]),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Done', style: TextStyle(fontSize: 11, color: C.muted)),
+            SizedBox(height: 4),
+            _ProgressBar(1),
+          ],
+        ),
       );
     }
     final progress = (_step / sMapReady).clamp(0.0, 1.0);
     final mins = _step == sQ1 ? 5 : (_step == sQ2 ? 4 : 3);
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 4, 16, 0),
-      child: Row(children: [
-        IconButton(onPressed: _confirmClose, icon: const Icon(Icons.close, size: 22)),
-        Expanded(
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            _ProgressBar(progress),
-            const SizedBox(height: 4),
-            Text('About $mins min left',
-                style: const TextStyle(fontSize: 11, color: C.muted)),
-          ]),
-        ),
-      ]),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: _confirmClose,
+            icon: const Icon(Icons.close, size: 22),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _ProgressBar(progress),
+                const SizedBox(height: 4),
+                Text(
+                  'About $mins min left',
+                  style: const TextStyle(fontSize: 11, color: C.muted),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -116,9 +133,19 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
   Widget _body() {
     switch (_step) {
       case sQ1:
-        return _mcq('Solve x + 5 = 12', ['x = 7', 'x = 17', 'x = −7', 'x = 5'], record: false);
+        return _mcq('Solve x + 5 = 12', [
+          'x = 7',
+          'x = 17',
+          'x = −7',
+          'x = 5',
+        ], record: false);
       case sQ2:
-        return _mcq('Solve 3x − 4 = 11', ['x = 5', 'x = 7/3', 'x = 15', 'x = 7'], record: false);
+        return _mcq('Solve 3x − 4 = 11', [
+          'x = 5',
+          'x = 7/3',
+          'x = 15',
+          'x = 7',
+        ], record: false);
       case sQ3:
         return _mcq('Solve 2x + 9 = 3', ['x = −3', 'x = 3', 'x = −6', 'x = 6']);
       case sWorkChoice:
@@ -149,24 +176,34 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
           key: const ValueKey('notSure'),
           icon: Icons.search,
           title: 'We’re not sure yet',
-          body: 'That one looked tricky, and there are a few possible reasons. '
+          body:
+              'That one looked tricky, and there are a few possible reasons. '
               'Let’s check one more thing.',
           button: 'Next',
           onPressed: _next,
         );
       case sNeg1:
         return NumericScreen(
-            key: const ValueKey('neg1'), prompt: '−3 − 5 = ?', onDone: (_) => _next());
+          key: const ValueKey('neg1'),
+          prompt: '−3 − 5 = ?',
+          onDone: (_) => _next(),
+        );
       case sNeg2:
         return NumericScreen(
-            key: const ValueKey('neg2'), prompt: '4 − 10 = ?', onDone: (_) => _next());
+          key: const ValueKey('neg2'),
+          prompt: '4 − 10 = ?',
+          onDone: (_) => _next(),
+        );
       case sQ4:
         return _mcq('Solve 2x + 1 = 9', ['x = 4', 'x = 8', 'x = 5', 'x = 10']);
       case sQ5:
         return _mcq('Solve 4x − 2 = 10', ['x = 3', 'x = 12', 'x = 2', 'x = 8']);
       case sFound:
         return ResultsScreen(
-            key: const ValueKey('found'), seen: _seen, onFix: _next);
+          key: const ValueKey('found'),
+          seen: _seen,
+          onFix: _next,
+        );
       case sFix:
         return QuickFixScreen(key: const ValueKey('fix'), onTryOne: _next);
       case sTurn:
@@ -208,14 +245,18 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
           key: const ValueKey('needsTime'),
           icon: Icons.grid_view_rounded,
           title: 'This block needs a bit more time',
-          body: 'That’s normal. It goes first in your plan, and we’ll come back to it '
+          body:
+              'That’s normal. It goes first in your plan, and we’ll come back to it '
               'with more practice.',
           button: 'Next',
           onPressed: _next,
         );
       case sMapReady:
         return _MapReady(
-            key: const ValueKey('mapReady'), name: widget.userName, onSeeMap: _next);
+          key: const ValueKey('mapReady'),
+          name: widget.userName,
+          onSeeMap: _next,
+        );
       default:
         return _MapOverview(
           key: const ValueKey('mapOverview'),
@@ -242,15 +283,17 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Column(children: [
-          if (_header() != null) _header()!,
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: const Duration(milliseconds: 220),
-              child: KeyedSubtree(key: ValueKey(_step), child: _body()),
+        child: Column(
+          children: [
+            if (_header() != null) _header()!,
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 220),
+                child: KeyedSubtree(key: ValueKey(_step), child: _body()),
+              ),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
@@ -261,14 +304,14 @@ class _ProgressBar extends StatelessWidget {
   final double value;
   @override
   Widget build(BuildContext context) => ClipRRect(
-        borderRadius: BorderRadius.circular(3),
-        child: LinearProgressIndicator(
-          value: value,
-          minHeight: 4,
-          backgroundColor: C.surface,
-          valueColor: const AlwaysStoppedAnimation(C.primary),
-        ),
-      );
+    borderRadius: BorderRadius.circular(3),
+    child: LinearProgressIndicator(
+      value: value,
+      minHeight: 4,
+      backgroundColor: C.surface,
+      valueColor: const AlwaysStoppedAnimation(C.primary),
+    ),
+  );
 }
 
 class _MapReady extends StatelessWidget {
@@ -278,51 +321,80 @@ class _MapReady extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Expanded(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-          child: Column(children: [
-            const BrickFace(BrickState.building, width: 56, height: 24),
-            const SizedBox(height: 6),
-            const Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              BrickFace(BrickState.solid, width: 56, height: 30),
-              SizedBox(width: 6),
-              BrickFace(BrickState.solid, width: 56, height: 30),
-            ]),
-            const SizedBox(height: 22),
-            const Text('Your map is ready',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 8),
-            Text(name == null ? 'Thanks. Here’s what today showed.' : 'Thanks, $name. Here’s what today showed.',
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 13.5, color: C.muted)),
-            const SizedBox(height: 18),
-            const Align(
-                alignment: Alignment.centerLeft,
-                child: SizedBox(
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
+            child: Column(
+              children: [
+                const BrickFace(BrickState.building, width: 56, height: 24),
+                const SizedBox(height: 6),
+                const Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    BrickFace(BrickState.solid, width: 56, height: 30),
+                    SizedBox(width: 6),
+                    BrickFace(BrickState.solid, width: 56, height: 30),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                const Text(
+                  'Your map is ready',
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  name == null
+                      ? 'Thanks. Here’s what today showed.'
+                      : 'Thanks, $name. Here’s what today showed.',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 13.5, color: C.muted),
+                ),
+                const SizedBox(height: 18),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
                     width: double.infinity,
-                    child: PanelCard(title: 'What you can do', items: kStrengths))),
-            const SizedBox(height: 12),
-            const InfoCard(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                SectionLabel('Block to build first'),
-                SizedBox(height: 8),
-                Text('Doing the two steps in the right order',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, height: 1.2)),
-                SizedBox(height: 6),
-                Text('It goes first in your plan, with more practice.',
-                    style: TextStyle(fontSize: 12.5, color: C.muted)),
-              ]),
+                    child: PanelCard(
+                      title: 'What you can do',
+                      items: kStrengths,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                const InfoCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SectionLabel('Block to build first'),
+                      SizedBox(height: 8),
+                      Text(
+                        'Doing the two steps in the right order',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          height: 1.2,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'It goes first in your plan, with more practice.',
+                        style: TextStyle(fontSize: 12.5, color: C.muted),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ]),
+          ),
         ),
-      ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
-        child: PrimaryButton(label: 'See my map', onPressed: onSeeMap),
-      ),
-    ]);
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+          child: PrimaryButton(label: 'See my map', onPressed: onSeeMap),
+        ),
+      ],
+    );
   }
 }
 
@@ -339,29 +411,45 @@ class _MapOverview extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      Expanded(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(name == null ? 'Here’s your map' : 'Here’s your map, $name',
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
-            const SizedBox(height: 14),
-            const PanelCard(title: 'Here’s what you can already do', items: kStrengths),
-            const SizedBox(height: 16),
-            SkillWall(data: buildWall(), highlight: 'Two-step equations'),
-            const SizedBox(height: 16),
-            const BuildNextCard(),
-          ]),
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name == null ? 'Here’s your map' : 'Here’s your map, $name',
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                const PanelCard(
+                  title: 'Here’s what you can already do',
+                  items: kStrengths,
+                ),
+                const SizedBox(height: 16),
+                SkillWall(data: buildWall(), highlight: 'Two-step equations'),
+                const SizedBox(height: 16),
+                const BuildNextCard(),
+              ],
+            ),
+          ),
         ),
-      ),
-      Padding(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
-        child: Column(children: [
-          PrimaryButton(label: 'See my full map', onPressed: onFullMap),
-          LinkButton(label: 'See what to learn', onPressed: onLearn),
-        ]),
-      ),
-    ]);
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+          child: Column(
+            children: [
+              PrimaryButton(label: 'See my full map', onPressed: onFullMap),
+              const SizedBox(height: 10),
+              LinkButton(label: 'See what to learn', onPressed: onLearn),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

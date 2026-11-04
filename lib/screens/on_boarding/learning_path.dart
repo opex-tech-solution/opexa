@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
+import '../routes/widget.dart';
 import 'widget.dart';
 
 // ==========================================
@@ -19,20 +21,10 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
   void _onContinuePressed() {
     if (_selectedPath == 0) {
       // Navigate to School Code input screen
-      Navigator.of(context).pushNamed('/school-code');
-
-      // Or if using standard MaterialPageRoute directly:
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(builder: (context) => const SchoolCodeScreen()),
-      // );
+      context.go(AppRoutes.schoolCode);
     } else {
       // Navigate to Home Account Creation screen
-      Navigator.of(context).pushNamed('/home-create-account');
-
-      // Or:
-      // Navigator.of(context).push(
-      //   MaterialPageRoute(builder: (context) => const CreateAccountScreen()),
-      // );
+      context.go(AppRoutes.homeCreateAccount);
     }
   }
 

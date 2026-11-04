@@ -2,6 +2,7 @@
 // 4. FINAL SETUP SCREEN: ASSESSMENT INTRO
 // ==========================================
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/model.dart';
 import '../routes/widget.dart';
 import 'widget.dart';
@@ -110,11 +111,9 @@ class AssessmentIntroScreen extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         // Action when user clicks to start assessment check
-                        Navigator.pushNamedAndRemoveUntil(
-                          context,
+                        context.go(
                           AppRoutes.mathDiagnostic,
-                          (route) => false,
-                          arguments: MathFlowArgs(userName: 'Chineche'),
+                          extra: const MathFlowArgs(userName: 'Chineche'),
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -141,6 +140,7 @@ class AssessmentIntroScreen extends StatelessWidget {
                   TextButton(
                     onPressed: () {
                       // Skip or do it later action
+                      context.go(AppRoutes.mainHome);
                     },
                     child: Text(
                       "I'll do it later",

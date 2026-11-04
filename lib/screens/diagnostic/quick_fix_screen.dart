@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-
-import '../../theme/widget.dart';
-import '../../widgets/widget.dart';
+import '../../theme/app_colors.dart';
+import '../../widgets/buttons.dart';
+import '../../widgets/cards.dart';
+import '../../widgets/info_widgets.dart';
 
 class QuickFixScreen extends StatelessWidget {
   const QuickFixScreen({super.key, required this.onTryOne});

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../models/skill.dart';
-import 'how_map_works_sheet.dart';
-import '../../theme/app_colors.dart';
-import '../../widgets/bricks.dart';
-import '../../widgets/cards.dart';
-import '../../widgets/info_widgets.dart';
+import 'package:opexa/screens/map/widget.dart';
+import 'package:opexa/widgets/widget.dart' show SectionLabel, BuildNextCard, SkillWall, InfoCard;
+import '../../models/model.dart';
+import '../../theme/widget.dart';
 
 class MapTab extends StatefulWidget {
   const MapTab({super.key, required this.onOpenLearningList});

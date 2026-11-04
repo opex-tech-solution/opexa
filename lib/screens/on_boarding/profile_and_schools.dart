@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../widgets/widget.dart';
+import '../routes/widget.dart';
 import 'widget.dart';
 
 // ==========================================
@@ -525,11 +527,7 @@ class SchoolPrivacyScreen extends StatelessWidget {
                 height: 52,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const AssessmentIntroScreen(),
-                      ),
-                    );
+                    context.go(AppRoutes.assessmentIntro);
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Theme.of(context).shadowColor,

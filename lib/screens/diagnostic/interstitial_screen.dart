@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../theme/widget.dart';
-import '../../widgets/widget.dart';
+import '../../theme/app_colors.dart';
+import '../../widgets/buttons.dart';
 
 class InterstitialScreen extends StatelessWidget {
   const InterstitialScreen({

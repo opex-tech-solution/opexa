@@ -7,3 +7,4 @@ export 'number_input.dart';
 export 'opexa_text_field.dart';
 export 'opexa_dropdown_field.dart';
 export 'option_tile.dart';
+export 'user_initials.dart';

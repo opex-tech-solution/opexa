@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-
-import '../../theme/widget.dart';
-import '../../widgets/widget.dart';
+import '../../theme/app_colors.dart';
+import '../../widgets/buttons.dart';
+import '../../widgets/info_widgets.dart';
 
 class WorkingTextScreen extends StatefulWidget {
   const WorkingTextScreen({

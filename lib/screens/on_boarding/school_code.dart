@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import '../routes/widget.dart';
 import 'widget.dart';
 
 // ==========================================
@@ -50,7 +52,7 @@ class _SchoolCodeScreenState extends State<SchoolCodeScreen> {
       });
 
       // Proceed to the next step (e.g., School About You screen)
-      Navigator.of(context).pushNamed('/school-about-you');
+      context.go(AppRoutes.schoolAboutYou);
     }
   }
 
