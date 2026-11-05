@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../routes/widget.dart';
-import 'what_guardian_sees_screen.dart';
 
 class WhoSeesMyProgressScreen extends StatelessWidget {
   const WhoSeesMyProgressScreen({super.key});

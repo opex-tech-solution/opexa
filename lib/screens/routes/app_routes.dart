@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/model.dart';
+import '../auth/widget.dart';
 import '../diagnostic/widget.dart';
 import '../home/widget.dart';
 import '../me/widget.dart';
@@ -20,6 +21,9 @@ class AppRoutes {
   static const String homeCreateAccount = '/home-create-account';
   static const String homeVerifyCode = '/home-verify-code';
   static const String schoolCode = '/school-code';
+
+  // authentication screens
+  static const String welcomeScreen = '/welcome-screen';
 
   // Math diagnostic check
   static const String mathDiagnostic = '/math-diagnostic';
@@ -40,6 +44,7 @@ class AppRoutes {
   static const String mainOurPromise = 'main-our-promise';
   static const String mainMeWhoSeesProgress = 'main-who-sees-progress';
   static const String mainMeWhatGuardianSees = 'main-what-guradian-sees';
+  static const String mainReadinessScience = 'main-readiness-science';
 
   // Opened above the bottom bar, from the Map tab. It is a child of mainMap in
   // the router below, so its path starts with mainMap.
@@ -113,6 +118,12 @@ class AppRouter {
         builder: (context, state) => const AssessmentIntroScreen(),
       ),
 
+      // Auth routes
+      GoRoute(
+        path: AppRoutes.welcomeScreen,
+        builder: (context, state) => const WelcomeBackScreen(),
+      ),
+
       // ── Math diagnostic check ───────────────────────────────────────────
       // Open with:
       //   context.go(AppRoutes.mathDiagnostic,
@@ -173,7 +184,13 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: AppRoutes.mainReadiness,
-                builder: (context, state) => const ReadinessScreen(),
+                builder: (context, state) => const ReadinessDashboardScreen(),
+                routes: [
+                  GoRoute(
+                    path: AppRoutes.mainReadinessScience,
+                    builder: (context, state) => const ScienceStreamScreen(),
+                  ),
+                ],
               ),
             ],
           ),
