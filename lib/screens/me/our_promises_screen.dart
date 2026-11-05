@@ -202,7 +202,7 @@ class OurPromisesScreen extends StatelessWidget {
             ],
           ),
         ),
-        if (showDivider) const Divider(height: 1, color: Colors.white12),
+        if (showDivider) const Divider(height: 1),
       ],
     );
   }

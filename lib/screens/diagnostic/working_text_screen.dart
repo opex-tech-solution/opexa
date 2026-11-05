@@ -31,7 +31,7 @@ class _WorkingTextScreenState extends State<WorkingTextScreen> {
   Widget build(BuildContext context) {
     final border = OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: C.outline),
+      borderSide: BorderSide(color: context.colors.border),
     );
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -41,8 +41,8 @@ class _WorkingTextScreenState extends State<WorkingTextScreen> {
         Text(widget.title,
             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w800)),
         const SizedBox(height: 8),
-        const Text('There’s no wrong answer here. A few words is plenty, or skip it.',
-            style: TextStyle(fontSize: 13, color: C.muted, height: 1.35)),
+        Text('There’s no wrong answer here. A few words is plenty, or skip it.',
+            style: TextStyle(fontSize: 13, color: context.colors.textSecondary, height: 1.35)),
         const SizedBox(height: 14),
         TextField(
           controller: _controller,
@@ -52,11 +52,11 @@ class _WorkingTextScreenState extends State<WorkingTextScreen> {
           textCapitalization: TextCapitalization.sentences,
           decoration: InputDecoration(
             hintText: 'e.g. I took 9 from 3…',
-            hintStyle: const TextStyle(color: C.muted),
+            hintStyle: TextStyle(color: context.colors.textSecondary),
             filled: true,
-            fillColor: C.surface,
+            fillColor: context.colors.surface,
             enabledBorder: border,
-            focusedBorder: border.copyWith(borderSide: const BorderSide(color: C.primary)),
+            focusedBorder: border.copyWith(borderSide: BorderSide(color: context.colors.accent)),
           ),
         ),
         const Spacer(),

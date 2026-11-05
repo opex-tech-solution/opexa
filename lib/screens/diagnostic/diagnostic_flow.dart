@@ -57,7 +57,7 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
     final leave = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
-        backgroundColor: C.surface,
+        backgroundColor: context.colors.surface,
         title: const Text('Leave this check?'),
         content: const Text('Your answers so far won’t be saved.'),
         actions: [
@@ -88,12 +88,12 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
   Widget? _header() {
     if (_step == sMapOverview) return null;
     if (_step == sMapReady) {
-      return const Padding(
+      return Padding(
         padding: EdgeInsets.fromLTRB(16, 12, 16, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Done', style: TextStyle(fontSize: 11, color: C.muted)),
+            Text('Done', style: TextStyle(fontSize: 11, color: context.colors.textSecondary)),
             SizedBox(height: 4),
             _ProgressBar(1),
           ],
@@ -118,7 +118,7 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
                 const SizedBox(height: 4),
                 Text(
                   'About $mins min left',
-                  style: const TextStyle(fontSize: 11, color: C.muted),
+                  style: TextStyle(fontSize: 11, color: context.colors.textSecondary),
                 ),
               ],
             ),
@@ -308,8 +308,8 @@ class _ProgressBar extends StatelessWidget {
     child: LinearProgressIndicator(
       value: value,
       minHeight: 4,
-      backgroundColor: C.surface,
-      valueColor: const AlwaysStoppedAnimation(C.primary),
+      backgroundColor: context.colors.surface,
+      valueColor: AlwaysStoppedAnimation(context.colors.accent),
     ),
   );
 }
@@ -349,7 +349,7 @@ class _MapReady extends StatelessWidget {
                       ? 'Thanks. Here’s what today showed.'
                       : 'Thanks, $name. Here’s what today showed.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 13.5, color: C.muted),
+                  style: TextStyle(fontSize: 13.5, color: context.colors.textSecondary),
                 ),
                 const SizedBox(height: 18),
                 const Align(
@@ -363,7 +363,7 @@ class _MapReady extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 12),
-                const InfoCard(
+                InfoCard(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -380,7 +380,7 @@ class _MapReady extends StatelessWidget {
                       SizedBox(height: 6),
                       Text(
                         'It goes first in your plan, with more practice.',
-                        style: TextStyle(fontSize: 12.5, color: C.muted),
+                        style: TextStyle(fontSize: 12.5, color: context.colors.textSecondary),
                       ),
                     ],
                   ),

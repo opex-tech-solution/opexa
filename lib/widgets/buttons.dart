@@ -14,10 +14,10 @@ class PrimaryButton extends StatelessWidget {
       child: FilledButton(
         onPressed: onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: C.primary,
-          foregroundColor: C.onPrimary,
-          disabledBackgroundColor: C.disabledBtn,
-          disabledForegroundColor: C.disabledText,
+          backgroundColor: context.colors.accent,
+          foregroundColor: context.colors.onAccent,
+          disabledBackgroundColor: context.colors.disabledFill,
+          disabledForegroundColor: context.colors.disabledText,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
         ),
@@ -37,7 +37,7 @@ class LinkButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final style = TextButton.styleFrom(
-      foregroundColor: color ?? C.text,
+      foregroundColor: color ?? context.colors.textPrimary,
       textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
     );
     if (icon != null) {

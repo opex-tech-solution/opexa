@@ -10,9 +10,9 @@ class QuestionCard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: C.surface,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: C.outlineSoft),
+          border: Border.all(color: context.colors.divider),
         ),
         child: Text(text,
             textAlign: TextAlign.center,
@@ -36,16 +36,16 @@ class PanelCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: C.panel,
+          color: context.colors.panel,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: C.panelBorder),
+          border: Border.all(color: context.colors.panelBorder),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
             Container(
                 width: 8,
                 height: 8,
-                decoration: const BoxDecoration(color: C.peach, shape: BoxShape.circle)),
+                decoration: BoxDecoration(color: context.colors.brickLocked, shape: BoxShape.circle)),
             const SizedBox(width: 10),
             Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
           ]),
@@ -68,9 +68,9 @@ class InfoCard extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: C.surface,
+          color: context.colors.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: border ?? C.outlineSoft),
+          border: Border.all(color: border ?? context.colors.divider),
         ),
         child: child,
       );

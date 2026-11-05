@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../theme/widget.dart';
 import 'widget.dart';
 
 /// Entry point for the whole diagnostic check (questions -> quick fix ->
@@ -14,8 +13,6 @@ class MathDiagnosticScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MathThemeScope(
-      child: DiagnosticFlow(userName: userName, onOpenMap: onOpenMap),
-    );
+    return DiagnosticFlow(userName: userName, onOpenMap: onOpenMap);
   }
 }

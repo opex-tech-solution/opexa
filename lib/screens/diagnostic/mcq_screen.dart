@@ -89,7 +89,7 @@ class _McqScreenState extends State<McqScreen> {
           Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: Text(widget.subtitle!,
-                style: const TextStyle(fontSize: 13, color: C.muted, height: 1.35)),
+                style: TextStyle(fontSize: 13, color: context.colors.textSecondary, height: 1.35)),
           ),
         if (widget.showBanner)
           const InfoBanner('We don’t mark answers as you go. Your map comes at the end.'),

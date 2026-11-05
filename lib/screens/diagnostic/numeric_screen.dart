@@ -120,7 +120,7 @@ class _NumericScreenState extends State<NumericScreen> {
   void _showHint() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: C.surface,
+      backgroundColor: context.colors.surface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -178,7 +178,7 @@ class _NumericScreenState extends State<NumericScreen> {
                   ? null
                   : Text(
                       _feedback!,
-                      style: const TextStyle(fontSize: 12.5, color: C.muted),
+                      style: TextStyle(fontSize: 12.5, color: context.colors.textSecondary),
                     ),
             ),
           ),
@@ -260,7 +260,7 @@ class _NumericScreenState extends State<NumericScreen> {
               alignment: Alignment.centerLeft,
               child: LinkButton(
                 label: 'Change my answer',
-                color: C.primary,
+                color: context.colors.accent,
                 onPressed: _locked
                     ? null
                     : () => setState(() => _confirmed = false),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../theme/widget.dart';
 
 /// One tab in [AppBottomNavBar].
 class AppNavItem {
@@ -30,17 +31,12 @@ class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onSelected;
 
-  // Soft grey pill behind the selected icon (white at ~14%).
-  static const Color _pill = Color(0x24FFFFFF);
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final barColor = theme.cardColor;
     final borderColor = theme.dividerColor;
-    final selectedColor = theme.canvasColor; // brand blue
-    final idleColor = theme.hintColor;
-    final labelColor = theme.textTheme.bodyMedium?.color ?? Colors.white;
+    final colors = context.colors;
 
     return Material(
       color: barColor,
@@ -59,11 +55,11 @@ class AppBottomNavBar extends StatelessWidget {
                     child: _NavButton(
                       item: items[i],
                       selected: i == currentIndex,
-                      iconColor: i == currentIndex ? selectedColor : idleColor,
+                      iconColor: i == currentIndex ? colors.accent : colors.textSecondary,
                       labelColor: i == currentIndex
-                          ? labelColor
-                          : labelColor.withOpacity(0.7),
-                      pillColor: _pill,
+                          ? colors.textPrimary
+                          : colors.textSecondary,
+                      pillColor: colors.accentContainer,
                       onTap: () => onSelected(i),
                     ),
                   ),

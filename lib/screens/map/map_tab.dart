@@ -18,7 +18,7 @@ class _MapTabState extends State<MapTab> {
   void _why() {
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: C.surface,
+      backgroundColor: context.colors.surface,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
       builder: (_) => const SafeArea(
@@ -68,17 +68,17 @@ class _MapTabState extends State<MapTab> {
           onTap: () => showModalBottomSheet<void>(
             context: context,
             isScrollControlled: true,
-            backgroundColor: C.surface,
+            backgroundColor: context.colors.surface,
             shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
             builder: (_) => const HowMapWorksSheet(),
           ),
-          child: const Padding(
+          child: Padding(
             padding: EdgeInsets.symmetric(vertical: 4),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(Icons.info_outline, size: 14, color: C.muted),
+              Icon(Icons.info_outline, size: 14, color: context.colors.textSecondary),
               SizedBox(width: 6),
-              Text('How your map works', style: TextStyle(fontSize: 12, color: C.muted)),
+              Text('How your map works', style: TextStyle(fontSize: 12, color: context.colors.textSecondary)),
             ]),
           ),
         ),
@@ -92,20 +92,20 @@ class _MapTabState extends State<MapTab> {
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                    color: C.bg, borderRadius: BorderRadius.circular(10)),
-                child: const Icon(Icons.checklist, size: 20, color: C.muted),
+                    color: context.colors.background, borderRadius: BorderRadius.circular(10)),
+                child: Icon(Icons.checklist, size: 20, color: context.colors.textSecondary),
               ),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text('Your learning list',
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800)),
                   SizedBox(height: 2),
                   Text('3 topics to learn. Next: Two-step equations',
-                      style: TextStyle(fontSize: 11.5, color: C.muted)),
+                      style: TextStyle(fontSize: 11.5, color: context.colors.textSecondary)),
                 ]),
               ),
-              const Icon(Icons.chevron_right, color: C.muted),
+              Icon(Icons.chevron_right, color: context.colors.textSecondary),
             ]),
           ),
         ),
@@ -142,7 +142,7 @@ class _Segmented extends StatelessWidget {
       padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: C.outlineSoft),
+        border: Border.all(color: context.colors.divider),
       ),
       child: Row(children: [
         for (var i = 0; i < labels.length; i++)
@@ -153,21 +153,21 @@ class _Segmented extends StatelessWidget {
                 height: 36,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: i == selected ? C.surface : Colors.transparent,
+                  color: i == selected ? context.colors.surface : Colors.transparent,
                   borderRadius: BorderRadius.circular(9),
-                  border: i == selected ? Border.all(color: C.outlineSoft) : null,
+                  border: i == selected ? Border.all(color: context.colors.divider) : null,
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Text(labels[i],
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w700,
-                        color: soon.contains(i) ? C.muted : C.text,
+                        color: soon.contains(i) ? context.colors.textSecondary : context.colors.textPrimary,
                       )),
                   if (soon.contains(i))
-                    const Padding(
+                    Padding(
                       padding: EdgeInsets.only(left: 4),
-                      child: Text('Soon', style: TextStyle(fontSize: 9, color: C.muted)),
+                      child: Text('Soon', style: TextStyle(fontSize: 9, color: context.colors.textSecondary)),
                     ),
                 ]),
               ),

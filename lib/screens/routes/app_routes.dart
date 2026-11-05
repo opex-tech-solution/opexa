@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/model.dart';
-import '../../theme/widget.dart';
 import '../diagnostic/widget.dart';
 import '../home/widget.dart';
 import '../me/widget.dart';
@@ -134,11 +133,8 @@ class AppRouter {
       // ── Main screens with the bottom navigation bar ─────────────────────
       // Branch ORDER = tab order. Keep it identical to MainShell._tabs.
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) => MathThemeScope(
-          // The main screens are dark-only for now (the Map is designed that
-          // way). Remove this wrapper once every tab supports the light theme.
-          child: main_shell.MainShell(navigationShell: navigationShell),
-        ),
+        builder: (context, state, navigationShell) =>
+            main_shell.MainShell(navigationShell: navigationShell),
         branches: [
           // 0 — Home
           StatefulShellBranch(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../theme/widget.dart';
 import '../map/widget.dart';
 /// Called when the student taps "Your learning list".
 typedef OpenLearningListCallback = void Function(BuildContext context);
@@ -13,12 +12,10 @@ class MathMapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MathThemeScope(
-      child: Scaffold(
-        body: SafeArea(
-          bottom: false, // the shell's bottom bar handles the bottom inset
-          child: MapTab(onOpenLearningList: () => onOpenLearningList(context)),
-        ),
+    return Scaffold(
+      body: SafeArea(
+        bottom: false, // the shell's bottom bar handles the bottom inset
+        child: MapTab(onOpenLearningList: () => onOpenLearningList(context)),
       ),
     );
   }

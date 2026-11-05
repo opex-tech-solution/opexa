@@ -13,15 +13,15 @@ class AnswerBox extends StatelessWidget {
       width: double.infinity,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: C.surface,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: has ? C.primary : C.outline),
+        border: Border.all(color: has ? context.colors.accent : context.colors.border),
       ),
       child: Text(
         has ? text : hint,
         style: has
             ? const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)
-            : const TextStyle(fontSize: 13.5, color: C.muted),
+            : TextStyle(fontSize: 13.5, color: context.colors.textSecondary),
       ),
     );
   }
@@ -38,15 +38,15 @@ class NumberPad extends StatelessWidget {
   final VoidCallback onNegative;
   final VoidCallback onBackspace;
 
-  Widget _key(Widget child, VoidCallback onTap, {bool dim = false}) {
+  Widget _key(BuildContext context, Widget child, VoidCallback onTap, {bool dim = false}) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Material(
-          color: dim ? C.bg : C.surface,
+          color: dim ? context.colors.background : context.colors.surface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
-            side: BorderSide(color: dim ? C.outline : C.outlineSoft),
+            side: BorderSide(color: dim ? context.colors.border : context.colors.divider),
           ),
           child: InkWell(
             borderRadius: BorderRadius.circular(10),
@@ -58,7 +58,8 @@ class NumberPad extends StatelessWidget {
     );
   }
 
-  Widget _digit(int d) => _key(
+  Widget _digit(BuildContext context, int d) => _key(
+        context,
         Text('$d', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700)),
         () => onDigit(d),
       );
@@ -66,20 +67,21 @@ class NumberPad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: [
-      Row(children: [_digit(1), _digit(2), _digit(3)]),
-      Row(children: [_digit(4), _digit(5), _digit(6)]),
-      Row(children: [_digit(7), _digit(8), _digit(9)]),
+      Row(children: [_digit(context, 1), _digit(context, 2), _digit(context, 3)]),
+      Row(children: [_digit(context, 4), _digit(context, 5), _digit(context, 6)]),
+      Row(children: [_digit(context, 7), _digit(context, 8), _digit(context, 9)]),
       Row(children: [
         _key(
-          const Column(mainAxisSize: MainAxisSize.min, children: [
+          context,
+          Column(mainAxisSize: MainAxisSize.min, children: [
             Text('±', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-            Text('Negative', style: TextStyle(fontSize: 8.5, color: C.muted)),
+            Text('Negative', style: TextStyle(fontSize: 8.5, color: context.colors.textSecondary)),
           ]),
           onNegative,
           dim: true,
         ),
-        _digit(0),
-        _key(const Icon(Icons.backspace_outlined, size: 20), onBackspace, dim: true),
+        _digit(context, 0),
+        _key(context, const Icon(Icons.backspace_outlined, size: 20), onBackspace, dim: true),
       ]),
     ]);
   }

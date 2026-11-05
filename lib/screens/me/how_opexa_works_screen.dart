@@ -61,6 +61,7 @@ class HowOpexAWorksScreen extends StatelessWidget {
 
                     // Step Timeline Items
                     _buildTimelineStep(
+                      context: context,
                       stepNumber: "STEP 1",
                       title: "Understand",
                       description:
@@ -72,6 +73,7 @@ class HowOpexAWorksScreen extends StatelessWidget {
                       isDark: isDark,
                     ),
                     _buildTimelineStep(
+                      context: context,
                       stepNumber: "STEP 2",
                       title: "Diagnose",
                       description:
@@ -81,6 +83,7 @@ class HowOpexAWorksScreen extends StatelessWidget {
                       isDark: isDark,
                     ),
                     _buildTimelineStep(
+                      context: context,
                       stepNumber: "STEP 3",
                       title: "Map",
                       description:
@@ -91,6 +94,7 @@ class HowOpexAWorksScreen extends StatelessWidget {
                       isDark: isDark,
                     ),
                     _buildTimelineStep(
+                      context: context,
                       stepNumber: "STEP 4",
                       title: "Personalise",
                       description:
@@ -101,6 +105,7 @@ class HowOpexAWorksScreen extends StatelessWidget {
                       isDark: isDark,
                     ),
                     _buildTimelineStep(
+                      context: context,
                       stepNumber: "STEP 5",
                       title: "Teach",
                       description:
@@ -110,6 +115,7 @@ class HowOpexAWorksScreen extends StatelessWidget {
                       isDark: isDark,
                     ),
                     _buildTimelineStep(
+                      context: context,
                       stepNumber: "STEP 6",
                       title: "Practise",
                       description:
@@ -119,6 +125,7 @@ class HowOpexAWorksScreen extends StatelessWidget {
                       isDark: isDark,
                     ),
                     _buildTimelineStep(
+                      context: context,
                       stepNumber: "STEP 7",
                       title: "Measure",
                       description:
@@ -129,6 +136,7 @@ class HowOpexAWorksScreen extends StatelessWidget {
                       isDark: isDark,
                     ),
                     _buildTimelineStep(
+                      context: context,
                       stepNumber: "STEP 8",
                       title: "Adapt",
                       description:
@@ -151,9 +159,9 @@ class HowOpexAWorksScreen extends StatelessWidget {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.refresh,
-                            color: C.iconColor,
+                            color: context.colors.accent,
                             size: 20,
                           ),
                           const SizedBox(width: 12),
@@ -181,6 +189,7 @@ class HowOpexAWorksScreen extends StatelessWidget {
   }
 
   Widget _buildTimelineStep({
+    required BuildContext context,
     required String stepNumber,
     required String title,
     required String description,
@@ -203,10 +212,10 @@ class HowOpexAWorksScreen extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: C.iconColor.withOpacity(0.1),
+                  color: context.colors.accent.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Center(child: Icon(icon, color: C.iconColor, size: 20)),
+                child: Center(child: Icon(icon, color: context.colors.accent, size: 20)),
               ),
               if (!isLast)
                 Expanded(
@@ -273,17 +282,17 @@ class HowOpexAWorksScreen extends StatelessWidget {
                         children: [
                           Text(
                             actionText,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13.5,
                               fontWeight: FontWeight.bold,
-                              color: C.iconColor,
+                              color: context.colors.accent,
                             ),
                           ),
                           const SizedBox(width: 4),
-                          const Icon(
+                          Icon(
                             Icons.chevron_right,
                             size: 16,
-                            color: C.iconColor,
+                            color: context.colors.accent,
                           ),
                         ],
                       ),

@@ -75,7 +75,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                               Icons.route_outlined,
                               color: isDark
                                   ? Colors.white70
-                                  : Theme.of(context).cardColor,
+                                  : const Color(0xFF3E2E20),
                               size: 22,
                             ),
                             const SizedBox(width: 14),
@@ -256,7 +256,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                               ),
                             ),
                           ),
-                          const Divider(height: 1, color: Colors.white12),
+                          const Divider(height: 1),
                           ListTile(
                             onTap: () {
                               GoRouter.of(context).push(
@@ -401,7 +401,7 @@ class _HelpSupportScreenState extends State<HelpSupportScreen> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide(
-                      color: isDark ? Colors.white24 : Colors.black12,
+                      color: Color(0xFF6B9BFA).withOpacity(0.8),
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(

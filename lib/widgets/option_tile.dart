@@ -26,8 +26,8 @@ class OptionTile extends StatelessWidget {
       leading = Container(
         width: 22,
         height: 22,
-        decoration: BoxDecoration(color: C.primary, borderRadius: BorderRadius.circular(6)),
-        child: const Icon(Icons.check, size: 15, color: C.onPrimary),
+        decoration: BoxDecoration(color: context.colors.accent, borderRadius: BorderRadius.circular(6)),
+        child: Icon(Icons.check, size: 15, color: context.colors.onAccent),
       );
     } else if (letter != null) {
       leading = Container(
@@ -35,21 +35,21 @@ class OptionTile extends StatelessWidget {
         height: 22,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          border: Border.all(color: C.outline),
+          border: Border.all(color: context.colors.border),
           borderRadius: BorderRadius.circular(6),
         ),
         child: Text(letter!, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
       );
     } else {
-      leading = Icon(icon ?? Icons.help_outline, size: 18, color: C.muted);
+      leading = Icon(icon ?? Icons.help_outline, size: 18, color: context.colors.textSecondary);
     }
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Material(
-        color: selected ? C.selected : C.surface,
+        color: selected ? context.colors.accentContainer : context.colors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: radius,
-          side: BorderSide(color: selected ? C.primary : C.outline),
+          side: BorderSide(color: selected ? context.colors.accent : context.colors.border),
         ),
         child: InkWell(
           onTap: onTap,
@@ -63,10 +63,10 @@ class OptionTile extends StatelessWidget {
                   child: Text(text,
                       style: const TextStyle(fontSize: 14.5, fontWeight: FontWeight.w600))),
               if (loading)
-                const SizedBox(
+                SizedBox(
                     width: 16,
                     height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: C.primary)),
+                    child: CircularProgressIndicator(strokeWidth: 2, color: context.colors.accent)),
             ]),
           ),
         ),

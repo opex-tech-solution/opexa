@@ -1,14 +1,42 @@
 // styles.dart
 import 'package:flutter/material.dart';
+import 'app_colors.dart';
 
 abstract class Styles {
   static ThemeData themeData(bool isDarkTheme, BuildContext context) {
+    // The single source of truth for colours. Screens read the same values
+    // with context.colors; this file feeds them into Flutter's own widgets.
+    final colors = isDarkTheme ? AppColors.dark : AppColors.light;
+    final brightness = isDarkTheme ? Brightness.dark : Brightness.light;
+
+    // Flutter's Material 3 widgets (dialogs, menus, dropdowns, switches, text
+    // fields, progress bars...) take their colours from the ColorScheme. Without
+    // one they fall back to Flutter's default purple, so we set it from the
+    // palette. The "surfaceContainer" roles tint dialogs, menus and sheets.
+    final scheme = ColorScheme.fromSeed(
+      seedColor: const Color(0xff2D58A2),
+      brightness: brightness,
+    ).copyWith(
+      primary: colors.accent,
+      onPrimary: colors.onAccent,
+      surface: colors.background,
+      onSurface: colors.textPrimary,
+      onSurfaceVariant: colors.textSecondary,
+      outline: colors.border,
+      outlineVariant: colors.divider,
+      surfaceContainerLowest: colors.background,
+      surfaceContainerLow: colors.surface,
+      surfaceContainer: colors.surface,
+      surfaceContainerHigh: colors.surface,
+      surfaceContainerHighest: colors.surfaceInset,
+    );
+
     return ThemeData(
+      colorScheme: scheme,
+      extensions: <ThemeExtension<dynamic>>[colors],
       visualDensity: VisualDensity.adaptivePlatformDensity,
       primaryColor: const Color(0xff2D58A2),
-      scaffoldBackgroundColor: isDarkTheme
-          ? const Color(0xFF241A10) // Custom Dark mode scaffold background
-          : const Color(0xFFF5EEEC), // Custom Light mode scaffold background
+      scaffoldBackgroundColor: colors.background,
       cardColor: isDarkTheme ? const Color(0xFF322418) : Colors.white,
       hoverColor: isDarkTheme
           ? const Color(0xFF3E2E20)
@@ -19,11 +47,9 @@ abstract class Styles {
           ? const Color(0xFFBAD0F4)
           : const Color(0xFF2D58A2),
       hintColor: isDarkTheme ? const Color(0xFFE3E3E3) : Colors.black,
-      brightness: isDarkTheme ? Brightness.dark : Brightness.light,
+      brightness: brightness,
       appBarTheme: AppBarTheme(
-        backgroundColor: isDarkTheme
-            ? const Color(0xFF241A10)
-            : const Color(0xFFF5EEEC),
+        backgroundColor: colors.background,
         elevation: 0,
         iconTheme: IconThemeData(
           color: isDarkTheme ? Colors.white : Colors.black87,
@@ -49,29 +75,9 @@ abstract class Styles {
           color: isDarkTheme ? Colors.white : const Color(0xFF1A1A2E),
         ),
       ),
-      dividerColor: isDarkTheme
-          ? const Color(0xFF4A3727)
-          : const Color(0xFFDCD2CE),
-    );
-  }
-
-  /// Theme for the math diagnostic / skills map screens.
-  ///
-  /// Those screens are designed dark-only, so this is always built on the
-  /// dark theme, whatever the phone's light/dark setting is. It also sets a
-  /// ColorScheme (the base theme leaves it at Flutter's default purple), which
-  /// the Material 3 buttons, dialogs, bottom sheets and navigation bar use.
-  static ThemeData mathTheme(BuildContext context) {
-    final base = themeData(true, context);
-    const scaffold = Color(0xFF241A10);
-    const primary = Color(0xFF7EB2FC);
-    return base.copyWith(
-      useMaterial3: true,
-      colorScheme: const ColorScheme.dark(
-        primary: primary,
-        onPrimary: Color(0xFF0F1E38),
-        surface: scaffold,
-      ),
+      dividerColor: colors.divider,
+      // Dividers use the theme colour unless a screen overrides it.
+      dividerTheme: DividerThemeData(color: colors.divider),
     );
   }
 }

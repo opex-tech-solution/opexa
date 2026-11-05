@@ -1,3 +1,4 @@
+export 'appearance_selector.dart';
 export 'bricks.dart';
 export 'buttons.dart';
 export 'cards.dart';

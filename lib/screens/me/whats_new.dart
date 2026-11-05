@@ -171,7 +171,7 @@ class WhatsNew extends StatelessWidget {
             style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w300),
           ),
         ),
-        const Divider(height: 1, color: Colors.white12),
+        const Divider(height: 1),
       ],
     );
   }

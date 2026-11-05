@@ -22,16 +22,16 @@ class BrickFace extends StatelessWidget {
           height: height,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: C.surface,
+            color: context.colors.surface,
             borderRadius: r,
-            border: Border.all(color: C.outline),
+            border: Border.all(color: context.colors.border),
           ),
           child: Text(
             state == BrickState.unchecked ? '?' : '···',
             style: TextStyle(
               fontSize: fs,
               fontWeight: FontWeight.w800,
-              color: C.muted,
+              color: context.colors.textSecondary,
             ),
           ),
         );
@@ -41,14 +41,14 @@ class BrickFace extends StatelessWidget {
           height: height,
           decoration: BoxDecoration(
             borderRadius: r,
-            border: Border.all(color: C.outline, width: 1),
+            border: Border.all(color: context.colors.border, width: 1),
           ),
           child: ClipRRect(
             borderRadius: r,
             child: Column(
               children: [
-                Expanded(flex: 2, child: Container(color: C.surface)),
-                Expanded(flex: 3, child: Container(color: C.building)),
+                Expanded(flex: 2, child: Container(color: context.colors.surface)),
+                Expanded(flex: 3, child: Container(color: context.colors.brickBuilding)),
               ],
             ),
           ),
@@ -62,17 +62,17 @@ class BrickFace extends StatelessWidget {
           height: height,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: locked ? C.peach : C.primary,
+            color: locked ? context.colors.brickLocked : context.colors.brickSolid,
             borderRadius: r,
             boxShadow: [
               BoxShadow(
-                color: locked ? const Color(0xFFC9A28C) : C.solidEdge,
+                color: locked ? const Color(0xFFC9A28C) : context.colors.brickSolidEdge,
                 offset: const Offset(0, 3),
               ),
             ],
           ),
           child: state == BrickState.mastered
-              ? Icon(Icons.star, size: fs, color: C.bg)
+              ? Icon(Icons.star, size: fs, color: context.colors.background)
               : locked
               ? Icon(
                   Icons.lock_outline,
@@ -104,11 +104,11 @@ class Brick extends StatelessWidget {
               width: 18,
               height: 18,
               decoration: BoxDecoration(
-                color: C.bg,
+                color: context.colors.background,
                 shape: BoxShape.circle,
-                border: Border.all(color: C.outline),
+                border: Border.all(color: context.colors.border),
               ),
-              child: const Icon(Icons.trending_up, size: 11, color: C.text),
+              child: Icon(Icons.trending_up, size: 11, color: context.colors.textPrimary),
             ),
           ),
       ],
@@ -118,7 +118,7 @@ class Brick extends StatelessWidget {
         padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(9),
-          border: Border.all(color: C.text, width: 2),
+          border: Border.all(color: context.colors.textPrimary, width: 2),
         ),
         child: face,
       );
@@ -133,7 +133,7 @@ class Brick extends StatelessWidget {
             skill.name,
             textAlign: TextAlign.center,
             maxLines: 3,
-            style: const TextStyle(fontSize: 10, color: C.muted, height: 1.15),
+            style: TextStyle(fontSize: 10, color: context.colors.textSecondary, height: 1.15),
           ),
         ],
       ),
@@ -147,6 +147,7 @@ class SkillWall extends StatelessWidget {
   final String? highlight;
 
   Widget _section(
+    BuildContext context,
     String title,
     String sub,
     List<List<Skill>> rows, {
@@ -159,7 +160,7 @@ class SkillWall extends StatelessWidget {
           children: [
             SectionLabel(title),
             const Spacer(),
-            Text(sub, style: const TextStyle(fontSize: 11, color: C.muted)),
+            Text(sub, style: TextStyle(fontSize: 11, color: context.colors.textSecondary)),
           ],
         ),
         const SizedBox(height: 10),
@@ -187,18 +188,19 @@ class SkillWall extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _section('Stretch', 'Blocks above your class', data.stretch),
+        _section(context, 'Stretch', 'Blocks above your class', data.stretch),
         const SizedBox(height: 6),
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: C.classPanel,
+            color: context.colors.band,
             borderRadius: BorderRadius.circular(14),
           ),
-          child: _section('Your class', 'JSS2 blocks', data.klass),
+          child: _section(context, 'Your class', 'JSS2 blocks', data.klass),
         ),
         const SizedBox(height: 14),
         _section(
+          context,
           'Foundations',
           'Blocks from earlier years',
           data.foundations,
@@ -208,15 +210,15 @@ class SkillWall extends StatelessWidget {
         Container(
           height: 6,
           decoration: BoxDecoration(
-            color: C.outlineSoft,
+            color: context.colors.divider,
             borderRadius: BorderRadius.circular(3),
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
+        Text(
           'Your foundations start here',
           textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 11, color: C.muted),
+          style: TextStyle(fontSize: 11, color: context.colors.textSecondary),
         ),
       ],
     );
@@ -241,7 +243,7 @@ class BuildNextCard extends StatelessWidget {
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: C.text.withOpacity(0.85)),
+        border: Border.all(color: context.colors.textPrimary.withOpacity(0.85)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -254,16 +256,16 @@ class BuildNextCard extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 4),
-            const Text(
+            Text(
               'Fixing this makes harder equations and word problems easier.',
-              style: TextStyle(fontSize: 12.5, color: C.muted, height: 1.35),
+              style: TextStyle(fontSize: 12.5, color: context.colors.textSecondary, height: 1.35),
             ),
           ] else ...[
             Row(
               children: [
                 const BrickFace(BrickState.building, width: 44, height: 28),
                 const SizedBox(width: 14),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -279,14 +281,14 @@ class BuildNextCard extends StatelessWidget {
                         'Fixing this makes harder equations and word problems easier.',
                         style: TextStyle(
                           fontSize: 12,
-                          color: C.muted,
+                          color: context.colors.textSecondary,
                           height: 1.3,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: C.muted),
+                Icon(Icons.chevron_right, color: context.colors.textSecondary),
               ],
             ),
             const SizedBox(height: 12),

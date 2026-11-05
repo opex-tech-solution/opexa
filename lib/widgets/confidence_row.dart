@@ -17,7 +17,7 @@ class SignalBars extends StatelessWidget {
             height: heights[i],
             margin: const EdgeInsets.symmetric(horizontal: 1),
             decoration: BoxDecoration(
-              color: i < count ? C.text : C.outlineSoft,
+              color: i < count ? context.colors.textPrimary : context.colors.divider,
               borderRadius: BorderRadius.circular(1.5),
             ),
           ),
@@ -37,10 +37,10 @@ class ConfidenceRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      const Row(children: [
+      Row(children: [
         Text('How sure are you?', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
         Spacer(),
-        Text('Tap one to go on', style: TextStyle(fontSize: 11, color: C.muted)),
+        Text('Tap one to go on', style: TextStyle(fontSize: 11, color: context.colors.textSecondary)),
       ]),
       const SizedBox(height: 8),
       Row(children: [
@@ -50,10 +50,10 @@ class ConfidenceRow extends StatelessWidget {
             child: Opacity(
               opacity: busy != null && busy != i ? 0.4 : 1,
               child: Material(
-                color: busy == i ? C.selected : C.surface,
+                color: busy == i ? context.colors.accentContainer : context.colors.surface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: busy == i ? C.primary : C.outline),
+                  side: BorderSide(color: busy == i ? context.colors.accent : context.colors.border),
                 ),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
@@ -68,13 +68,13 @@ class ConfidenceRow extends StatelessWidget {
                             style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600)),
                       ]),
                       if (busy == i)
-                        const Positioned(
+                        Positioned(
                           top: 6,
                           right: 8,
                           child: SizedBox(
                               width: 12,
                               height: 12,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: C.primary)),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: context.colors.accent)),
                         ),
                     ]),
                   ),

@@ -111,11 +111,7 @@ class _NotificationSettingsScreenState
                             isDark: isDark,
                           ),
                           if (_dailyReminder) ...[
-                            const Divider(
-                              height: 1,
-                              indent: 56,
-                              color: Colors.white12,
-                            ),
+                            const Divider(height: 1, indent: 56),
                             _buildDropdownTile(
                               title: "Remind me at",
                               selectedValue: _reminderTime,
@@ -127,11 +123,7 @@ class _NotificationSettingsScreenState
                               isDark: isDark,
                             ),
                           ],
-                          const Divider(
-                            height: 1,
-                            indent: 56,
-                            color: Colors.white12,
-                          ),
+                          const Divider(height: 1, indent: 56),
                           _buildSwitchTile(
                             icon: Icons.lock_outline,
                             title: "Quick-check reminders",
@@ -142,11 +134,7 @@ class _NotificationSettingsScreenState
                                 setState(() => _quickCheckReminders = v),
                             isDark: isDark,
                           ),
-                          const Divider(
-                            height: 1,
-                            indent: 56,
-                            color: Colors.white12,
-                          ),
+                          const Divider(height: 1, indent: 56),
                           _buildSwitchTile(
                             icon: Icons.chat_bubble_outline,
                             title: "Messages from your Guardian",
@@ -180,11 +168,7 @@ class _NotificationSettingsScreenState
                             isDark: isDark,
                           ),
                           if (_quietHours) ...[
-                            const Divider(
-                              height: 1,
-                              indent: 16,
-                              color: Colors.white12,
-                            ),
+                            const Divider(height: 1, indent: 16),
                             _buildDropdownTile(
                               title: "From",
                               selectedValue: _quietFromTime,
@@ -195,11 +179,7 @@ class _NotificationSettingsScreenState
                               },
                               isDark: isDark,
                             ),
-                            const Divider(
-                              height: 1,
-                              indent: 16,
-                              color: Colors.white12,
-                            ),
+                            const Divider(height: 1, indent: 16),
                             _buildDropdownTile(
                               title: "To",
                               selectedValue: _quietToTime,
@@ -211,11 +191,7 @@ class _NotificationSettingsScreenState
                               isDark: isDark,
                             ),
                           ],
-                          const Divider(
-                            height: 1,
-                            indent: 56,
-                            color: Colors.white12,
-                          ),
+                          const Divider(height: 1, indent: 56),
                           _buildSwitchTile(
                             icon: Icons.account_balance_outlined,
                             title: "School hours",
@@ -314,7 +290,7 @@ class _NotificationSettingsScreenState
     required bool isDark,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 7.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -327,7 +303,7 @@ class _NotificationSettingsScreenState
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade400),
               borderRadius: BorderRadius.circular(10),

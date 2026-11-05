@@ -13,7 +13,7 @@ class LearningListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: C.bg,
+        backgroundColor: context.colors.background,
         title: const Text('Your learning list',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
       ),
@@ -22,10 +22,10 @@ class LearningListPage extends StatelessWidget {
         itemCount: _topics.length,
         separatorBuilder: (_, __) => const SizedBox(height: 10),
         itemBuilder: (_, i) => InfoCard(
-          border: i == 0 ? C.text : null,
+          border: i == 0 ? context.colors.textPrimary : null,
           child: Row(children: [
             Text('${i + 1}',
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: C.muted)),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: context.colors.textSecondary)),
             const SizedBox(width: 14),
             Expanded(
                 child: Text(_topics[i],

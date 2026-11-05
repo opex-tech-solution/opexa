@@ -58,8 +58,8 @@ class _HowMapWorksSheetState extends State<HowMapWorksSheet> {
           _legend(BrickState.lockedIn, 'Locked in'),
         ]),
         const SizedBox(height: 18),
-        const Text('Each brick is one Maths skill. Its look tells you how sure we are that you can do it.',
-            style: TextStyle(fontSize: 13, color: C.muted, height: 1.4)),
+        Text('Each brick is one Maths skill. Its look tells you how sure we are that you can do it.',
+            style: TextStyle(fontSize: 13, color: context.colors.textSecondary, height: 1.4)),
       ]);
 
   Widget _page2() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -74,7 +74,7 @@ class _HowMapWorksSheetState extends State<HowMapWorksSheet> {
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(vertical: 8),
-          decoration: BoxDecoration(color: C.classPanel, borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(color: context.colors.band, borderRadius: BorderRadius.circular(12)),
           child: const Column(children: [
             SectionLabel('Your class'),
             SizedBox(height: 6),
@@ -96,8 +96,8 @@ class _HowMapWorksSheetState extends State<HowMapWorksSheet> {
           BrickFace(BrickState.mastered, width: 46, height: 28),
         ]),
         const SizedBox(height: 14),
-        const Text('Foundations from earlier years sit at the bottom. Strong foundations hold up your class topics, and Stretch sits on top.',
-            style: TextStyle(fontSize: 12.5, color: C.muted, height: 1.4)),
+        Text('Foundations from earlier years sit at the bottom. Strong foundations hold up your class topics, and Stretch sits on top.',
+            style: TextStyle(fontSize: 12.5, color: context.colors.textSecondary, height: 1.4)),
       ]);
 
   Widget _row(BrickState s, String title, String desc) => Padding(
@@ -108,7 +108,7 @@ class _HowMapWorksSheetState extends State<HowMapWorksSheet> {
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(title, style: const TextStyle(fontSize: 13.5, fontWeight: FontWeight.w800)),
-              Text(desc, style: const TextStyle(fontSize: 12, color: C.muted, height: 1.3)),
+              Text(desc, style: TextStyle(fontSize: 12, color: context.colors.textSecondary, height: 1.3)),
             ]),
           ),
         ]),
@@ -126,8 +126,8 @@ class _HowMapWorksSheetState extends State<HowMapWorksSheet> {
             'On another day, with varied questions and a new kind of problem.'),
         _row(BrickState.lockedIn, 'Locked in', 'Still there a week later.'),
         const SizedBox(height: 4),
-        const Text('Lessons move bricks up. Nothing ever moves down because of one bad day.',
-            style: TextStyle(fontSize: 12.5, color: C.muted, height: 1.4)),
+        Text('Lessons move bricks up. Nothing ever moves down because of one bad day.',
+            style: TextStyle(fontSize: 12.5, color: context.colors.textSecondary, height: 1.4)),
       ]);
 
   @override
@@ -139,7 +139,7 @@ class _HowMapWorksSheetState extends State<HowMapWorksSheet> {
           Container(
             width: 36,
             height: 4,
-            decoration: BoxDecoration(color: C.outline, borderRadius: BorderRadius.circular(2)),
+            decoration: BoxDecoration(color: context.colors.border, borderRadius: BorderRadius.circular(2)),
           ),
           const SizedBox(height: 18),
           SizedBox(
@@ -158,7 +158,7 @@ class _HowMapWorksSheetState extends State<HowMapWorksSheet> {
                 margin: const EdgeInsets.symmetric(horizontal: 3),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: i == _page ? C.primary : C.outlineSoft,
+                  color: i == _page ? context.colors.accent : context.colors.divider,
                 ),
               ),
           ]),

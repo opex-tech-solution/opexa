@@ -17,7 +17,6 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
   bool _largerText = false;
   bool _reduceMotion = true;
   bool _slowerVoice = false;
-  int _appearanceThemeIndex = 0; // 0: Phone, 1: Light, 2: Dark
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +100,7 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
                     ),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 14.0),
-                      child: Divider(height: 1, color: Colors.white12),
+                      child: Divider(height: 1),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -263,43 +262,10 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
               ),
               const SizedBox(height: 24),
 
-              // SECTION: Appearance Selector Segmented
+              // SECTION: Appearance
               _buildSectionTitle("Appearance"),
-              Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _buildAppearanceSegment(
-                        0,
-                        Icons.phone_android,
-                        "Phone",
-                        isDark,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildAppearanceSegment(
-                        1,
-                        Icons.wb_sunny_outlined,
-                        "Light",
-                        isDark,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildAppearanceSegment(
-                        2,
-                        Icons.nightlight_outlined,
-                        "Dark",
-                        isDark,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              // Phone / Light / Dark: applies instantly and is remembered.
+              const AppearanceSelector(),
               const SizedBox(height: 24),
 
               // SECTION: Settings
@@ -495,7 +461,7 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
               : null,
           trailing: const Icon(Icons.chevron_right, color: Colors.grey),
         ),
-        if (showDivider) Divider(height: 1, color: Colors.white12),
+        if (showDivider) Divider(height: 1),
       ],
     );
   }
@@ -539,60 +505,8 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
             ),
           ),
         ),
-        if (showDivider) Divider(height: 1, indent: 56, color: Colors.white12),
+        if (showDivider) Divider(height: 1, indent: 56),
       ],
-    );
-  }
-
-  Widget _buildAppearanceSegment(
-    int index,
-    IconData icon,
-    String label,
-    bool isDark,
-  ) {
-    bool isSelected = _appearanceThemeIndex == index;
-    return GestureDetector(
-      onTap: () => setState(() => _appearanceThemeIndex = index),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? (isDark ? const Color(0xFF2C394B) : Colors.white)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(10),
-          boxShadow: isSelected && !isDark
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 4,
-                  ),
-                ]
-              : [],
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              icon,
-              size: 16,
-              color: isSelected
-                  ? (isDark ? Colors.white : Colors.black87)
-                  : Colors.grey,
-            ),
-            const SizedBox(width: 6),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: isSelected
-                    ? (isDark ? Colors.white : Colors.black87)
-                    : Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 

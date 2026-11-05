@@ -23,8 +23,8 @@ class QuickFixScreen extends StatelessWidget {
         const Text('Two steps, in the right order',
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800, height: 1.15)),
         const SizedBox(height: 8),
-        const Text('First undo the adding or taking away. Then undo the multiplying by dividing.',
-            style: TextStyle(fontSize: 14, color: C.muted, height: 1.4)),
+        Text('First undo the adding or taking away. Then undo the multiplying by dividing.',
+            style: TextStyle(fontSize: 14, color: context.colors.textSecondary, height: 1.4)),
         const SizedBox(height: 16),
         InfoCard(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
