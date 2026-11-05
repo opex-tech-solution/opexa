@@ -3,3 +3,8 @@ export 'what_opexa_knows_screen.dart';
 export 'notification_settings_screen.dart';
 export 'edit_profile.dart';
 export 'whats_new.dart';
+export 'help_support_screen.dart';
+export 'how_opexa_works_screen.dart';
+export 'what_opexa_knows_school_screen.dart';
+export 'change_password_screen.dart';
+export 'our_promises_screen.dart';

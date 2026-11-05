@@ -34,6 +34,11 @@ class AppRoutes {
   static const String mainMeWhatOpexAKnows = 'main-what-opexa-knows';
   static const String mainMeNotificationSettings = 'main-notification-settings';
   static const String mainMeEditProfile = 'main-edit-profile';
+  static const String mainMeWhatsNew = 'main-whats-new';
+  static const String mainMeHelpSupport = 'main-help-support';
+  static const String mainHowOpexAWorks = 'main-how-opexa-works';
+  static const String mainChangePassword = 'main-change-password';
+  static const String mainOurPromise = 'main-our-promise';
 
   // Opened above the bottom bar, from the Map tab. It is a child of mainMap in
   // the router below, so its path starts with mainMap.
@@ -193,6 +198,29 @@ class AppRouter {
                   GoRoute(
                     path: AppRoutes.mainMeWhatOpexAKnows,
                     builder: (context, state) => const WhatOpexAKnowsScreen(),
+                  ),
+                  GoRoute(
+                    path: AppRoutes.mainChangePassword,
+                    builder: (context, state) => const ChangePasswordScreen(),
+                  ),
+                  GoRoute(
+                    path: AppRoutes.mainOurPromise,
+                    builder: (context, state) => const OurPromisesScreen(),
+                  ),
+                  GoRoute(
+                    path: AppRoutes.mainMeHelpSupport,
+                    builder: (context, state) => const HelpSupportScreen(),
+                    routes: [
+                      GoRoute(
+                        path: AppRoutes.mainMeWhatsNew,
+                        builder: (context, state) => const WhatsNew(),
+                      ),
+                      GoRoute(
+                        path: AppRoutes.mainHowOpexAWorks,
+                        builder: (context, state) =>
+                            const HowOpexAWorksScreen(),
+                      ),
+                    ],
                   ),
                 ],
               ),

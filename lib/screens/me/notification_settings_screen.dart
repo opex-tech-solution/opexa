@@ -4,10 +4,12 @@ class NotificationSettingsScreen extends StatefulWidget {
   const NotificationSettingsScreen({super.key});
 
   @override
-  State<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
+  State<NotificationSettingsScreen> createState() =>
+      _NotificationSettingsScreenState();
 }
 
-class _NotificationSettingsScreenState extends State<NotificationSettingsScreen> {
+class _NotificationSettingsScreenState
+    extends State<NotificationSettingsScreen> {
   // Toggle states
   bool _dailyReminder = true;
   bool _quickCheckReminders = true;
@@ -22,31 +24,54 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
   // Full list of times for dropdown selection
   final List<String> _timeOptions = [
-    "12:00 am", "1:00 am", "2:00 am", "3:00 am", "4:00 am", "5:00 am",
-    "6:00 am", "7:00 am", "8:00 am", "9:00 am", "10:00 am", "11:00 am",
-    "12:00 pm", "1:00 pm", "2:00 pm", "3:00 pm", "4:00 pm", "5:00 pm",
-    "6:00 pm", "7:00 pm", "8:00 pm", "9:00 pm", "10:00 pm", "11:00 pm",
+    "12:00 am",
+    "1:00 am",
+    "2:00 am",
+    "3:00 am",
+    "4:00 am",
+    "5:00 am",
+    "6:00 am",
+    "7:00 am",
+    "8:00 am",
+    "9:00 am",
+    "10:00 am",
+    "11:00 am",
+    "12:00 pm",
+    "1:00 pm",
+    "2:00 pm",
+    "3:00 pm",
+    "4:00 pm",
+    "5:00 pm",
+    "6:00 pm",
+    "7:00 pm",
+    "8:00 pm",
+    "9:00 pm",
+    "10:00 pm",
+    "11:00 pm",
   ];
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark ? const Color(0xFF241A10) : const Color(0xFFF5EEEC);
-    final cardColor = isDark ? const Color(0xFF382D24) : Colors.white;
 
     return Scaffold(
-      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Top App Bar Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
               child: Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back, color: isDark ? Colors.white70 : Colors.black87),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 8),
@@ -70,11 +95,10 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   children: [
                     // SECTION: Reminders
                     _buildSectionTitle("Reminders"),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                    Material(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      clipBehavior: Clip.antiAlias,
                       child: Column(
                         children: [
                           _buildSwitchTile(
@@ -82,37 +106,54 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                             title: "Daily reminder",
                             subtitle: "Every day at $_reminderTime",
                             value: _dailyReminder,
-                            onChanged: (v) => setState(() => _dailyReminder = v),
+                            onChanged: (v) =>
+                                setState(() => _dailyReminder = v),
                             isDark: isDark,
                           ),
                           if (_dailyReminder) ...[
-                            const Divider(height: 1, indent: 56, color: Colors.white12),
+                            const Divider(
+                              height: 1,
+                              indent: 56,
+                              color: Colors.white12,
+                            ),
                             _buildDropdownTile(
                               title: "Remind me at",
                               selectedValue: _reminderTime,
                               items: _timeOptions,
                               onChanged: (val) {
-                                if (val != null) setState(() => _reminderTime = val);
+                                if (val != null)
+                                  setState(() => _reminderTime = val);
                               },
                               isDark: isDark,
                             ),
                           ],
-                          const Divider(height: 1, indent: 56, color: Colors.white12),
+                          const Divider(
+                            height: 1,
+                            indent: 56,
+                            color: Colors.white12,
+                          ),
                           _buildSwitchTile(
                             icon: Icons.lock_outline,
                             title: "Quick-check reminders",
-                            subtitle: "When a Mastered block is ready to lock in",
+                            subtitle:
+                                "When a Mastered block is ready to lock in",
                             value: _quickCheckReminders,
-                            onChanged: (v) => setState(() => _quickCheckReminders = v),
+                            onChanged: (v) =>
+                                setState(() => _quickCheckReminders = v),
                             isDark: isDark,
                           ),
-                          const Divider(height: 1, indent: 56, color: Colors.white12),
+                          const Divider(
+                            height: 1,
+                            indent: 56,
+                            color: Colors.white12,
+                          ),
                           _buildSwitchTile(
                             icon: Icons.chat_bubble_outline,
                             title: "Messages from your Guardian",
                             subtitle: "From Mrs Adeyemi",
                             value: _guardianMessages,
-                            onChanged: (v) => setState(() => _guardianMessages = v),
+                            onChanged: (v) =>
+                                setState(() => _guardianMessages = v),
                             isDark: isDark,
                             showDivider: false,
                           ),
@@ -123,48 +164,63 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
                     // SECTION: Quiet times
                     _buildSectionTitle("Quiet times"),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: cardColor,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
+                    Material(
+                      color: Theme.of(context).cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      clipBehavior: Clip.antiAlias,
                       child: Column(
                         children: [
                           _buildSwitchTile(
                             icon: Icons.nightlight_outlined,
                             title: "Quiet hours",
-                            subtitle: "No reminders $_quietFromTime to $_quietToTime",
+                            subtitle:
+                                "No reminders $_quietFromTime to $_quietToTime",
                             value: _quietHours,
                             onChanged: (v) => setState(() => _quietHours = v),
                             isDark: isDark,
                           ),
                           if (_quietHours) ...[
-                            const Divider(height: 1, indent: 16, color: Colors.white12),
+                            const Divider(
+                              height: 1,
+                              indent: 16,
+                              color: Colors.white12,
+                            ),
                             _buildDropdownTile(
                               title: "From",
                               selectedValue: _quietFromTime,
                               items: _timeOptions,
                               onChanged: (val) {
-                                if (val != null) setState(() => _quietFromTime = val);
+                                if (val != null)
+                                  setState(() => _quietFromTime = val);
                               },
                               isDark: isDark,
                             ),
-                            const Divider(height: 1, indent: 16, color: Colors.white12),
+                            const Divider(
+                              height: 1,
+                              indent: 16,
+                              color: Colors.white12,
+                            ),
                             _buildDropdownTile(
                               title: "To",
                               selectedValue: _quietToTime,
                               items: _timeOptions,
                               onChanged: (val) {
-                                if (val != null) setState(() => _quietToTime = val);
+                                if (val != null)
+                                  setState(() => _quietToTime = val);
                               },
                               isDark: isDark,
                             ),
                           ],
-                          const Divider(height: 1, indent: 56, color: Colors.white12),
+                          const Divider(
+                            height: 1,
+                            indent: 56,
+                            color: Colors.white12,
+                          ),
                           _buildSwitchTile(
                             icon: Icons.account_balance_outlined,
                             title: "School hours",
-                            subtitle: "No reminders 8 am to 2 pm, Monday to Friday",
+                            subtitle:
+                                "No reminders 8 am to 2 pm, Monday to Friday",
                             value: _schoolHours,
                             onChanged: (v) => setState(() => _schoolHours = v),
                             isDark: isDark,
@@ -202,7 +258,11 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       padding: const EdgeInsets.only(bottom: 8.0, left: 4.0),
       child: Text(
         title,
-        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey),
+        style: const TextStyle(
+          fontSize: 15,
+          fontWeight: FontWeight.bold,
+          color: Colors.grey,
+        ),
       ),
     );
   }
@@ -223,9 +283,26 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
       activeTrackColor: const Color(0xFF1B4988),
       inactiveThumbColor: Colors.white,
       inactiveTrackColor: Colors.grey.shade600,
-      secondary: Icon(icon, color: isDark ? Colors.white70 : Colors.black54, size: 22),
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isDark ? Colors.white : Colors.black87)),
-      subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54)),
+      secondary: Icon(
+        icon,
+        color: isDark ? Colors.white70 : Colors.black54,
+        size: 22,
+      ),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 15,
+          color: isDark ? Colors.white : Colors.black87,
+        ),
+      ),
+      subtitle: Text(
+        subtitle,
+        style: TextStyle(
+          fontSize: 12,
+          color: isDark ? Colors.white60 : Colors.black54,
+        ),
+      ),
     );
   }
 

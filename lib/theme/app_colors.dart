@@ -19,4 +19,5 @@ class C {
   static const solidEdge = Color(0xFF5B8BDB);
   static const peach = Color(0xFFF4CDB8);
   static const classPanel = Color(0xFF2E3037);
+  static const iconColor = Color(0xFF2D58A2);
 }

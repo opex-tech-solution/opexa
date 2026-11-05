@@ -7,13 +7,7 @@ class WhatOpexAKnowsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final backgroundColor = isDark
-        ? const Color(0xFF241A10)
-        : const Color(0xFFF5EEEC);
-    final cardColor = isDark ? const Color(0xFF382D24) : Colors.white;
-
     return Scaffold(
-      backgroundColor: backgroundColor,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +59,7 @@ class WhatOpexAKnowsScreen extends StatelessWidget {
                     _buildSectionTitle("About you"),
                     Container(
                       decoration: BoxDecoration(
-                        color: cardColor,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -98,7 +92,7 @@ class WhatOpexAKnowsScreen extends StatelessWidget {
                     _buildSectionTitle("Your learning"),
                     Container(
                       decoration: BoxDecoration(
-                        color: cardColor,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -126,7 +120,7 @@ class WhatOpexAKnowsScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: cardColor,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -159,7 +153,7 @@ class WhatOpexAKnowsScreen extends StatelessWidget {
                     _buildSectionTitle("Sharing and settings"),
                     Container(
                       decoration: BoxDecoration(
-                        color: cardColor,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
@@ -185,7 +179,7 @@ class WhatOpexAKnowsScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: cardColor,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(

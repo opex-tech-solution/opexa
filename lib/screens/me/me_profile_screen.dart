@@ -223,7 +223,11 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
                     title: "Our promises",
                     subtitle: "How we look after your data",
                     isDark: isDark,
-                    onTap: () {},
+                    onTap: () {
+                      GoRouter.of(
+                        context,
+                      ).push('${AppRoutes.mainMe}/${AppRoutes.mainOurPromise}');
+                    },
                     showDivider: false,
                   ),
                 ],
@@ -248,7 +252,11 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
                     title: "Change password",
                     subtitle: "",
                     isDark: isDark,
-                    onTap: () {},
+                    onTap: () {
+                      GoRouter.of(context).push(
+                        '${AppRoutes.mainMe}/${AppRoutes.mainChangePassword}',
+                      );
+                    },
                     showDivider: false,
                   ),
                 ],
@@ -313,7 +321,11 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
                     title: "Notifications",
                     subtitle: "Daily at 4:00 pm · quiet hours on",
                     isDark: isDark,
-                    onTap: () {},
+                    onTap: () {
+                      GoRouter.of(context).push(
+                        '${AppRoutes.mainMe}/${AppRoutes.mainMeNotificationSettings}',
+                      );
+                    },
                     showDivider: false,
                   ),
                 ],
@@ -367,7 +379,11 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
                     title: "Help and questions",
                     subtitle: "Common questions and OpexA support",
                     isDark: isDark,
-                    onTap: () {},
+                    onTap: () {
+                      GoRouter.of(context).push(
+                        '${AppRoutes.mainMe}/${AppRoutes.mainMeHelpSupport}',
+                      );
+                    },
                     showDivider: false,
                   ),
                 ],

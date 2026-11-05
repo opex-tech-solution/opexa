@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/widget.dart';
+
 class HowOpexAWorksScreen extends StatelessWidget {
   const HowOpexAWorksScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final cardColor = isDark ? const Color(0xFF382D24) : Colors.white;
 
     return Scaffold(
       body: SafeArea(
@@ -15,11 +16,17 @@ class HowOpexAWorksScreen extends StatelessWidget {
           children: [
             // Top App Bar Header
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
               child: Row(
                 children: [
                   IconButton(
-                    icon: Icon(Icons.arrow_back, color: isDark ? Colors.white70 : Colors.black87),
+                    icon: Icon(
+                      Icons.arrow_back,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
                     onPressed: () => Navigator.of(context).pop(),
                   ),
                   const SizedBox(width: 8),
@@ -56,7 +63,8 @@ class HowOpexAWorksScreen extends StatelessWidget {
                     _buildTimelineStep(
                       stepNumber: "STEP 1",
                       title: "Understand",
-                      description: "We start with you: your class, your school system, and the subjects you enjoy or find tough.",
+                      description:
+                          "We start with you: your class, your school system, and the subjects you enjoy or find tough.",
                       icon: Icons.person_outline,
                       actionText: "About you",
                       onActionTap: () {},
@@ -66,7 +74,8 @@ class HowOpexAWorksScreen extends StatelessWidget {
                     _buildTimelineStep(
                       stepNumber: "STEP 2",
                       title: "Diagnose",
-                      description: "Your first check. When something goes wrong, we ask one more question to find out why, instead of guessing.",
+                      description:
+                          "Your first check. When something goes wrong, we ask one more question to find out why, instead of guessing.",
                       icon: Icons.search,
                       subtext: "First check",
                       isDark: isDark,
@@ -74,7 +83,8 @@ class HowOpexAWorksScreen extends StatelessWidget {
                     _buildTimelineStep(
                       stepNumber: "STEP 3",
                       title: "Map",
-                      description: "Your blocks show what you can do, what’s still building, and what we’re not sure about yet.",
+                      description:
+                          "Your blocks show what you can do, what’s still building, and what we’re not sure about yet.",
                       icon: Icons.map_outlined,
                       actionText: "Map",
                       onActionTap: () {},
@@ -83,7 +93,8 @@ class HowOpexAWorksScreen extends StatelessWidget {
                     _buildTimelineStep(
                       stepNumber: "STEP 4",
                       title: "Personalise",
-                      description: "Today gives you three tracks: Foundation fixes the block that unlocks the most, Class keeps up with this week’s topic, and Stretch takes you further.",
+                      description:
+                          "Today gives you three tracks: Foundation fixes the block that unlocks the most, Class keeps up with this week’s topic, and Stretch takes you further.",
                       icon: Icons.track_changes_outlined,
                       actionText: "Today",
                       onActionTap: () {},
@@ -92,7 +103,8 @@ class HowOpexAWorksScreen extends StatelessWidget {
                     _buildTimelineStep(
                       stepNumber: "STEP 5",
                       title: "Teach",
-                      description: "Teach me explains each topic with everyday examples, worked steps and a common mistake. Tap Listen to hear it.",
+                      description:
+                          "Teach me explains each topic with everyday examples, worked steps and a common mistake. Tap Listen to hear it.",
                       icon: Icons.menu_book_outlined,
                       subtext: "Teach me",
                       isDark: isDark,
@@ -100,7 +112,8 @@ class HowOpexAWorksScreen extends StatelessWidget {
                     _buildTimelineStep(
                       stepNumber: "STEP 6",
                       title: "Practise",
-                      description: "Lessons let you have a go, with hints, before a short check on your own.",
+                      description:
+                          "Lessons let you have a go, with hints, before a short check on your own.",
                       icon: Icons.edit_outlined,
                       subtext: "Lessons",
                       isDark: isDark,
@@ -108,7 +121,8 @@ class HowOpexAWorksScreen extends StatelessWidget {
                     _buildTimelineStep(
                       stepNumber: "STEP 7",
                       title: "Measure",
-                      description: "A block only moves up when you answer fresh questions on your own: Solid, then Mastered, then Locked in a week later.",
+                      description:
+                          "A block only moves up when you answer fresh questions on your own: Solid, then Mastered, then Locked in a week later.",
                       icon: Icons.show_chart,
                       actionText: "Results and your map",
                       onActionTap: () {},
@@ -117,7 +131,8 @@ class HowOpexAWorksScreen extends StatelessWidget {
                     _buildTimelineStep(
                       stepNumber: "STEP 8",
                       title: "Adapt",
-                      description: "OpexA remembers what helps you, like starting with an example, and tries another way when something doesn’t click.",
+                      description:
+                          "OpexA remembers what helps you, like starting with an example, and tries another way when something doesn’t click.",
                       icon: Icons.auto_awesome_outlined,
                       actionText: "What helps you learn",
                       onActionTap: () {},
@@ -130,13 +145,17 @@ class HowOpexAWorksScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: cardColor,
+                        color: Theme.of(context).cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(Icons.refresh, color: Color(0xFF6B9BFA), size: 20),
+                          const Icon(
+                            Icons.refresh,
+                            color: C.iconColor,
+                            size: 20,
+                          ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
@@ -184,12 +203,10 @@ class HowOpexAWorksScreen extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE8F1FF),
+                  color: C.iconColor.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Center(
-                  child: Icon(icon, color: const Color(0xFF1B4988), size: 20),
-                ),
+                child: Center(child: Icon(icon, color: C.iconColor, size: 20)),
               ),
               if (!isLast)
                 Expanded(
@@ -259,11 +276,15 @@ class HowOpexAWorksScreen extends StatelessWidget {
                             style: const TextStyle(
                               fontSize: 13.5,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF6B9BFA),
+                              color: C.iconColor,
                             ),
                           ),
                           const SizedBox(width: 4),
-                          const Icon(Icons.chevron_right, size: 16, color: Color(0xFF6B9BFA)),
+                          const Icon(
+                            Icons.chevron_right,
+                            size: 16,
+                            color: C.iconColor,
+                          ),
                         ],
                       ),
                     ),
