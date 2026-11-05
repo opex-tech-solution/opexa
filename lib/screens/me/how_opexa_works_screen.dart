@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../theme/widget.dart';
+import '../routes/widget.dart';
 
 class HowOpexAWorksScreen extends StatelessWidget {
   const HowOpexAWorksScreen({super.key});
@@ -68,7 +70,11 @@ class HowOpexAWorksScreen extends StatelessWidget {
                           "We start with you: your class, your school system, and the subjects you enjoy or find tough.",
                       icon: Icons.person_outline,
                       actionText: "About you",
-                      onActionTap: () {},
+                      onActionTap: () {
+                        GoRouter.of(context).push(
+                          '${AppRoutes.mainMe}/${AppRoutes.mainMeHelpSupport}/${AppRoutes.mainHowOpexAWorks}/${AppRoutes.mainMeWhatOpexAKnows}',
+                        );
+                      },
                       isFirst: true,
                       isDark: isDark,
                     ),
@@ -215,7 +221,9 @@ class HowOpexAWorksScreen extends StatelessWidget {
                   color: context.colors.accent.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Center(child: Icon(icon, color: context.colors.accent, size: 20)),
+                child: Center(
+                  child: Icon(icon, color: context.colors.accent, size: 20),
+                ),
               ),
               if (!isLast)
                 Expanded(

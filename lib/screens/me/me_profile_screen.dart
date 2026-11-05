@@ -204,7 +204,11 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
                     title: "Who sees your progress",
                     subtitle: "You and Mrs Adeyemi",
                     isDark: isDark,
-                    onTap: () {},
+                    onTap: () {
+                      GoRouter.of(context).push(
+                        '${AppRoutes.mainMe}/${AppRoutes.mainMeWhoSeesProgress}',
+                      );
+                    },
                   ),
                   _buildNavTile(
                     icon: Icons.storage_outlined,

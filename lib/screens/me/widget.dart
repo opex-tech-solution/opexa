@@ -8,3 +8,5 @@ export 'how_opexa_works_screen.dart';
 export 'what_opexa_knows_school_screen.dart';
 export 'change_password_screen.dart';
 export 'our_promises_screen.dart';
+export 'what_guardian_sees_screen.dart';
+export 'who_sees_my_progress_screen.dart';
