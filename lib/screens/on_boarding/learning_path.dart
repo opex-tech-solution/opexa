@@ -138,7 +138,7 @@ class _LearningPathScreenState extends State<LearningPathScreen> {
                       GestureDetector(
                         onTap: () {
                           // Navigate to Login / Welcome Back screen
-                          Navigator.of(context).pushNamed('/login');
+                          context.push(AppRoutes.welcomeScreen);
                         },
                         child: Text(
                           "Log in",

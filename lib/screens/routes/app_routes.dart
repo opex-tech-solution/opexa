@@ -5,6 +5,7 @@ import '../../models/model.dart';
 import '../auth/widget.dart';
 import '../diagnostic/widget.dart';
 import '../home/widget.dart';
+import '../home/home_widget/today_store.dart';
 import '../me/widget.dart';
 import '../readiness/widget.dart';
 import 'main_shell.dart' as main_shell;
@@ -24,6 +25,7 @@ class AppRoutes {
 
   // authentication screens
   static const String welcomeScreen = '/welcome-screen';
+  static const String forgotPasswordScreen = '/forgot-password';
 
   // Math diagnostic check
   static const String mathDiagnostic = '/math-diagnostic';
@@ -34,6 +36,10 @@ class AppRoutes {
   static const String mainMap = '/main-map';
   static const String mainReadiness = '/main-readiness';
   static const String mainMe = '/main-me';
+  // Children of mainHome (relative, like the other child routes below).
+  static const String mainHomeNotifications = 'main-notifications';
+  static const String mainHomeNotificationSettings =
+      'main-home-notification-settings';
   static const String mainMeWhatOpexAKnows = 'main-what-opexa-knows';
   static const String mainMeNotificationSettings = 'main-notification-settings';
   static const String mainMeEditProfile = 'main-edit-profile';
@@ -123,6 +129,10 @@ class AppRouter {
         path: AppRoutes.welcomeScreen,
         builder: (context, state) => const WelcomeBackScreen(),
       ),
+      GoRoute(
+        path: AppRoutes.forgotPasswordScreen,
+        builder: (context, state) => const ResetPasswordScreen(),
+      ),
 
       // ── Math diagnostic check ───────────────────────────────────────────
       // Open with:
@@ -135,10 +145,15 @@ class AppRouter {
           final args = extra is MathFlowArgs ? extra : const MathFlowArgs();
           return MathDiagnosticScreen(
             userName: args.userName,
-            // go (not push): after the test, Back must not return into it.
-            onOpenMap: (ctx, openLearningList) => ctx.go(
-              openLearningList ? AppRoutes.mathLearningList : AppRoutes.mainMap,
-            ),
+            onOpenMap: (ctx, openLearningList) {
+              TodayStore.instance.completeFirstCheck();
+              // go (not push): after the test, Back must not return into it.
+              ctx.go(
+                openLearningList
+                    ? AppRoutes.mathLearningList
+                    : AppRoutes.mainMap,
+              );
+            },
           );
         },
       ),
@@ -155,6 +170,19 @@ class AppRouter {
               GoRoute(
                 path: AppRoutes.mainHome,
                 builder: (context, state) => HomeScreen(),
+                routes: [
+                  GoRoute(
+                    path: AppRoutes.mainHomeNotifications,
+                    builder: (context, state) => const NotificationsScreen(),
+                    routes: [
+                      GoRoute(
+                        path: AppRoutes.mainHomeNotificationSettings,
+                        builder: (context, state) =>
+                            const NotificationSettingsScreen(),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

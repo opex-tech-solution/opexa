@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-
-import 'widget.dart';
+import 'package:go_router/go_router.dart';
+import '../routes/widget.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -46,9 +46,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       );
     } else {
       // Navigates to the first step of your auth flow when "Get Started" is pressed
-      Navigator.of(context).push(
-        MaterialPageRoute(builder: (context) => const LearningPathScreen()),
-      );
+      context.go(AppRoutes.learningPath);
     }
   }
 

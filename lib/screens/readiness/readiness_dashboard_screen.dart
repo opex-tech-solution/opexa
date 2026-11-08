@@ -76,18 +76,20 @@ class ReadinessDashboardScreen extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () => Navigator.of(context).pop(),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF24488A),
-                      foregroundColor: Colors.white,
+                      backgroundColor: Theme.of(context).shadowColor,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
+                    child: Text(
                       "OK",
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Colors.black
+                            : Colors.white,
                       ),
                     ),
                   ),
@@ -139,18 +141,18 @@ class ReadinessDashboardScreen extends StatelessWidget {
                 onTap: () => _showHowStreamsWorkModal(context),
                 child: Row(
                   children: [
-                    const Icon(
+                    Icon(
                       Icons.info_outline,
                       size: 18,
-                      color: Color(0xFF6B9BFA),
+                      color: Theme.of(context).shadowColor,
                     ),
                     const SizedBox(width: 8),
-                    const Text(
+                    Text(
                       "How SS streams work",
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF6B9BFA),
+                        color: Theme.of(context).shadowColor,
                       ),
                     ),
                   ],

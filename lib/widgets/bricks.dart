@@ -12,43 +12,58 @@ class BrickFace extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = context.colors;
     final r = BorderRadius.circular(6);
     final fs = height * 0.42;
     switch (state) {
       case BrickState.unchecked:
+        return Container(
+          width: width,
+          height: height,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: c.brickNeutral,
+            borderRadius: r,
+            border: Border.all(color: c.brickNeutralBorder),
+          ),
+          child: Text(
+            '?',
+            style: TextStyle(
+              fontSize: fs,
+              fontWeight: FontWeight.w800,
+              color: c.textSecondary,
+            ),
+          ),
+        );
       case BrickState.notSure:
         return Container(
           width: width,
           height: height,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: context.colors.surface,
+            color: c.panel,
             borderRadius: r,
-            border: Border.all(color: context.colors.border),
+            border: Border.all(color: c.panelBorder),
           ),
           child: Text(
-            state == BrickState.unchecked ? '?' : '···',
+            '···',
             style: TextStyle(
               fontSize: fs,
               fontWeight: FontWeight.w800,
-              color: context.colors.textSecondary,
+              color: c.panelBorder,
             ),
           ),
         );
       case BrickState.building:
-        return Container(
+        return SizedBox(
           width: width,
           height: height,
-          decoration: BoxDecoration(
-            borderRadius: r,
-            border: Border.all(color: context.colors.border, width: 1),
-          ),
           child: ClipRRect(
             borderRadius: r,
             child: Column(
               children: [
-                Expanded(flex: 2, child: Container(color: context.colors.surface)),
-                Expanded(flex: 3, child: Container(color: context.colors.brickBuilding)),
+                Expanded(flex: 2, child: Container(color: c.brickNeutral)),
+                Expanded(flex: 3, child: Container(color: c.brickBuilding)),
               ],
             ),
           ),
@@ -57,22 +72,26 @@ class BrickFace extends StatelessWidget {
       case BrickState.mastered:
       case BrickState.lockedIn:
         final locked = state == BrickState.lockedIn;
+        final mastered = state == BrickState.mastered;
+        final fill = locked
+            ? c.brickLocked
+            : (mastered ? c.brickMastered : c.brickSolid);
+        final edge = locked
+            ? const Color(0xFFC9A28C)
+            : (mastered
+                  ? Color.lerp(c.brickMastered, Colors.black, 0.28)!
+                  : c.brickSolidEdge);
         return Container(
           width: width,
           height: height,
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: locked ? context.colors.brickLocked : context.colors.brickSolid,
+            color: fill,
             borderRadius: r,
-            boxShadow: [
-              BoxShadow(
-                color: locked ? const Color(0xFFC9A28C) : context.colors.brickSolidEdge,
-                offset: const Offset(0, 3),
-              ),
-            ],
+            boxShadow: [BoxShadow(color: edge, offset: const Offset(0, 3))],
           ),
-          child: state == BrickState.mastered
-              ? Icon(Icons.star, size: fs, color: context.colors.background)
+          child: mastered
+              ? Icon(Icons.star_outline, size: fs, color: c.onBrickMastered)
               : locked
               ? Icon(
                   Icons.lock_outline,

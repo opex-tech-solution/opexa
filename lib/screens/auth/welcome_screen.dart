@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-
-import '../on_boarding/widget.dart';
-import 'widget.dart';
+import 'package:go_router/go_router.dart';
+import 'package:opexa/screens/routes/app_routes.dart';
 
 class WelcomeBackScreen extends StatefulWidget {
   const WelcomeBackScreen({super.key});
@@ -268,18 +267,12 @@ class _WelcomeBackScreenState extends State<WelcomeBackScreen> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (context) =>
-                                    const ResetPasswordScreen(),
-                              ),
-                            );
-                          },
-                          child: const Text(
+                          onTap: () =>
+                              context.push(AppRoutes.forgotPasswordScreen),
+                          child: Text(
                             "Forgot password?",
                             style: TextStyle(
-                              color: Color(0xFF0052FF),
+                              color: Theme.of(context).shadowColor,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -298,20 +291,22 @@ class _WelcomeBackScreenState extends State<WelcomeBackScreen> {
                     width: double.infinity,
                     height: 52,
                     child: ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () => context.go(AppRoutes.mainHome),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF24488A),
-                        foregroundColor: Colors.white,
+                        backgroundColor: Theme.of(context).shadowColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
                         elevation: 0,
                       ),
-                      child: const Text(
+                      child: Text(
                         'Log in',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? Colors.black
+                              : Colors.white,
                         ),
                       ),
                     ),
@@ -329,17 +324,11 @@ class _WelcomeBackScreenState extends State<WelcomeBackScreen> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => const LearningPathScreen(),
-                            ),
-                          );
-                        },
-                        child: const Text(
+                        onTap: () => context.push(AppRoutes.learningPath),
+                        child: Text(
                           "Get started",
                           style: TextStyle(
-                            color: Color(0xFF0052FF),
+                            color: Theme.of(context).shadowColor,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

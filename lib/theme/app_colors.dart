@@ -36,6 +36,16 @@ class AppColors extends ThemeExtension<AppColors> {
     required this.brickSolid,
     required this.brickSolidEdge,
     required this.brickLocked,
+    required this.brickMastered,
+    required this.onBrickMastered,
+    required this.brickNeutral,
+    required this.brickNeutralBorder,
+    required this.trackFoundation,
+    required this.onTrackFoundation,
+    required this.trackClass,
+    required this.onTrackClass,
+    required this.trackStretch,
+    required this.onTrackStretch,
   });
 
   /// Page background (Scaffold).
@@ -44,7 +54,7 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Cards, grouped lists, option rows, segmented tracks.
   final Color surface;
 
-  /// Recessed chips and tags.
+  /// Recessed chips, tags, empty day boxes.
   final Color surfaceInset;
 
   /// Borders of interactive rows and inputs.
@@ -65,7 +75,7 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Text/icons placed on [accent].
   final Color onAccent;
 
-  /// Selected state fill (segments, option rows, nav pill).
+  /// Selected / tinted fill (segments, nav pill, "Done" chip, list icon tile).
   final Color accentContainer;
 
   /// Text/icons placed on [accentContainer].
@@ -77,19 +87,19 @@ class AppColors extends ThemeExtension<AppColors> {
   /// Disabled button text.
   final Color disabledText;
 
-  /// Orange callout card.
+  /// Warm callout fill (offline banner, "not sure" brick, orange card).
   final Color panel;
 
-  /// Border of the orange callout card.
+  /// Warm border / bell badge / warm accents.
   final Color panelBorder;
 
   /// "Your class" band behind the skill bricks.
   final Color band;
 
-  /// Skill brick: building.
+  /// Skill brick: building (lower part).
   final Color brickBuilding;
 
-  /// Skill brick: solid / mastered.
+  /// Skill brick: solid.
   final Color brickSolid;
 
   /// Skill brick: bottom edge.
@@ -97,6 +107,36 @@ class AppColors extends ThemeExtension<AppColors> {
 
   /// Skill brick: locked in.
   final Color brickLocked;
+
+  /// Skill brick: mastered.
+  final Color brickMastered;
+
+  /// Star on a mastered brick.
+  final Color onBrickMastered;
+
+  /// Skill brick: not checked / top of a building brick.
+  final Color brickNeutral;
+
+  /// Border of a not-checked brick.
+  final Color brickNeutralBorder;
+
+  /// Foundation track badge fill.
+  final Color trackFoundation;
+
+  /// Icon on the Foundation badge.
+  final Color onTrackFoundation;
+
+  /// Class track badge fill.
+  final Color trackClass;
+
+  /// Icon on the Class badge.
+  final Color onTrackClass;
+
+  /// Stretch track badge fill.
+  final Color trackStretch;
+
+  /// Icon on the Stretch badge.
+  final Color onTrackStretch;
 
   static const dark = AppColors(
     background: Color(0xFF241A10),
@@ -119,29 +159,49 @@ class AppColors extends ThemeExtension<AppColors> {
     brickSolid: Color(0xFF7EB2FC),
     brickSolidEdge: Color(0xFF5B8BDB),
     brickLocked: Color(0xFFF4CDB8),
+    brickMastered: Color(0xFFB3CCF5),
+    onBrickMastered: Color(0xFF0F1E38),
+    brickNeutral: Color(0xFF382D24),
+    brickNeutralBorder: Color(0xFF7D6C5A),
+    trackFoundation: Color(0xFF45403F),
+    onTrackFoundation: Color(0xFFC8D0DE),
+    trackClass: Color(0xFF56361A),
+    onTrackClass: Color(0xFFEADCCB),
+    trackStretch: Color(0xFF4C3756),
+    onTrackStretch: Color(0xFFC3AEE3),
   );
 
   static const light = AppColors(
     background: Color(0xFFF5EEEC),
     surface: Color(0xFFFFFFFF),
-    surfaceInset: Color(0xFFEEE7E4),
+    surfaceInset: Color(0xFFEBE0DD),
     border: Color(0xFFB8AAA3),
-    divider: Color(0xFFDCD2CE),
-    textPrimary: Color(0xFF1A1A2E),
-    textSecondary: Color(0xFF6E625C),
+    divider: Color(0xFFE3D9D5),
+    textPrimary: Color(0xFF372D23),
+    textSecondary: Color(0xFF55555A),
     accent: Color(0xFF2D58A2),
     onAccent: Color(0xFFFFFFFF),
-    accentContainer: Color(0xFFE3EDFD),
-    onAccentContainer: Color(0xFF1F4380),
+    accentContainer: Color(0xFFE4EAF6),
+    onAccentContainer: Color(0xFF2D58A2),
     disabledFill: Color(0xFFD9DDE6),
     disabledText: Color(0xFF9AA1B0),
-    panel: Color(0xFFFFE8D2),
-    panelBorder: Color(0xFFDDA066),
+    panel: Color(0xFFF6D8C6),
+    panelBorder: Color(0xFFA05A22),
     band: Color(0xFFEAE1DD),
-    brickBuilding: Color(0xFF2F66E8),
-    brickSolid: Color(0xFF7EB2FC),
-    brickSolidEdge: Color(0xFF5B8BDB),
+    brickBuilding: Color(0xFF1E72FC),
+    brickSolid: Color(0xFF1E72FC),
+    brickSolidEdge: Color(0xFF1558C8),
     brickLocked: Color(0xFFF4CDB8),
+    brickMastered: Color(0xFF2A54A2),
+    onBrickMastered: Color(0xFFFFFFFF),
+    brickNeutral: Color(0xFFE4DED8),
+    brickNeutralBorder: Color(0xFF8C7B73),
+    trackFoundation: Color(0xFFE4EAF6),
+    onTrackFoundation: Color(0xFF2D58A2),
+    trackClass: Color(0xFFF8DFCB),
+    onTrackClass: Color(0xFF9A5420),
+    trackStretch: Color(0xFFE8E2F7),
+    onTrackStretch: Color(0xFF6A4FB8),
   );
 
   @override
@@ -166,6 +226,16 @@ class AppColors extends ThemeExtension<AppColors> {
     Color? brickSolid,
     Color? brickSolidEdge,
     Color? brickLocked,
+    Color? brickMastered,
+    Color? onBrickMastered,
+    Color? brickNeutral,
+    Color? brickNeutralBorder,
+    Color? trackFoundation,
+    Color? onTrackFoundation,
+    Color? trackClass,
+    Color? onTrackClass,
+    Color? trackStretch,
+    Color? onTrackStretch,
   }) {
     return AppColors(
       background: background ?? this.background,
@@ -188,6 +258,16 @@ class AppColors extends ThemeExtension<AppColors> {
       brickSolid: brickSolid ?? this.brickSolid,
       brickSolidEdge: brickSolidEdge ?? this.brickSolidEdge,
       brickLocked: brickLocked ?? this.brickLocked,
+      brickMastered: brickMastered ?? this.brickMastered,
+      onBrickMastered: onBrickMastered ?? this.onBrickMastered,
+      brickNeutral: brickNeutral ?? this.brickNeutral,
+      brickNeutralBorder: brickNeutralBorder ?? this.brickNeutralBorder,
+      trackFoundation: trackFoundation ?? this.trackFoundation,
+      onTrackFoundation: onTrackFoundation ?? this.onTrackFoundation,
+      trackClass: trackClass ?? this.trackClass,
+      onTrackClass: onTrackClass ?? this.onTrackClass,
+      trackStretch: trackStretch ?? this.trackStretch,
+      onTrackStretch: onTrackStretch ?? this.onTrackStretch,
     );
   }
 
@@ -215,6 +295,16 @@ class AppColors extends ThemeExtension<AppColors> {
       brickSolid: Color.lerp(brickSolid, other.brickSolid, t)!,
       brickSolidEdge: Color.lerp(brickSolidEdge, other.brickSolidEdge, t)!,
       brickLocked: Color.lerp(brickLocked, other.brickLocked, t)!,
+      brickMastered: Color.lerp(brickMastered, other.brickMastered, t)!,
+      onBrickMastered: Color.lerp(onBrickMastered, other.onBrickMastered, t)!,
+      brickNeutral: Color.lerp(brickNeutral, other.brickNeutral, t)!,
+      brickNeutralBorder: Color.lerp(brickNeutralBorder, other.brickNeutralBorder, t)!,
+      trackFoundation: Color.lerp(trackFoundation, other.trackFoundation, t)!,
+      onTrackFoundation: Color.lerp(onTrackFoundation, other.onTrackFoundation, t)!,
+      trackClass: Color.lerp(trackClass, other.trackClass, t)!,
+      onTrackClass: Color.lerp(onTrackClass, other.onTrackClass, t)!,
+      trackStretch: Color.lerp(trackStretch, other.trackStretch, t)!,
+      onTrackStretch: Color.lerp(onTrackStretch, other.onTrackStretch, t)!,
     );
   }
 }

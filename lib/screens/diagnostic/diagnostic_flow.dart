@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../models/answer_result.dart';
 import '../../models/skill.dart';
+import '../../theme/widget.dart';
+import '../../widgets/widget.dart';
 import 'interstitial_screen.dart';
 import 'mcq_screen.dart';
 import 'numeric_screen.dart';
 import 'quick_fix_screen.dart';
 import 'results_screen.dart';
 import 'working_text_screen.dart';
-import '../../theme/app_colors.dart';
-import '../../widgets/bricks.dart';
-import '../../widgets/buttons.dart';
-import '../../widgets/cards.dart';
-import '../../widgets/info_widgets.dart';
 
 /// Called when the student taps "See my full map" / "See what to learn".
 /// Wire this in your router (see AppRouter in app_routes.dart).
@@ -73,10 +70,16 @@ class _DiagnosticFlowState extends State<DiagnosticFlow> {
       ),
     );
     if (leave == true && mounted) {
-      setState(() {
-        _step = sQ1;
-        _seen.clear();
-      });
+      if (Navigator.of(context).canPop()) {
+        // Opened from Today: go back there.
+        Navigator.of(context).pop();
+      } else {
+        // Opened as the first screen: nowhere to go back to, so start over.
+        setState(() {
+          _step = sQ1;
+          _seen.clear();
+        });
+      }
     }
   }
 

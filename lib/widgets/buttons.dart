@@ -2,9 +2,17 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 
 class PrimaryButton extends StatelessWidget {
-  const PrimaryButton({super.key, required this.label, this.onPressed});
+  const PrimaryButton({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.trailingIcon,
+  });
   final String label;
   final VoidCallback? onPressed;
+
+  /// Optional icon shown after the label, e.g. Icons.arrow_forward.
+  final IconData? trailingIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +29,16 @@ class PrimaryButton extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           textStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 15),
         ),
-        child: Text(label),
+        child: trailingIcon == null
+            ? Text(label)
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(label),
+                  const SizedBox(width: 8),
+                  Icon(trailingIcon, size: 18),
+                ],
+              ),
       ),
     );
   }
