@@ -127,7 +127,11 @@ class Brick extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(color: context.colors.border),
               ),
-              child: Icon(Icons.trending_up, size: 11, color: context.colors.textPrimary),
+              child: Icon(
+                Icons.trending_up,
+                size: 11,
+                color: context.colors.textPrimary,
+              ),
             ),
           ),
       ],
@@ -152,7 +156,11 @@ class Brick extends StatelessWidget {
             skill.name,
             textAlign: TextAlign.center,
             maxLines: 3,
-            style: TextStyle(fontSize: 10, color: context.colors.textSecondary, height: 1.15),
+            style: TextStyle(
+              fontSize: 10,
+              color: context.colors.textSecondary,
+              height: 1.15,
+            ),
           ),
         ],
       ),
@@ -161,9 +169,15 @@ class Brick extends StatelessWidget {
 }
 
 class SkillWall extends StatelessWidget {
-  const SkillWall({super.key, required this.data, this.highlight});
+  const SkillWall({
+    super.key,
+    required this.data,
+    this.highlight,
+    this.onSkillTap,
+  });
   final WallData data;
   final String? highlight;
+  final ValueChanged<Skill>? onSkillTap;
 
   Widget _section(
     BuildContext context,
@@ -179,7 +193,13 @@ class SkillWall extends StatelessWidget {
           children: [
             SectionLabel(title),
             const Spacer(),
-            Text(sub, style: TextStyle(fontSize: 11, color: context.colors.textSecondary)),
+            Text(
+              sub,
+              style: TextStyle(
+                fontSize: 11,
+                color: context.colors.textSecondary,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 10),
@@ -194,7 +214,10 @@ class SkillWall extends StatelessWidget {
               runSpacing: 10,
               children: [
                 for (final s in rows[r])
-                  Brick(s, highlighted: s.name == highlight),
+                  GestureDetector(
+                    onTap: onSkillTap == null ? null : () => onSkillTap!(s),
+                    child: Brick(s, highlighted: s.name == highlight),
+                  ),
               ],
             ),
           ),
@@ -277,7 +300,11 @@ class BuildNextCard extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               'Fixing this makes harder equations and word problems easier.',
-              style: TextStyle(fontSize: 12.5, color: context.colors.textSecondary, height: 1.35),
+              style: TextStyle(
+                fontSize: 12.5,
+                color: context.colors.textSecondary,
+                height: 1.35,
+              ),
             ),
           ] else ...[
             Row(

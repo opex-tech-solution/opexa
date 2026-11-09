@@ -2,13 +2,19 @@ enum BrickState { unchecked, notSure, building, solid, mastered, lockedIn }
 
 class Skill {
   const Skill(this.name, this.state, {this.trending = false});
+
   final String name;
   final BrickState state;
   final bool trending;
 }
 
 class WallData {
-  const WallData({required this.stretch, required this.klass, required this.foundations});
+  const WallData({
+    required this.stretch,
+    required this.klass,
+    required this.foundations,
+  });
+
   final List<List<Skill>> stretch;
   final List<List<Skill>> klass;
   final List<List<Skill>> foundations;
@@ -21,42 +27,49 @@ class WallData {
     }
   }
 
-  int count(BrickState s) => all.where((e) => e.state == s).length;
+  int count(BrickState state) =>
+      all.where((skill) => skill.state == state).length;
 }
 
-/// Sample data matching the recording. Replace with real data from your backend.
+/// Sample Mathematics wall based on the Map reference recording.
+/// Replace this local sample with the student's wall returned by your API.
+///
+/// In the "Now" view, two blocks are solid. The historical view shows the
+/// state immediately after the student's first check: one solid and one
+/// uncertain block.
 WallData buildWall({bool afterFirstCheck = false}) {
-  const u = BrickState.unchecked;
+  const unchecked = BrickState.unchecked;
+
   return WallData(
     stretch: const [
-      [Skill('Simultaneous equations', u)],
+      [Skill('Simultaneous equations', unchecked)],
     ],
-    klass: [
+    klass: const [
+      [
+        Skill('Harder equations', unchecked),
+        Skill('Word problems', unchecked),
+        Skill('Expanding brackets', unchecked),
+      ],
+      [Skill('Two-step equations', unchecked)],
+    ],
+    foundations: [
       const [
-        Skill('Harder equations', u),
-        Skill('Word problems', u),
-        Skill('Expanding brackets', u),
+        Skill('Substituting', unchecked),
+        Skill('Multiply & divide integers', unchecked),
+        Skill('Simplifying', unchecked),
       ],
       [
-        Skill('Two-step equations',
-            afterFirstCheck ? BrickState.solid : BrickState.building),
+        Skill(
+          'One-step equations',
+          afterFirstCheck ? BrickState.notSure : BrickState.solid,
+        ),
+        Skill('Add & subtract integers', unchecked),
+        Skill('Negative numbers', unchecked),
       ],
-    ],
-    foundations: const [
-      [
-        Skill('Substituting', u),
-        Skill('Multiply & divide integers', u),
-        Skill('Simplifying', u),
-      ],
-      [
-        Skill('One-step equations', BrickState.solid),
-        Skill('Add & subtract integers', BrickState.solid),
-        Skill('Negative numbers', u),
-      ],
-      [
-        Skill('Order of operations', u),
+      const [
+        Skill('Order of operations', unchecked),
         Skill('Letters for numbers', BrickState.solid, trending: true),
-        Skill('Whole numbers', u),
+        Skill('Whole numbers', unchecked),
       ],
     ],
   );

@@ -61,7 +61,10 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                       const SizedBox(width: 4),
                       const Text(
                         'Notifications',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
                     ],
                   ),
@@ -147,12 +150,19 @@ class _NotificationCard extends StatelessWidget {
               children: [
                 Text(
                   item.title,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   item.body,
-                  style: TextStyle(fontSize: 14, height: 1.35, color: c.textSecondary),
+                  style: TextStyle(
+                    fontSize: 14,
+                    height: 1.35,
+                    color: c.textSecondary,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 Text(
@@ -185,7 +195,7 @@ class _EmptyCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          const _EmptyIllustration(),
+          Image.asset('assets/images/Illustration.png'),
           const SizedBox(height: 16),
           const Text(
             'Nothing new',
@@ -196,62 +206,11 @@ class _EmptyCard extends StatelessWidget {
             'Quick checks that are due, messages from your teacher and replies '
             'from OpexA show up here.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, height: 1.45, color: c.textSecondary),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// A simple drawn stand-in for the empty-state artwork (bell, sparkle, blocks).
-/// Swap for an Image.asset when you have the final illustration.
-class _EmptyIllustration extends StatelessWidget {
-  const _EmptyIllustration();
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-
-    Widget tile(IconData icon, {double size = 40, Color? fill, Color? glyph}) {
-      return Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          color: fill ?? c.surfaceInset,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: c.divider),
-        ),
-        child: Icon(icon, size: size * 0.5, color: glyph ?? c.textSecondary),
-      );
-    }
-
-    return SizedBox(
-      width: 220,
-      height: 130,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 210,
-            height: 100,
-            decoration: BoxDecoration(
-              color: c.band,
-              borderRadius: BorderRadius.circular(50),
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.45,
+              color: c.textSecondary,
             ),
-          ),
-          Positioned(left: 22, top: 8, child: tile(Icons.auto_awesome, size: 34)),
-          Positioned(top: 0, child: tile(Icons.notifications_none_outlined, size: 56)),
-          Positioned(right: 24, top: 22, child: tile(Icons.check, size: 34)),
-          Positioned(
-            left: 50,
-            bottom: 4,
-            child: tile(Icons.question_mark, size: 40, fill: c.brickSolid, glyph: c.onAccent),
-          ),
-          Positioned(
-            right: 56,
-            bottom: 4,
-            child: tile(Icons.star, size: 40, fill: c.brickSolid, glyph: c.onAccent),
           ),
         ],
       ),

@@ -236,7 +236,7 @@ class _HowMapWorksSheetState extends State<HowMapWorksSheet> {
             ),
             const SizedBox(height: 18),
             SizedBox(
-              height: 350,
+              height: _page == 0 ? 250 : 350,
               child: PageView(
                 controller: _pc,
                 onPageChanged: (i) => setState(() => _page = i),
@@ -266,9 +266,12 @@ class _HowMapWorksSheetState extends State<HowMapWorksSheet> {
               onPressed: _next,
             ),
             if (_page < 2)
-              LinkButton(label: 'Skip', onPressed: () => Navigator.pop(context))
-            else
-              const SizedBox(height: 48),
+              LinkButton(
+                label: 'Skip',
+                onPressed: () => Navigator.pop(context),
+              ),
+            /* else
+              const SizedBox(height: 48), */
           ],
         ),
       ),

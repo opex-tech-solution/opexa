@@ -6,6 +6,7 @@ import '../auth/widget.dart';
 import '../diagnostic/widget.dart';
 import '../home/widget.dart';
 import '../home/home_widget/today_store.dart';
+import '../map/widget.dart';
 import '../me/widget.dart';
 import '../readiness/widget.dart';
 import 'main_shell.dart' as main_shell;
@@ -51,6 +52,9 @@ class AppRoutes {
   static const String mainMeWhoSeesProgress = 'main-who-sees-progress';
   static const String mainMeWhatGuardianSees = 'main-what-guradian-sees';
   static const String mainReadinessScience = 'main-readiness-science';
+  static const String mainMapBlockDetails = 'main-map-block-details';
+  static const String mainMapWhyThisBlock = 'main-map-why-this-block';
+  static const String mainMapTopicScreen = 'main-map-topic';
 
   // Opened above the bottom bar, from the Map tab. It is a child of mainMap in
   // the router below, so its path starts with mainMap.
@@ -202,6 +206,25 @@ class AppRouter {
                     // Show above the bottom bar, not inside the tab.
                     parentNavigatorKey: _rootKey,
                     builder: (context, state) => const MathLearningListScreen(),
+                  ),
+                  GoRoute(
+                    path: AppRoutes.mainMapTopicScreen,
+                    builder: (context, state) {
+                      final topic = state.extra is String
+                          ? state.extra as String
+                          : '';
+                      return TopicScreen(topic: topic);
+                    },
+                  ),
+                  GoRoute(
+                    path: AppRoutes.mainMapBlockDetails,
+                    builder: (context, state) => const BlockDetailDeepScreen(),
+                    routes: [
+                      GoRoute(
+                        path: AppRoutes.mainMapWhyThisBlock,
+                        builder: (context, state) => const WhyThisBlockScreen(),
+                      ),
+                    ],
                   ),
                 ],
               ),
