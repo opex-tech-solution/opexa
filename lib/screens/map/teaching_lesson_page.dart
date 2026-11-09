@@ -54,30 +54,77 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
   int? _selectedAnswer;
   bool _complete = false;
   bool _isSpeaking = false;
+  bool _speechReady = false;
+  bool _speechInitializing = true;
+  String? _speechError;
   final TextToSpeechService _speech = TextToSpeechService();
 
   @override
   void initState() {
     super.initState();
-    _speech.initialize(
-      onStart: () {
-        if (mounted) setState(() => _isSpeaking = true);
-      },
-      onComplete: () {
-        if (mounted) setState(() => _isSpeaking = false);
-      },
-      onError: (message) {
-        if (mounted) setState(() => _isSpeaking = false);
-      },
-    ).catchError((Object error) {
-      if (mounted) setState(() => _isSpeaking = false);
-    });
+    unawaited(_initializeSpeech());
+  }
+
+  /// Set up the device TTS engine once for this lesson page.
+  ///
+  /// The service callbacks are the source of truth for native playback events.
+  /// The page also updates [_isSpeaking] optimistically when the student taps
+  /// Listen so the button changes to Stop without waiting for the native event.
+  Future<void> _initializeSpeech() async {
+    try {
+      await _speech.initialize(
+        onStart: () {
+          if (!mounted) return;
+          setState(() {
+            _isSpeaking = true;
+            _speechError = null;
+          });
+        },
+        onComplete: () {
+          if (!mounted) return;
+          setState(() => _isSpeaking = false);
+        },
+        onError: (message) {
+          if (!mounted) return;
+          setState(() {
+            _isSpeaking = false;
+            _speechError = message;
+          });
+        },
+      );
+
+      if (!mounted) return;
+      setState(() {
+        _speechReady = true;
+        _speechInitializing = false;
+        _speechError = null;
+      });
+    } catch (error, stackTrace) {
+      debugPrint('TTS initialization failed: $error\n$stackTrace');
+      if (!mounted) return;
+      setState(() {
+        _speechReady = false;
+        _speechInitializing = false;
+        _isSpeaking = false;
+        _speechError = error.toString();
+      });
+    }
   }
 
   @override
   void dispose() {
-    unawaited(_speech.dispose());
+    // Stop and release the native TTS engine without leaving an unhandled
+    // asynchronous error during route changes or app shutdown.
+    unawaited(_disposeSpeechSafely());
     super.dispose();
+  }
+
+  Future<void> _disposeSpeechSafely() async {
+    try {
+      await _speech.dispose();
+    } catch (error, stackTrace) {
+      debugPrint('TTS disposal failed: $error\n$stackTrace');
+    }
   }
 
   bool get _isWholeNumbers =>
@@ -86,8 +133,8 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
   String get _topicName => _isWholeNumbers
       ? 'whole numbers'
       : widget.skill.name.toLowerCase().contains('simultaneous')
-          ? 'simultaneous equations'
-          : widget.skill.name.toLowerCase();
+      ? 'simultaneous equations'
+      : widget.skill.name.toLowerCase();
 
   List<_LessonStep> _buildSteps(Skill skill) {
     if (skill.name.toLowerCase().contains('whole number')) {
@@ -200,7 +247,10 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
             _WorkedStep('1   Take the second equation from the first', 'x = 4'),
             _WorkedStep('2   Put x = 4 into the second equation', '4 + y = 7'),
             _WorkedStep('3   Take 4 from both sides', 'y = 3'),
-            _WorkedStep('4   Check: 2 × 4 + 3 = 11', 'It works in the first equation too.'),
+            _WorkedStep(
+              '4   Check: 2 × 4 + 3 = 11',
+              'It works in the first equation too.',
+            ),
           ],
         ),
         _LessonStep(
@@ -253,10 +303,19 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
         title: 'Work through an example',
         body: 'Take your time and follow each step in order.',
         workedSteps: const [
-          _WorkedStep('1   Read the question', 'Identify the information you already have.'),
-          _WorkedStep('2   Choose a method', 'Use the rule that fits this problem.'),
+          _WorkedStep(
+            '1   Read the question',
+            'Identify the information you already have.',
+          ),
+          _WorkedStep(
+            '2   Choose a method',
+            'Use the rule that fits this problem.',
+          ),
           _WorkedStep('3   Work it out', 'Complete the calculation carefully.'),
-          _WorkedStep('4   Check your answer', 'Make sure the result makes sense.'),
+          _WorkedStep(
+            '4   Check your answer',
+            'Make sure the result makes sense.',
+          ),
         ],
       ),
       _LessonStep(
@@ -292,10 +351,22 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
     ];
   }
 
-  void _next() {
-    unawaited(_speech.stop());
+  Future<void> _stopSpeaking() async {
+    try {
+      await _speech.stop();
+    } catch (error, stackTrace) {
+      debugPrint('TTS stop failed: $error\n$stackTrace');
+    } finally {
+      if (mounted) setState(() => _isSpeaking = false);
+    }
+  }
+
+  Future<void> _next() async {
     final current = _steps[_stepIndex];
     if (current.question != null && _selectedAnswer == null) return;
+
+    if (_isSpeaking) await _stopSpeaking();
+    if (!mounted) return;
 
     if (_stepIndex == _steps.length - 1) {
       setState(() => _complete = true);
@@ -307,22 +378,38 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
     }
   }
 
-  void _back() {
-    unawaited(_speech.stop());
+  Future<void> _back() async {
     if (_complete) {
+      if (_isSpeaking) await _stopSpeaking();
+      if (!mounted) return;
       setState(() => _complete = false);
       return;
     }
+
     if (_stepIndex == 0) return;
+
+    if (_isSpeaking) await _stopSpeaking();
+    if (!mounted) return;
+
     setState(() {
       _stepIndex--;
       _selectedAnswer = null;
     });
   }
 
+  Future<void> _closeLesson() async {
+    if (_isSpeaking) await _stopSpeaking();
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
+
   String _speechTextForCurrentStep() {
     final step = _steps[_stepIndex];
-    final parts = <String>[step.section, step.question ?? step.title, step.body];
+    final parts = <String>[
+      step.section,
+      step.question ?? step.title,
+      step.body,
+    ];
 
     if (step.equation != null) {
       parts.add('Example. ${_makeSymbolsSpeakable(step.equation!)}');
@@ -342,7 +429,9 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
         parts.add('${String.fromCharCode(65 + i)}. ${step.options[i]}');
       }
       if (_selectedAnswer != null) {
-        parts.add(_selectedAnswer == step.answerIndex ? 'That is right.' : 'Not quite.');
+        parts.add(
+          _selectedAnswer == step.answerIndex ? 'That is right.' : 'Not quite.',
+        );
         if (step.answerExplanation?.isNotEmpty == true) {
           parts.add(step.answerExplanation!);
         }
@@ -367,25 +456,67 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
   }
 
   Future<void> _listen() async {
+    // The same button acts as Listen and Stop.
     if (_isSpeaking) {
-      await _speech.stop();
-      if (mounted) setState(() => _isSpeaking = false);
+      await _stopSpeaking();
       return;
     }
 
+    if (_speechInitializing) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Preparing audio. Please try again shortly.'),
+        ),
+      );
+      return;
+    }
+
+    if (!_speechReady) {
+      final message = _speechError == null || _speechError!.trim().isEmpty
+          ? 'Text-to-speech could not be initialized. Check that your device has a speech engine and an installed voice.'
+          : 'Text-to-speech is unavailable: $_speechError';
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+      return;
+    }
+
+    final textToRead = _speechTextForCurrentStep();
+    if (textToRead.trim().isEmpty) return;
+
+    // Update the UI immediately. Native onStart/onComplete/onError callbacks
+    // keep this flag synchronized with the device's actual playback state.
+    setState(() {
+      _isSpeaking = true;
+      _speechError = null;
+    });
+
     try {
-      await _speech.speak(_speechTextForCurrentStep());
-      if (mounted) setState(() => _isSpeaking = false);
-    } catch (_) {
+      // TextToSpeechService is configured with awaitSpeakCompletion(true),
+      // so this future completes when playback finishes or is cancelled.
+      await _speech.speak(textToRead);
+    } catch (error, stackTrace) {
+      debugPrint('TTS playback failed: $error\n$stackTrace');
       if (!mounted) return;
-      setState(() => _isSpeaking = false);
+
+      setState(() {
+        _isSpeaking = false;
+        _speechError = error.toString();
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text(
-            'Text-to-speech is unavailable. Check that your device has a speech engine and voice installed.',
+            'Could not read this lesson aloud. Check your device TTS engine and voice settings.',
           ),
         ),
       );
+    } finally {
+      // With awaitSpeakCompletion enabled, speak() returns after the utterance
+      // has ended. The native completion callback may already have reset it.
+      if (mounted && _isSpeaking) {
+        setState(() => _isSpeaking = false);
+      }
     }
   }
 
@@ -397,7 +528,7 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
         Row(
           children: [
             IconButton(
-              onPressed: () => Navigator.of(context).pop(),
+              onPressed: _closeLesson,
               icon: const Icon(Icons.close),
               tooltip: 'Close lesson',
             ),
@@ -439,7 +570,7 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
 
   Widget _listenPill() {
     return InkWell(
-      onTap: _listen,
+      onTap: _speechInitializing ? null : _listen,
       borderRadius: BorderRadius.circular(24),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -451,13 +582,17 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              _isSpeaking ? Icons.stop_circle_outlined : Icons.volume_up_outlined,
+              _isSpeaking
+                  ? Icons.stop_circle_outlined
+                  : Icons.volume_up_outlined,
               size: 16,
               color: context.colors.onAccentContainer,
             ),
             const SizedBox(width: 5),
             Text(
-              _isSpeaking ? 'Stop' : 'Listen',
+              _speechInitializing
+                  ? 'Preparing'
+                  : (_isSpeaking ? 'Stop' : 'Listen'),
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
@@ -601,7 +736,10 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
               borderRadius: BorderRadius.circular(10),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: selected == i
                       ? context.colors.accentContainer
@@ -623,10 +761,16 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: context.colors.border),
-                        color: selected == i ? context.colors.accent : Colors.transparent,
+                        color: selected == i
+                            ? context.colors.accent
+                            : Colors.transparent,
                       ),
                       child: selected == i
-                          ? Icon(Icons.check, size: 14, color: context.colors.onAccent)
+                          ? Icon(
+                              Icons.check,
+                              size: 14,
+                              color: context.colors.onAccent,
+                            )
                           : Text(
                               String.fromCharCode(65 + i),
                               style: TextStyle(
@@ -640,7 +784,10 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
                     Expanded(
                       child: Text(
                         step.options[i],
-                        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ],
@@ -654,10 +801,14 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
             width: double.infinity,
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: isCorrect ? context.colors.accentContainer : context.colors.panel,
+              color: isCorrect
+                  ? context.colors.accentContainer
+                  : context.colors.panel,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: isCorrect ? context.colors.accent : context.colors.panelBorder,
+                color: isCorrect
+                    ? context.colors.accent
+                    : context.colors.panelBorder,
               ),
             ),
             child: Column(
@@ -665,7 +816,10 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
               children: [
                 Text(
                   isCorrect ? 'That is right' : 'Not quite',
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
@@ -706,14 +860,15 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
         const SizedBox(height: 18),
         Text(
           step.question ?? step.title,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, height: 1.2),
+          style: const TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            height: 1.2,
+          ),
         ),
         const SizedBox(height: 14),
         if (step.question == null)
-          Text(
-            step.body,
-            style: const TextStyle(fontSize: 14, height: 1.55),
-          )
+          Text(step.body, style: const TextStyle(fontSize: 14, height: 1.55))
         else
           Text(
             step.body,
@@ -748,8 +903,9 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
   }
 
   Widget _doneBody() {
-    final isSimultaneous =
-        widget.skill.name.toLowerCase().contains('simultaneous');
+    final isSimultaneous = widget.skill.name.toLowerCase().contains(
+      'simultaneous',
+    );
     return Center(
       child: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(24, 24, 24, 32),
@@ -770,14 +926,26 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
                   Positioned(
                     left: 30,
                     bottom: 20,
-                    child: Icon(Icons.auto_awesome, color: context.colors.accent, size: 24),
+                    child: Icon(
+                      Icons.auto_awesome,
+                      color: context.colors.accent,
+                      size: 24,
+                    ),
                   ),
                   Positioned(
                     right: 28,
                     top: 20,
-                    child: Icon(Icons.star_outline, color: context.colors.accent, size: 24),
+                    child: Icon(
+                      Icons.star_outline,
+                      color: context.colors.accent,
+                      size: 24,
+                    ),
                   ),
-                  Icon(Icons.menu_book_rounded, color: context.colors.accent, size: 48),
+                  Icon(
+                    Icons.menu_book_rounded,
+                    color: context.colors.accent,
+                    size: 48,
+                  ),
                 ],
               ),
             ),
@@ -785,7 +953,11 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
             Text(
               'You have learned ${isSimultaneous ? 'simultaneous equations' : _topicName}',
               textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800, height: 1.2),
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                height: 1.2,
+              ),
             ),
             const SizedBox(height: 12),
             Text(
@@ -800,7 +972,10 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
             const SizedBox(height: 18),
             Text(
               'About 8 minutes · Works offline',
-              style: TextStyle(fontSize: 12, color: context.colors.textSecondary),
+              style: TextStyle(
+                fontSize: 12,
+                color: context.colors.textSecondary,
+              ),
             ),
           ],
         ),
@@ -834,9 +1009,8 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
                             onPressed: () {
                               Navigator.of(context, rootNavigator: true).push(
                                 MaterialPageRoute<void>(
-                                  builder: (_) => QuickPracticeScreen(
-                                    skill: widget.skill,
-                                  ),
+                                  builder: (_) =>
+                                      QuickPracticeScreen(skill: widget.skill),
                                 ),
                               );
                             },
@@ -881,8 +1055,10 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
                               minimumSize: const Size.fromHeight(52),
                               backgroundColor: context.colors.accent,
                               foregroundColor: context.colors.onAccent,
-                              disabledBackgroundColor: context.colors.disabledFill,
-                              disabledForegroundColor: context.colors.disabledText,
+                              disabledBackgroundColor:
+                                  context.colors.disabledFill,
+                              disabledForegroundColor:
+                                  context.colors.disabledText,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -918,35 +1094,11 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
   int? _selected;
   int _correct = 0;
   bool _complete = false;
-  bool _isSpeaking = false;
-  final TextToSpeechService _speech = TextToSpeechService();
 
-  @override
-  void initState() {
-    super.initState();
-    _speech.initialize(
-      onStart: () {
-        if (mounted) setState(() => _isSpeaking = true);
-      },
-      onComplete: () {
-        if (mounted) setState(() => _isSpeaking = false);
-      },
-      onError: (message) {
-        if (mounted) setState(() => _isSpeaking = false);
-      },
-    ).catchError((Object error) {
-      if (mounted) setState(() => _isSpeaking = false);
-    });
-  }
-
-  @override
-  void dispose() {
-    unawaited(_speech.dispose());
-    super.dispose();
-  }
-
-  List<({String question, List<String> options, int answer, String explanation})>
-      get _questions {
+  List<
+    ({String question, List<String> options, int answer, String explanation})
+  >
+  get _questions {
     if (widget.skill.name.toLowerCase().contains('whole number')) {
       return const [
         (
@@ -971,13 +1123,15 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
           question: 'What does the zero show in 2,306?',
           options: ['No thousands', 'No hundreds', 'No tens', 'No ones'],
           answer: 2,
-          explanation: 'The zero holds the tens place because there are no tens.',
+          explanation:
+              'The zero holds the tens place because there are no tens.',
         ),
       ];
     }
 
     final skillName = widget.skill.name.toLowerCase();
-    final isEquationSkill = skillName.contains('equation') ||
+    final isEquationSkill =
+        skillName.contains('equation') ||
         skillName.contains('letter') ||
         skillName.contains('substitut');
 
@@ -997,7 +1151,12 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
         ),
         (
           question: 'What should you do after finding x?',
-          options: ['Stop', 'Find y and check both equations', 'Change the values', 'Ignore the second equation'],
+          options: [
+            'Stop',
+            'Find y and check both equations',
+            'Change the values',
+            'Ignore the second equation',
+          ],
           answer: 1,
           explanation: 'Both unknowns must satisfy both equations.',
         ),
@@ -1012,28 +1171,53 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
 
     return const [
       (
-        question: 'What should you do first when a maths question feels difficult?',
-        options: ['Read it and identify what is given', 'Guess immediately', 'Skip the working', 'Ignore the question'],
+        question:
+            'What should you do first when a maths question feels difficult?',
+        options: [
+          'Read it and identify what is given',
+          'Guess immediately',
+          'Skip the working',
+          'Ignore the question',
+        ],
         answer: 0,
-        explanation: 'Read carefully first so you know what information you have.',
+        explanation:
+            'Read carefully first so you know what information you have.',
       ),
       (
         question: 'Why is it useful to show your steps?',
-        options: ['It makes the page longer', 'It helps you check your reasoning', 'It hides mistakes', 'It changes the question'],
+        options: [
+          'It makes the page longer',
+          'It helps you check your reasoning',
+          'It hides mistakes',
+          'It changes the question',
+        ],
         answer: 1,
-        explanation: 'Showing your steps helps you follow your reasoning and spot mistakes.',
+        explanation:
+            'Showing your steps helps you follow your reasoning and spot mistakes.',
       ),
       (
         question: 'What should you do after finding an answer?',
-        options: ['Stop without checking', 'Check that it makes sense', 'Erase the working', 'Change the numbers'],
+        options: [
+          'Stop without checking',
+          'Check that it makes sense',
+          'Erase the working',
+          'Change the numbers',
+        ],
         answer: 1,
-        explanation: 'A quick check helps confirm that your answer fits the question.',
+        explanation:
+            'A quick check helps confirm that your answer fits the question.',
       ),
       (
         question: 'What can help when you are not sure how to start?',
-        options: ['A worked example or hint', 'Skipping every lesson', 'Choosing a random answer', 'Giving up'],
+        options: [
+          'A worked example or hint',
+          'Skipping every lesson',
+          'Choosing a random answer',
+          'Giving up',
+        ],
         answer: 0,
-        explanation: 'A worked example or hint can help you understand the first step.',
+        explanation:
+            'A worked example or hint can help you understand the first step.',
       ),
     ];
   }
@@ -1070,7 +1254,11 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.emoji_events_outlined, size: 64, color: colors.accent),
+                Icon(
+                  Icons.emoji_events_outlined,
+                  size: 64,
+                  color: colors.accent,
+                ),
                 const SizedBox(height: 18),
                 const Text(
                   'Good work!',
@@ -1085,7 +1273,8 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: FilledButton(
-                    onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+                    onPressed: () =>
+                        Navigator.of(context, rootNavigator: true).pop(),
                     child: const Text('Back to your lesson'),
                   ),
                 ),
@@ -1118,7 +1307,11 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
           const SizedBox(height: 24),
           Text(
             question.question,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w800, height: 1.3),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+              height: 1.3,
+            ),
           ),
           const SizedBox(height: 18),
           for (var i = 0; i < question.options.length; i++)
@@ -1130,7 +1323,9 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: _selected == i ? colors.accentContainer : colors.surface,
+                    color: _selected == i
+                        ? colors.accentContainer
+                        : colors.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: _selected == i ? colors.accent : colors.border,
@@ -1140,7 +1335,10 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
                     children: [
                       Expanded(child: Text(question.options[i])),
                       if (_selected == i)
-                        Icon(Icons.check_circle, color: colors.onAccentContainer),
+                        Icon(
+                          Icons.check_circle,
+                          color: colors.onAccentContainer,
+                        ),
                     ],
                   ),
                 ),
@@ -1172,7 +1370,9 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
             width: double.infinity,
             child: FilledButton(
               onPressed: _selected == null ? null : _next,
-              child: Text(_index == _questions.length - 1 ? 'Finish practice' : 'Next'),
+              child: Text(
+                _index == _questions.length - 1 ? 'Finish practice' : 'Next',
+              ),
             ),
           ),
         ],

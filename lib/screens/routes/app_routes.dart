@@ -54,7 +54,9 @@ class AppRoutes {
   static const String mainReadinessScience = 'main-readiness-science';
   static const String mainMapBlockDetails = 'main-map-block-details';
   static const String mainMapWhyThisBlock = 'main-map-why-this-block';
-  static const String mainMapTopicScreen = 'main-map-topic';
+  static const String mainMapLearningLearningScreen =
+      'main-map-learning-lesson';
+  static const String mainMapSkillDetails = 'main-map-skill-details';
 
   // Opened above the bottom bar, from the Map tab. It is a child of mainMap in
   // the router below, so its path starts with mainMap.
@@ -208,13 +210,34 @@ class AppRouter {
                     builder: (context, state) => const MathLearningListScreen(),
                   ),
                   GoRoute(
-                    path: AppRoutes.mainMapTopicScreen,
+                    path: AppRoutes.mainMapSkillDetails,
                     builder: (context, state) {
-                      final topic = state.extra is String
-                          ? state.extra as String
-                          : '';
-                      return TopicScreen(topic: topic);
+                      final skill = state.extra is Skill
+                          ? state.extra as Skill
+                          : Skill(
+                              state.extra is String
+                                  ? state.extra as String
+                                  : '',
+                              BrickState.unchecked,
+                            );
+                      return SkillDetailPage(skill: skill);
                     },
+                    routes: [
+                      GoRoute(
+                        path: AppRoutes.mainMapLearningLearningScreen,
+                        builder: (context, state) {
+                          final skill = state.extra is Skill
+                              ? state.extra as Skill
+                              : Skill(
+                                  state.extra is String
+                                      ? state.extra as String
+                                      : '',
+                                  BrickState.unchecked,
+                                );
+                          return TeachingLessonPage(skill: skill);
+                        },
+                      ),
+                    ],
                   ),
                   GoRoute(
                     path: AppRoutes.mainMapBlockDetails,

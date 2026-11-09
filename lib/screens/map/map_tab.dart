@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../models/skill.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/bricks.dart';
 import '../../widgets/cards.dart';
 import '../../widgets/info_widgets.dart';
+import '../routes/widget.dart';
 import 'widget.dart';
 
 /// Main content for the Map bottom-navigation tab.
@@ -26,10 +28,9 @@ class _MapTabState extends State<MapTab> {
   bool _afterFirstCheck = false;
 
   void _openSkill(Skill skill) {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(
-        builder: (_) => SkillDetailPage(skill: skill),
-      ),
+    context.push(
+      '${AppRoutes.mainMap}/${AppRoutes.mainMapSkillDetails}',
+      extra: skill,
     );
   }
 

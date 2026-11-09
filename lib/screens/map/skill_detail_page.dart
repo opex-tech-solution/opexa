@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:iconsax/iconsax.dart';
 
 import '../../models/skill.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/bricks.dart';
 import '../../widgets/cards.dart';
 import '../../widgets/info_widgets.dart';
-import 'teaching_lesson_page.dart';
+import '../routes/widget.dart';
 
 class _SkillDetails {
   const _SkillDetails({
@@ -52,7 +54,8 @@ const Map<String, _SkillDetails> _skillDetails = {
   ),
   'Two-step equations': _SkillDetails(
     description: 'Solving equations that need two inverse operations',
-    evidence: 'Your recent answers show that the order of the two steps needs practice.',
+    evidence:
+        'Your recent answers show that the order of the two steps needs practice.',
     needs: ['One-step equations', 'Negative numbers'],
     unlocks: ['Harder equations', 'Word problems', 'Simultaneous equations'],
     supports: 'General Mathematics, Physics and Economics',
@@ -60,7 +63,8 @@ const Map<String, _SkillDetails> _skillDetails = {
   ),
   'Simultaneous equations': _SkillDetails(
     description: 'Solving two equations together to find two unknown values',
-    evidence: 'This block is used when two facts share the same unknown values.',
+    evidence:
+        'This block is used when two facts share the same unknown values.',
     needs: ['Letters for numbers', 'One-step equations'],
     unlocks: ['Word problems', 'Harder equations'],
     supports: 'General Mathematics, Physics and Economics',
@@ -73,10 +77,12 @@ class SkillDetailPage extends StatelessWidget {
 
   final Skill skill;
 
-  _SkillDetails get _details => _skillDetails[skill.name] ??
+  _SkillDetails get _details =>
+      _skillDetails[skill.name] ??
       const _SkillDetails(
         description: 'A building block in your Mathematics learning map.',
-        evidence: 'We will use your lesson and practice answers to check this skill.',
+        evidence:
+            'We will use your lesson and practice answers to check this skill.',
         needs: [],
         unlocks: [],
         supports: 'General Mathematics',
@@ -164,10 +170,9 @@ class SkillDetailPage extends StatelessWidget {
   }
 
   void _openTeaching(BuildContext context) {
-    Navigator.of(context, rootNavigator: true).push(
-      MaterialPageRoute<void>(
-        builder: (_) => TeachingLessonPage(skill: skill),
-      ),
+    context.push(
+      '${AppRoutes.mainMap}/${AppRoutes.mainMapSkillDetails}/${AppRoutes.mainMapLearningLearningScreen}',
+      extra: skill,
     );
   }
 
@@ -190,8 +195,8 @@ class SkillDetailPage extends StatelessWidget {
                 child: Column(
                   children: [
                     Container(
-                      width: 26,
-                      height: 26,
+                      width: 20,
+                      height: 20,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: i < _progressIndex
@@ -208,15 +213,15 @@ class SkillDetailPage extends StatelessWidget {
                       child: i < _progressIndex
                           ? Icon(Icons.check, size: 15, color: colors.onAccent)
                           : i == _progressIndex
-                              ? Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: colors.accent,
-                                    shape: BoxShape.circle,
-                                  ),
-                                )
-                              : null,
+                          ? Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: colors.accent,
+                                shape: BoxShape.circle,
+                              ),
+                            )
+                          : null,
                     ),
                     const SizedBox(height: 6),
                     Text(
@@ -224,7 +229,7 @@ class SkillDetailPage extends StatelessWidget {
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       style: TextStyle(
-                        fontSize: 9,
+                        fontSize: 8,
                         height: 1.1,
                         color: colors.textSecondary,
                       ),
@@ -294,7 +299,8 @@ class SkillDetailPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 BrickFace(
-                  name == 'One-step equations' && skill.state == BrickState.solid
+                  name == 'One-step equations' &&
+                          skill.state == BrickState.solid
                       ? BrickState.solid
                       : BrickState.unchecked,
                   width: 84,
@@ -320,7 +326,10 @@ class SkillDetailPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800)),
+        Text(
+          title,
+          style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w800),
+        ),
         const SizedBox(height: 10),
         child,
       ],
@@ -404,7 +413,7 @@ class SkillDetailPage extends StatelessWidget {
             width: double.infinity,
             child: FilledButton.icon(
               onPressed: () => _openTeaching(context),
-              icon: const Icon(Icons.menu_book_outlined),
+              icon: const Icon(Iconsax.book_1, weight: 2.0),
               label: Text(_actionLabel),
               style: FilledButton.styleFrom(
                 backgroundColor: context.colors.accent,
@@ -415,7 +424,7 @@ class SkillDetailPage extends StatelessWidget {
                 ),
                 textStyle: const TextStyle(
                   fontSize: 15,
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
@@ -447,11 +456,7 @@ class SkillDetailPage extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 22),
-          _textPanel(
-            context,
-            'Needs',
-            _relatedSkills(context, details.needs),
-          ),
+          _textPanel(context, 'Needs', _relatedSkills(context, details.needs)),
           const SizedBox(height: 22),
           _textPanel(
             context,
@@ -475,10 +480,7 @@ class SkillDetailPage extends StatelessWidget {
           const SizedBox(height: 18),
           Text(
             details.usuallyMet,
-            style: TextStyle(
-              fontSize: 12,
-              color: context.colors.textSecondary,
-            ),
+            style: TextStyle(fontSize: 12, color: context.colors.textSecondary),
           ),
         ],
       ),
