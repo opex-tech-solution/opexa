@@ -1,0 +1,146 @@
+[
+  {
+    "map_label": "Substituting",
+    "topic_id": "substitution",
+    "map_group": "foundations",
+    "map_band": "Blocks from earlier years",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "substitution-check-01"
+  },
+  {
+    "map_label": "Simultaneous equations",
+    "topic_id": "simultaneous_equations",
+    "map_group": "stretch",
+    "map_band": "Stretch",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "simultaneous-check-01"
+  },
+  {
+    "map_label": "Quadratic equations",
+    "topic_id": "quadratic_equations",
+    "map_group": "stretch",
+    "map_band": "Stretch",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "quadratic-check-01"
+  },
+  {
+    "map_label": "Add & subtract integers",
+    "topic_id": "addition_subtraction_integers",
+    "map_group": "foundations",
+    "map_band": "Blocks from earlier years",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "integers-add-sub-check-01"
+  },
+  {
+    "map_label": "Expanding brackets",
+    "topic_id": "expanding_brackets",
+    "map_group": "your_class",
+    "map_band": "JSS2 blocks",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "expanding-check-01"
+  },
+  {
+    "map_label": "Multiply & divide integers",
+    "topic_id": "multiplying_dividing_integers",
+    "map_group": "foundations",
+    "map_band": "Blocks from earlier years",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "multiply-divide-check-01"
+  },
+  {
+    "map_label": "Inequalities",
+    "topic_id": "inequalities",
+    "map_group": "stretch",
+    "map_band": "Stretch",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "inequalities-check-01"
+  },
+  {
+    "map_label": "Harder equations",
+    "topic_id": "harder_equations",
+    "map_group": "your_class",
+    "map_band": "JSS2 blocks",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "harder-equations-check-01"
+  },
+  {
+    "map_label": "Word problems",
+    "topic_id": "word_problems",
+    "map_group": "your_class",
+    "map_band": "JSS2 blocks",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "word-problems-check-01"
+  },
+  {
+    "map_label": "Two-step equations",
+    "topic_id": "two_step_equations",
+    "map_group": "your_class",
+    "map_band": "JSS2 blocks",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "two-step-equations-check-01"
+  },
+  {
+    "map_label": "Simplifying",
+    "topic_id": "simplifying_expressions",
+    "map_group": "foundations",
+    "map_band": "Blocks from earlier years",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "simplifying-check-01"
+  },
+  {
+    "map_label": "One-step equations",
+    "topic_id": "one_step_equations",
+    "map_group": "foundations",
+    "map_band": "Blocks from earlier years",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "one-step-equations-check-01"
+  },
+  {
+    "map_label": "Negative numbers",
+    "topic_id": "negative_numbers",
+    "map_group": "foundations",
+    "map_band": "Blocks from earlier years",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "negative-numbers-check-01"
+  },
+  {
+    "map_label": "Order of operations",
+    "topic_id": "order_of_operations",
+    "map_group": "foundations",
+    "map_band": "Blocks from earlier years",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "order-of-operations-check-01"
+  },
+  {
+    "map_label": "Letters for numbers",
+    "topic_id": "letters_for_numbers",
+    "map_group": "foundations",
+    "map_band": "Blocks from earlier years",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "letters-for-numbers-check-01"
+  },
+  {
+    "map_label": "Whole numbers",
+    "topic_id": "whole_numbers",
+    "map_group": "foundations",
+    "map_band": "Blocks from earlier years",
+    "practice_question_count": 10,
+    "lesson_step_count": 7,
+    "quick_check_id": "whole-numbers-check-01"
+  }
+]
