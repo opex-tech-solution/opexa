@@ -186,10 +186,7 @@ class _MapTabState extends State<MapTab> {
               runSpacing: 10,
               children: [
                 for (final skill in rows[rowIndex])
-                  _MapSkillTile(
-                    skill: skill,
-                    onTap: () => _openSkill(skill),
-                  ),
+                  _MapSkillTile(skill: skill, onTap: () => _openSkill(skill)),
               ],
             ),
           ),
@@ -246,7 +243,10 @@ class _MapTabState extends State<MapTab> {
         children: [
           Row(
             children: [
-              _LegendItem(state: BrickState.unchecked, label: 'Not checked yet'),
+              _LegendItem(
+                state: BrickState.unchecked,
+                label: 'Not checked yet',
+              ),
               const SizedBox(width: 10),
               _LegendItem(state: BrickState.building, label: 'Building'),
             ],
@@ -431,6 +431,8 @@ class _MapTabState extends State<MapTab> {
           ),
         ),
         const SizedBox(height: 16),
+        LearningListLauncherCard(),
+        const SizedBox(height: 16),
         _statusCard(),
         const SizedBox(height: 20),
         _skillSection(
@@ -463,10 +465,7 @@ class _MapTabState extends State<MapTab> {
         const SizedBox(height: 8),
         Text(
           'Your foundations start here',
-          style: TextStyle(
-            fontSize: 12,
-            color: context.colors.textSecondary,
-          ),
+          style: TextStyle(fontSize: 12, color: context.colors.textSecondary),
         ),
         const SizedBox(height: 20),
         if (!_afterFirstCheck) ...[
@@ -484,10 +483,7 @@ class _MapTabState extends State<MapTab> {
         const SizedBox(height: 12),
         Text(
           'Based on the Nigerian national curriculum.',
-          style: TextStyle(
-            fontSize: 11.5,
-            color: context.colors.textSecondary,
-          ),
+          style: TextStyle(fontSize: 11.5, color: context.colors.textSecondary),
         ),
       ],
     );
@@ -521,7 +517,9 @@ class _SubjectTab extends StatelessWidget {
         style: TextStyle(
           fontSize: 12.5,
           fontWeight: FontWeight.w700,
-          color: soon ? context.colors.textSecondary : context.colors.textPrimary,
+          color: soon
+              ? context.colors.textSecondary
+              : context.colors.textPrimary,
         ),
       ),
     );

@@ -1,5 +1,18 @@
-enum BrickState { unchecked, notSure, building, solid, mastered, lockedIn }
+/// Represents the learner's current state for a skill brick on the Map.
+enum BrickState {
+  unchecked,
+  notSure,
+  building,
+  solid,
+  mastered,
+  lockedIn,
+}
 
+/// A skill shown on the OpexA learning Map.
+///
+/// `contentId` is the stable identifier shared by all learning experiences
+/// associated with this skill. Teach Me and Practice Lesson use the same ID
+/// to retrieve their own content from the topic record in the JSON content bank.
 class Skill {
   const Skill(
     this.name,
@@ -8,15 +21,29 @@ class Skill {
     this.contentId,
   });
 
+  /// Human-readable skill name displayed on the Map.
   final String name;
+
+  /// The learner's current progress state for this skill.
   final BrickState state;
+
+  /// Whether this skill should display the trending indicator on the Map.
   final bool trending;
 
-  /// Stable ID used to retrieve the related Teach Me content from JSON/API.
-  /// It is optional so existing Skill constructors remain compatible.
+  /// Stable topic ID used by both Teach Me and Practice Lesson repositories.
+  ///
+  /// Example: `two_step_equations`.
+  ///
+  /// The Teach Me repository uses this ID to retrieve lesson steps, examples
+  /// and quick checks. The Practice Lesson repository uses the same ID to
+  /// retrieve guided practice, hints, reflection prompts and independent checks.
+  ///
+  /// It is nullable to preserve compatibility with skills that do not yet
+  /// have content in the JSON bank.
   final String? contentId;
 }
 
+/// Organises skill bricks into the three learning sections displayed on the Map.
 class WallData {
   const WallData({
     required this.stretch,
@@ -28,6 +55,7 @@ class WallData {
   final List<List<Skill>> klass;
   final List<List<Skill>> foundations;
 
+  /// Provides every skill on the Map, regardless of its section.
   Iterable<Skill> get all sync* {
     for (final section in [stretch, klass, foundations]) {
       for (final row in section) {
@@ -36,11 +64,16 @@ class WallData {
     }
   }
 
-  int count(BrickState state) => all.where((skill) => skill.state == state).length;
+  /// Counts skills currently in the supplied progress state.
+  int count(BrickState state) =>
+      all.where((skill) => skill.state == state).length;
 }
 
-/// Sample Mathematics wall based on the Map reference recording.
-/// Each skill that has lesson content carries the stable JSON topic ID.
+/// Sample Mathematics wall based on the OpexA Map reference.
+///
+/// Each skill with available learning content is connected to the JSON content
+/// bank through `contentId`. Both Teach Me and Practice Lesson resolve content
+/// through that same ID; they do not need separate Skill models or IDs.
 WallData buildWall({bool afterFirstCheck = false}) {
   const unchecked = BrickState.unchecked;
 
@@ -80,7 +113,11 @@ WallData buildWall({bool afterFirstCheck = false}) {
           unchecked,
           contentId: 'multiplying_dividing_integers',
         ),
-        Skill('Simplifying', unchecked, contentId: 'simplifying_expressions'),
+        Skill(
+          'Simplifying',
+          unchecked,
+          contentId: 'simplifying_expressions',
+        ),
       ],
       [
         Skill(
@@ -93,7 +130,11 @@ WallData buildWall({bool afterFirstCheck = false}) {
           unchecked,
           contentId: 'addition_subtraction_integers',
         ),
-        Skill('Negative numbers', unchecked, contentId: 'negative_numbers'),
+        Skill(
+          'Negative numbers',
+          unchecked,
+          contentId: 'negative_numbers',
+        ),
       ],
       const [
         Skill(

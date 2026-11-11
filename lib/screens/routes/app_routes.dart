@@ -57,6 +57,7 @@ class AppRoutes {
   static const String mainMapLearningLearningScreen =
       'main-map-learning-lesson';
   static const String mainMapSkillDetails = 'main-map-skill-details';
+  static const String mainMapLearningList = 'main-map-learning-list';
 
   // Opened above the bottom bar, from the Map tab. It is a child of mainMap in
   // the router below, so its path starts with mainMap.
@@ -203,8 +204,7 @@ class AppRouter {
                 ),
                 routes: [
                   GoRoute(
-                    // Relative to mainMap. Full path = AppRoutes.mathLearningList
-                    path: 'learning-list',
+                    path: AppRoutes.mathLearningList,
                     // Show above the bottom bar, not inside the tab.
                     parentNavigatorKey: _rootKey,
                     builder: (context, state) => const MathLearningListScreen(),
@@ -238,6 +238,10 @@ class AppRouter {
                         },
                       ),
                     ],
+                  ),
+                  GoRoute(
+                    path: AppRoutes.mainMapLearningList,
+                    builder: (context, state) => const LearningListPage(),
                   ),
                   GoRoute(
                     path: AppRoutes.mainMapBlockDetails,

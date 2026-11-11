@@ -3,12 +3,7 @@ import '../../models/answer_result.dart';
 import '../../models/skill.dart';
 import '../../theme/widget.dart';
 import '../../widgets/widget.dart';
-import 'interstitial_screen.dart';
-import 'mcq_screen.dart';
-import 'numeric_screen.dart';
-import 'quick_fix_screen.dart';
-import 'results_screen.dart';
-import 'working_text_screen.dart';
+import 'widget.dart';
 
 /// Called when the student taps "See my full map" / "See what to learn".
 /// Wire this in your router (see AppRouter in app_routes.dart).
