@@ -22,9 +22,10 @@ class _LearningListLauncherCardState extends State<LearningListLauncherCard> {
   }
 
   Future<void> _loadSummary() async {
-    final summary = await LearningRepository.fetchNextTopicSummary();
+    final data = await LearningListRepository.fetch();
+    if (!mounted) return;
     setState(() {
-      _summaryText = summary;
+      _summaryText = data.summary;
     });
   }
 

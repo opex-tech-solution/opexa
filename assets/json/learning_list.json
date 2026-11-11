@@ -1,0 +1,45 @@
+{
+  "intro": "These are the topics your check showed you need, and the ones that build on them, in the best order to learn them: foundations first, because each one holds up the next.",
+  "intro_note": "Each topic starts with a short lesson that teaches it, with Listen if you want it read to you. Then you practise.",
+  "sections": [
+    {
+      "id": "your_class",
+      "title": "Your class",
+      "trailing": "JSS2",
+      "topics": [
+        { "topic_id": "two_step_equations", "name": "Two-step equations", "minutes": 5, "brick": "building", "start_here": true },
+        { "topic_id": "harder_equations", "name": "Harder equations", "minutes": 5 },
+        { "topic_id": "word_problems", "name": "Word problems", "minutes": 5 }
+      ]
+    },
+    {
+      "id": "stretch",
+      "title": "Stretch",
+      "trailing": "When you’re ready",
+      "topics": [
+        { "topic_id": "simultaneous_equations", "name": "Simultaneous equations", "minutes": 5 }
+      ]
+    },
+    {
+      "id": "not_checked_yet",
+      "title": "Not checked yet",
+      "trailing": "Learn these any time",
+      "caption": "The check didn’t need to ask about these. You can still learn them.",
+      "topics": [
+        { "topic_id": "whole_numbers", "name": "Whole numbers", "minutes": 5 },
+        { "topic_id": "negative_numbers", "name": "Negative numbers", "minutes": 5 },
+        { "topic_id": "order_of_operations", "name": "Order of operations", "minutes": 5 },
+        { "topic_id": "addition_subtraction_integers", "name": "Add & subtract integers", "minutes": 5 },
+        { "topic_id": "multiplying_dividing_integers", "name": "Multiply & divide integers", "minutes": 5 },
+        { "topic_id": "simplifying_expressions", "name": "Simplifying", "minutes": 5 },
+        { "topic_id": "substitution", "name": "Substituting", "minutes": 5 },
+        { "topic_id": "expanding_brackets", "name": "Expanding brackets", "minutes": 5 }
+      ]
+    }
+  ],
+  "initial_state": {
+    "_note": "Demo starting point, copied into the progress store ONCE on first launch so the list matches the design. Delete this block when real progress exists.",
+    "learned": ["two_step_equations", "whole_numbers"],
+    "in_progress": { "topic_id": "two_step_equations", "name": "Two-step equations", "kind": "Class" }
+  }
+}

@@ -1,34 +1,31 @@
 import 'dart:convert';
-import 'package:flutter/services.dart';
 
+import 'package:flutter/services.dart';
 import '../../models/model.dart';
 
-class LearningRepository {
-  // Loads the robust JSON file from assets
-  static Future fetchLearningData() async {
-    final jsonString = await rootBundle.loadString('assets/json/learning_topics.json');
-    return json.decode(jsonString);
-  }
+/// Loads the grouped learning list from assets/json/learning_list.json.
+class LearningListRepository {
+  LearningListRepository._();
 
-  // Returns a list of all parsed learning topics
-  static Future<List<LearningTopic>> fetchTopics() async {
-    final data = await fetchLearningData();
-    final List list = data['topics'];
-    return list.map((item) => LearningTopic.fromJson(item)).toList();
-  }
+  static const String _asset = 'assets/json/learning_list.json';
+  static LearningListData? _cache;
 
-  // Generates the summary text for launcher cards
-  static Future<String> fetchNextTopicSummary() async {
-    final data = await fetchLearningData();
-    int total = data['total_topics'];
-    
-    List topics = data['topics'];
-    var nextTopic = topics.firstWhere(
-      (t) => t['status'] == 'building' || t['status'] == 'unchecked',
-      orElse: () => topics.first,
+  static Future<LearningListData> fetch() async {
+    final cached = _cache;
+    if (cached != null) return cached;
+    final raw = await rootBundle.loadString(_asset);
+    final data = LearningListData.fromJson(
+      Map<String, dynamic>.from(jsonDecode(raw) as Map),
     );
-    
-    String title = nextTopic['title'];
-    return "$total topics to learn. Next: $title";
+    return _cache = data;
+  }
+
+  /// Finds the content ID for a lesson title such as "Two-step equations".
+  static String? contentIdForName(String name) {
+    final wanted = name.trim().toLowerCase();
+    for (final skill in buildWall().all) {
+      if (skill.name.toLowerCase() == wanted) return skill.contentId;
+    }
+    return null;
   }
 }

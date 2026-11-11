@@ -8,6 +8,7 @@ import '../../api/repositories/widget.dart';
 import '../../models/practice_lesson_content.dart';
 import '../../theme/app_colors.dart';
 import '../routes/widget.dart';
+import 'widget.dart';
 
 /// Recreates the multi-stage OpexA practice lesson shown in the supplied
 /// recording. Its text, moves, hints, questions and result copy are loaded
@@ -319,114 +320,6 @@ class _PracticeLessonPageState extends State<PracticeLessonPage> {
     );
   }
 
-  Future<void> showTakeABreakBottomSheet({
-    required BuildContext context,
-    required VoidCallback onKeepGoing,
-    required VoidCallback onStopForNow,
-  }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (BuildContext context) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(24.0, 12.0, 24.0, 24.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Drag Handle Bar
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Title
-              Text(
-                "Take a break?",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-
-              // Description Body
-              Text(
-                "Your answers are saved on this phone. You can pick up from this exact question later.",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.white70 : Colors.black54,
-                  height: 1.4,
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // "Keep going" Primary Action Button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    onKeepGoing();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6B9BFA),
-                    foregroundColor: Colors.black87,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    "Keep going",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 10),
-
-              // "Stop for now" Secondary Action Button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    onStopForNow();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isDark
-                        ? const Color(0xFF38332E)
-                        : Colors.grey.shade300,
-                    foregroundColor: isDark ? Colors.white70 : Colors.black87,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  child: const Text(
-                    "Stop for now",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Widget _buildHeader({bool result = false}) {
     final colors = context.colors;
     return Padding(
@@ -438,17 +331,12 @@ class _PracticeLessonPageState extends State<PracticeLessonPage> {
             children: [
               IconButton(
                 visualDensity: VisualDensity.compact,
-                onPressed: () {
-                  showTakeABreakBottomSheet(
-                    context: context,
-                    onKeepGoing: () {
-                      // Resume current lesson session logic
-                    },
-                    onStopForNow: () {
-                      Navigator.of(context).pop(_result);
-                      navBarVisible.value = true;
-                    },
-                  );
+                onPressed: () async {
+                  final stop = await showTakeBreakSheet(context);
+                  if (stop && mounted) {
+                    navBarVisible.value = true;
+                    Navigator.of(context).pop(_result);
+                  }
                 },
                 icon: const Icon(Icons.close, size: 20),
                 tooltip: 'Close practice lesson',

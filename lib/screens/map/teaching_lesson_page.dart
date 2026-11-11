@@ -8,6 +8,7 @@ import '../../models/lesson_content.dart';
 import '../../models/skill.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/info_widgets.dart';
+import '../routes/widget.dart';
 
 String _makeSymbolsSpeakable(String text) {
   return text
@@ -35,11 +36,7 @@ String _makeSymbolsSpeakable(String text) {
 /// Existing callers can continue to pass only [skill]. If a Map item has a
 /// stable content ID, pass it through [topicId] to avoid relying on a label.
 class TeachingLessonPage extends StatefulWidget {
-  const TeachingLessonPage({
-    super.key,
-    required this.skill,
-    this.topicId,
-  });
+  const TeachingLessonPage({super.key, required this.skill, this.topicId});
 
   final Skill skill;
   final String? topicId;
@@ -49,8 +46,7 @@ class TeachingLessonPage extends StatefulWidget {
 }
 
 class _TeachingLessonPageState extends State<TeachingLessonPage> {
-  final LessonContentRepository _contentRepository =
-      LessonContentRepository();
+  final LessonContentRepository _contentRepository = LessonContentRepository();
   final TextToSpeechService _speech = TextToSpeechService();
 
   TopicContent? _topic;
@@ -219,9 +215,11 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
       }
 
       if (_selectedQuickCheckOptionId != null) {
-        parts.add(question.isCorrect(_selectedQuickCheckOptionId)
-            ? 'That is correct.'
-            : 'Not quite.');
+        parts.add(
+          question.isCorrect(_selectedQuickCheckOptionId)
+              ? 'That is correct.'
+              : 'Not quite.',
+        );
         if (question.explanation.isNotEmpty) {
           parts.add(question.explanation);
         }
@@ -270,7 +268,10 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
 
   Future<void> _closeLesson() async {
     await _stopSpeech();
-    if (mounted) Navigator.of(context).pop();
+    if (mounted) {
+      navBarVisible.value = true;
+      Navigator.of(context).pop();
+    }
   }
 
   void _selectQuickCheckOption(String optionId) {
@@ -281,11 +282,7 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
 
   Widget _loadingView() {
     return const Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
+      body: SafeArea(child: Center(child: CircularProgressIndicator())),
     );
   }
 
@@ -295,9 +292,7 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
         : 'A Teach Me lesson for ${widget.skill.name} has not been added yet.';
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Teach me'),
-      ),
+      appBar: AppBar(title: const Text('Teach me')),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(24),
@@ -330,7 +325,10 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
                   child: const Text('Try again'),
                 ),
               TextButton(
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () {
+                  navBarVisible.value = true;
+                  Navigator.of(context).pop();
+                },
                 child: const Text('Go back'),
               ),
             ],
@@ -402,7 +400,9 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              _isSpeaking ? Icons.stop_circle_outlined : Icons.volume_up_outlined,
+              _isSpeaking
+                  ? Icons.stop_circle_outlined
+                  : Icons.volume_up_outlined,
               size: 16,
               color: context.colors.onAccentContainer,
             ),
@@ -552,7 +552,10 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
               borderRadius: BorderRadius.circular(10),
               child: Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 12,
+                ),
                 decoration: BoxDecoration(
                   color: selectedId == option.id
                       ? context.colors.accentContainer
@@ -807,15 +810,11 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
         child: Column(
           children: [
             _progressHeader(),
-            Expanded(
-              child: _isComplete ? _doneBody() : _lessonBody(),
-            ),
+            Expanded(child: _isComplete ? _doneBody() : _lessonBody()),
             Container(
               padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
               decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(color: context.colors.divider),
-                ),
+                border: Border(top: BorderSide(color: context.colors.divider)),
               ),
               child: _isComplete
                   ? Column(
@@ -829,7 +828,8 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
                                 MaterialPageRoute<void>(
                                   builder: (_) => QuickPracticeScreen(
                                     skill: widget.skill,
-                                    topicId: widget.topicId ?? widget.skill.topicId,
+                                    topicId:
+                                        widget.topicId ?? widget.skill.topicId,
                                     topicContent: _topic,
                                   ),
                                 ),
@@ -920,8 +920,7 @@ class QuickPracticeScreen extends StatefulWidget {
 }
 
 class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
-  final LessonContentRepository _contentRepository =
-      LessonContentRepository();
+  final LessonContentRepository _contentRepository = LessonContentRepository();
 
   TopicContent? _topic;
   Object? _loadError;
@@ -994,7 +993,11 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
       parts.add('${option.id}. ${option.text}');
     }
     if (_selectedOptionId != null) {
-      parts.add(question.isCorrect(_selectedOptionId) ? 'That is correct.' : 'Not quite.');
+      parts.add(
+        question.isCorrect(_selectedOptionId)
+            ? 'That is correct.'
+            : 'Not quite.',
+      );
       if (question.explanation.isNotEmpty) parts.add(question.explanation);
     }
     return _makeSymbolsSpeakable(parts.join('. '));
@@ -1048,7 +1051,9 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(
-              _isSpeaking ? Icons.stop_circle_outlined : Icons.volume_up_outlined,
+              _isSpeaking
+                  ? Icons.stop_circle_outlined
+                  : Icons.volume_up_outlined,
               size: 16,
               color: context.colors.onAccentContainer,
             ),
@@ -1130,7 +1135,9 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('We could not load practice questions for this topic.'),
+                const Text(
+                  'We could not load practice questions for this topic.',
+                ),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
@@ -1152,7 +1159,9 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Practice questions are not available for this topic yet.'),
+                const Text(
+                  'Practice questions are not available for this topic yet.',
+                ),
                 const SizedBox(height: 16),
                 FilledButton(
                   onPressed: () => Navigator.of(context).pop(),
@@ -1218,7 +1227,8 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
           ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
-              value: (_index + (selectedOption == null ? 0 : 1)) /
+              value:
+                  (_index + (selectedOption == null ? 0 : 1)) /
                   _questions.length,
               minHeight: 6,
               backgroundColor: colors.divider,
@@ -1284,7 +1294,11 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
                               : Colors.transparent,
                         ),
                         child: selectedOption == option.id
-                            ? Icon(Icons.check, size: 15, color: colors.onAccent)
+                            ? Icon(
+                                Icons.check,
+                                size: 15,
+                                color: colors.onAccent,
+                              )
                             : Text(
                                 option.id,
                                 style: TextStyle(
