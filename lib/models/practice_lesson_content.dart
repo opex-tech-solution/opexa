@@ -5,7 +5,7 @@
 /// experience can evolve independently while sharing the same topic catalog.
 class PracticeLessonContent {
   const PracticeLessonContent({
-    required this.id,
+    required this.topicId,
     required this.title,
     required this.estimatedMinutes,
     required this.worksOffline,
@@ -20,7 +20,7 @@ class PracticeLessonContent {
     required this.result,
   });
 
-  final String id;
+  final String topicId;
   final String title;
   final int estimatedMinutes;
   final bool worksOffline;
@@ -29,40 +29,95 @@ class PracticeLessonContent {
   final PracticeIdeaContent idea;
   final WatchContent watch;
   final WhatIfContent whatIf;
-  final List<NumericPracticeQuestion> guidedPractice;
+  final List<PracticeQuestion> guidedPractice;
   final ReflectionContent reflection;
-  final List<NumericPracticeQuestion> independentCheck;
+  final List<PracticeQuestion> independentCheck;
   final PracticeResultContent result;
 
-  factory PracticeLessonContent.fromJson(Map<String, dynamic> json) {
+  factory PracticeLessonContent.fromTopicJson({
+    required String topicId,
+    required String topicName,
+    required String topicLevel,
+    required String topicSummary,
+    required Map<String, dynamic> json,
+  }) {
+    final stages = {
+      for (final stage in _objects(json['stages'], 'practice_lesson.stages'))
+        _string(stage['id']): stage,
+    };
+    final start = _requiredStage(stages, 'start');
+    final haveAGo = _requiredStage(stages, 'have_a_go');
+    final idea = _requiredStage(stages, 'the_idea');
+    final watch = _requiredStage(stages, 'watch');
+    final whatIf = _requiredStage(stages, 'what_if');
+    final guidedPractice = _requiredStage(stages, 'guided_practice');
+    final reflection = _requiredStage(stages, 'reflection');
+    final independentCheck = _requiredStage(stages, 'independent_check');
+    final objectives = _strings(json['learning_objectives']);
+    final watchContent = WatchContent.fromCatalogJson(watch);
+    final guidedQuestions = _objects(
+      guidedPractice['questions'],
+      'stages.guided_practice.questions',
+    ).map(PracticeQuestion.fromJson).toList(growable: false);
+    final checkQuestions = _objects(
+      independentCheck['questions'],
+      'stages.independent_check.questions',
+    ).map(PracticeQuestion.fromJson).toList(growable: false);
+
+    if (watchContent.steps.isEmpty ||
+        guidedQuestions.isEmpty ||
+        checkQuestions.isEmpty) {
+      throw const FormatException(
+        'Practice lessons require worked steps, guided questions, and an independent check.',
+      );
+    }
+
     return PracticeLessonContent(
-      id: _string(json['id']),
-      title: _string(json['title']),
+      topicId: topicId,
+      title: topicName,
       estimatedMinutes: _integer(json['estimated_minutes'], fallback: 10),
-      worksOffline: _boolean(json['works_offline'], fallback: true),
-      start: PracticeStartContent.fromJson(_object(json['start'], 'start')),
-      haveAGo: HaveAGoContent.fromJson(
-        _object(json['have_a_go'], 'have_a_go'),
+      worksOffline: true,
+      start: PracticeStartContent(
+        classLabel: 'MATHS · $topicLevel',
+        lessonStartsTitle: _string(start['title']),
+        lessonStartsBody: _string(start['body']),
+        differentWayLabel: _string(start['purpose']),
+        whyItMatters: topicSummary,
+        learningOutcome: objectives.join('\n'),
       ),
-      idea: PracticeIdeaContent.fromJson(_object(json['idea'], 'idea')),
-      watch: WatchContent.fromJson(_object(json['watch'], 'watch')),
-      whatIf: WhatIfContent.fromJson(_object(json['what_if'], 'what_if')),
-      guidedPractice: _objects(
-        json['guided_practice'],
-        'guided_practice',
-      ).map(NumericPracticeQuestion.fromJson).toList(growable: false),
-      reflection: ReflectionContent.fromJson(
-        _object(json['reflection'], 'reflection'),
+      haveAGo: HaveAGoContent.fromCatalogJson(haveAGo),
+      idea: PracticeIdeaContent(
+        eyebrow: 'THE IDEA',
+        title: _string(idea['title']),
+        body: _string(idea['body']),
+        exampleLabel: 'KEY IDEA',
+        example: _string(idea['key_point']),
       ),
-      independentCheck: _objects(
-        json['independent_check'],
-        'independent_check',
-      ).map(NumericPracticeQuestion.fromJson).toList(growable: false),
-      result: PracticeResultContent.fromJson(
-        _object(json['result'], 'result'),
+      watch: watchContent,
+      whatIf: WhatIfContent.fromQuestion(
+        _object(whatIf['question'], 'stages.what_if.question'),
+        prompt: _string(whatIf['prompt']),
+      ),
+      guidedPractice: guidedQuestions,
+      reflection: ReflectionContent.fromCatalogJson(reflection),
+      independentCheck: checkQuestions,
+      result: PracticeResultContent.fromCompletion(
+        _object(json['completion'], 'practice_lesson.completion'),
+        independentCheckCount: checkQuestions.length,
       ),
     );
   }
+}
+
+Map<String, dynamic> _requiredStage(
+  Map<String, Map<String, dynamic>> stages,
+  String id,
+) {
+  final stage = stages[id];
+  if (stage == null) {
+    throw FormatException('The practice lesson is missing the "$id" stage.');
+  }
+  return stage;
 }
 
 class PracticeStartContent {
@@ -81,17 +136,6 @@ class PracticeStartContent {
   final String differentWayLabel;
   final String whyItMatters;
   final String learningOutcome;
-
-  factory PracticeStartContent.fromJson(Map<String, dynamic> json) {
-    return PracticeStartContent(
-      classLabel: _string(json['class_label'], fallback: 'CLASS · NEW LESSON'),
-      lessonStartsTitle: _string(json['lesson_starts_title']),
-      lessonStartsBody: _string(json['lesson_starts_body']),
-      differentWayLabel: _string(json['different_way_label']),
-      whyItMatters: _string(json['why_it_matters']),
-      learningOutcome: _string(json['learning_outcome']),
-    );
-  }
 }
 
 class HaveAGoContent {
@@ -99,76 +143,24 @@ class HaveAGoContent {
     required this.eyebrow,
     required this.intro,
     required this.prompt,
-    required this.steps,
+    required this.question,
   });
 
   final String eyebrow;
   final String intro;
   final String prompt;
-  final List<EquationMoveStep> steps;
+  final PracticeQuestion question;
 
-  factory HaveAGoContent.fromJson(Map<String, dynamic> json) {
+  factory HaveAGoContent.fromCatalogJson(Map<String, dynamic> json) {
     return HaveAGoContent(
-      eyebrow: _string(json['eyebrow'], fallback: 'HAVE A GO FIRST'),
-      intro: _string(json['intro']),
-      prompt: _string(json['prompt']),
-      steps: _objects(json['steps'], 'have_a_go.steps')
-          .map(EquationMoveStep.fromJson)
-          .toList(growable: false),
-    );
-  }
-}
-
-class EquationMoveStep {
-  const EquationMoveStep({
-    required this.equationLeft,
-    required this.equationRight,
-    required this.correctMoveId,
-    required this.moves,
-    required this.resultLeft,
-    required this.resultRight,
-    required this.successCaption,
-  });
-
-  final String equationLeft;
-  final String equationRight;
-  final String correctMoveId;
-  final List<EquationMoveOption> moves;
-  final String resultLeft;
-  final String resultRight;
-  final String successCaption;
-
-  factory EquationMoveStep.fromJson(Map<String, dynamic> json) {
-    return EquationMoveStep(
-      equationLeft: _string(json['equation_left']),
-      equationRight: _string(json['equation_right']),
-      correctMoveId: _string(json['correct_move_id']),
-      moves: _objects(json['moves'], 'have_a_go.moves')
-          .map(EquationMoveOption.fromJson)
-          .toList(growable: false),
-      resultLeft: _string(json['result_left']),
-      resultRight: _string(json['result_right']),
-      successCaption: _string(json['success_caption']),
-    );
-  }
-}
-
-class EquationMoveOption {
-  const EquationMoveOption({
-    required this.id,
-    required this.label,
-    required this.feedback,
-  });
-
-  final String id;
-  final String label;
-  final String feedback;
-
-  factory EquationMoveOption.fromJson(Map<String, dynamic> json) {
-    return EquationMoveOption(
-      id: _string(json['id']),
-      label: _string(json['label']),
-      feedback: _string(json['feedback']),
+      eyebrow: _string(json['title'], fallback: 'HAVE A GO FIRST'),
+      intro: _string(json['instruction']),
+      prompt: _string(
+        _object(json['question'], 'stages.have_a_go.question')['prompt'],
+      ),
+      question: PracticeQuestion.fromJson(
+        _object(json['question'], 'stages.have_a_go.question'),
+      ),
     );
   }
 }
@@ -187,52 +179,50 @@ class PracticeIdeaContent {
   final String body;
   final String exampleLabel;
   final String example;
-
-  factory PracticeIdeaContent.fromJson(Map<String, dynamic> json) {
-    return PracticeIdeaContent(
-      eyebrow: _string(json['eyebrow'], fallback: 'THE IDEA'),
-      title: _string(json['title']),
-      body: _string(json['body']),
-      exampleLabel: _string(json['example_label'], fallback: 'EXAMPLE'),
-      example: _string(json['example']),
-    );
-  }
 }
 
 class WatchContent {
-  const WatchContent({required this.eyebrow, required this.steps, required this.replayLabel});
+  const WatchContent({
+    required this.eyebrow,
+    required this.exampleTitle,
+    required this.prompt,
+    required this.equation,
+    required this.steps,
+    required this.replayLabel,
+  });
 
   final String eyebrow;
+  final String exampleTitle;
+  final String prompt;
+  final String equation;
   final List<WatchStepContent> steps;
   final String replayLabel;
 
-  factory WatchContent.fromJson(Map<String, dynamic> json) {
+  factory WatchContent.fromCatalogJson(Map<String, dynamic> json) {
     return WatchContent(
-      eyebrow: _string(json['eyebrow'], fallback: 'WATCH'),
-      steps: _objects(json['steps'], 'watch.steps')
-          .map(WatchStepContent.fromJson)
-          .toList(growable: false),
-      replayLabel: _string(json['replay_label'], fallback: 'Play again'),
+      eyebrow: _string(json['title'], fallback: 'WATCH'),
+      exampleTitle: _string(json['example_title']),
+      prompt: _string(json['prompt']),
+      equation: _string(json['equation']),
+      steps: _objects(
+        json['steps'],
+        'watch.steps',
+      ).map(WatchStepContent.fromJson).toList(growable: false),
+      replayLabel: 'Play again',
     );
   }
 }
 
 class WatchStepContent {
-  const WatchStepContent({
-    required this.equationLeft,
-    required this.equationRight,
-    required this.caption,
-  });
+  const WatchStepContent({required this.heading, required this.explanation});
 
-  final String equationLeft;
-  final String equationRight;
-  final String caption;
+  final String heading;
+  final String explanation;
 
   factory WatchStepContent.fromJson(Map<String, dynamic> json) {
     return WatchStepContent(
-      equationLeft: _string(json['equation_left']),
-      equationRight: _string(json['equation_right']),
-      caption: _string(json['caption']),
+      heading: _string(json['heading']),
+      explanation: _string(json['explanation']),
     );
   }
 }
@@ -248,13 +238,26 @@ class WhatIfContent {
   final String prompt;
   final List<WhatIfOption> options;
 
-  factory WhatIfContent.fromJson(Map<String, dynamic> json) {
+  factory WhatIfContent.fromQuestion(
+    Map<String, dynamic> question, {
+    required String prompt,
+  }) {
+    final practiceQuestion = PracticeQuestion.fromJson(question);
     return WhatIfContent(
-      eyebrow: _string(json['eyebrow'], fallback: 'WHAT HAPPENS IF...?'),
-      prompt: _string(json['prompt']),
-      options: _objects(json['options'], 'what_if.options')
-          .map(WhatIfOption.fromJson)
-          .toList(growable: false),
+      eyebrow: 'WHAT IF?',
+      prompt: prompt.isEmpty ? practiceQuestion.prompt : prompt,
+      options: [
+        for (final option in practiceQuestion.options)
+          WhatIfOption(
+            id: option.id,
+            label: option.label,
+            isCorrect: option.id == practiceQuestion.correctOptionId,
+            feedbackTitle: option.id == practiceQuestion.correctOptionId
+                ? 'That is correct'
+                : 'Not quite',
+            feedbackBody: practiceQuestion.explanation,
+          ),
+      ],
     );
   }
 }
@@ -273,86 +276,107 @@ class WhatIfOption {
   final bool isCorrect;
   final String feedbackTitle;
   final String feedbackBody;
-
-  factory WhatIfOption.fromJson(Map<String, dynamic> json) {
-    return WhatIfOption(
-      id: _string(json['id']),
-      label: _string(json['label']),
-      isCorrect: _boolean(json['is_correct']),
-      feedbackTitle: _string(json['feedback_title']),
-      feedbackBody: _string(json['feedback_body']),
-    );
-  }
 }
 
-class NumericPracticeQuestion {
-  const NumericPracticeQuestion({
+class PracticeQuestion {
+  const PracticeQuestion({
     required this.id,
     required this.prompt,
-    required this.answer,
-    required this.hints,
     required this.explanation,
-    required this.correctFeedback,
-    required this.incorrectFeedback,
-    required this.solutionSteps,
+    required this.options,
+    required this.correctOptionId,
   });
 
   final String id;
   final String prompt;
-  final String answer;
-  final List<String> hints;
   final String explanation;
-  final String correctFeedback;
-  final String incorrectFeedback;
-  final List<String> solutionSteps;
+  final List<PracticeQuestionOption> options;
+  final String correctOptionId;
+  String get answer =>
+      options.firstWhere((option) => option.id == correctOptionId).label;
 
-  factory NumericPracticeQuestion.fromJson(Map<String, dynamic> json) {
-    return NumericPracticeQuestion(
+  factory PracticeQuestion.fromJson(Map<String, dynamic> json) {
+    final options = _objects(
+      json['options'],
+      'question.options',
+    ).map(PracticeQuestionOption.fromJson).toList(growable: false);
+    final correctOptionId = _string(json['correct_option_id']);
+    final correctOption = options.where(
+      (option) => option.id == correctOptionId,
+    );
+    if (correctOptionId.isEmpty || correctOption.isEmpty) {
+      throw FormatException(
+        'Question "${_string(json['id'])}" has no matching correct option.',
+      );
+    }
+    final explanation = _string(json['explanation']);
+
+    return PracticeQuestion(
       id: _string(json['id']),
       prompt: _string(json['prompt']),
-      answer: _string(json['answer']),
-      hints: _strings(json['hints']),
-      explanation: _string(json['explanation'] ?? json['correct_feedback']),
-      correctFeedback: _string(json['correct_feedback'] ?? json['explanation']),
-      incorrectFeedback: _string(json['incorrect_feedback'] ?? json['explanation']),
-      solutionSteps: _strings(json['solution_steps']),
+      explanation: explanation,
+      options: options,
+      correctOptionId: correctOptionId,
     );
   }
+}
 
+class PracticeQuestionOption {
+  const PracticeQuestionOption({required this.id, required this.label});
+
+  final String id;
+  final String label;
+
+  factory PracticeQuestionOption.fromJson(Map<String, dynamic> json) {
+    return PracticeQuestionOption(
+      id: _string(json['id']),
+      label: _string(json['text']),
+    );
+  }
 }
 
 class ReflectionContent {
-  const ReflectionContent({required this.eyebrow, required this.title, required this.groups});
+  const ReflectionContent({
+    required this.eyebrow,
+    required this.title,
+    required this.groups,
+  });
 
   final String eyebrow;
   final String title;
   final List<ReflectionGroup> groups;
 
-  factory ReflectionContent.fromJson(Map<String, dynamic> json) {
+  factory ReflectionContent.fromCatalogJson(Map<String, dynamic> json) {
     return ReflectionContent(
-      eyebrow: _string(json['eyebrow'], fallback: 'THINK'),
-      title: _string(json['title'], fallback: 'A moment to think'),
-      groups: _objects(json['groups'], 'reflection.groups')
-          .map(ReflectionGroup.fromJson)
-          .toList(growable: false),
+      eyebrow: _string(json['title'], fallback: 'THINK'),
+      title: _string(json['purpose'], fallback: 'A moment to think'),
+      groups: _objects(
+        json['prompts'],
+        'stages.reflection.prompts',
+      ).map(ReflectionGroup.fromCatalogJson).toList(growable: false),
     );
   }
 }
 
 class ReflectionGroup {
-  const ReflectionGroup({required this.id, required this.prompt, required this.options});
+  const ReflectionGroup({
+    required this.id,
+    required this.prompt,
+    required this.options,
+  });
 
   final String id;
   final String prompt;
   final List<ReflectionOption> options;
 
-  factory ReflectionGroup.fromJson(Map<String, dynamic> json) {
+  factory ReflectionGroup.fromCatalogJson(Map<String, dynamic> json) {
     return ReflectionGroup(
       id: _string(json['id']),
-      prompt: _string(json['prompt']),
-      options: _objects(json['options'], 'reflection.options')
-          .map(ReflectionOption.fromJson)
-          .toList(growable: false),
+      prompt: _string(json['question']),
+      options: _objects(
+        json['options'],
+        'reflection.prompt.options',
+      ).map(ReflectionOption.fromCatalogJson).toList(growable: false),
     );
   }
 }
@@ -363,13 +387,20 @@ class ReflectionOption {
   final String id;
   final String label;
 
-  factory ReflectionOption.fromJson(Map<String, dynamic> json) {
-    return ReflectionOption(id: _string(json['id']), label: _string(json['label']));
+  factory ReflectionOption.fromCatalogJson(Map<String, dynamic> json) {
+    return ReflectionOption(
+      id: _string(json['id']),
+      label: _string(json['label']),
+    );
   }
 }
 
 class PracticeResultContent {
   const PracticeResultContent({
+    required this.showScore,
+    required this.showCorrectAnswers,
+    required this.showExplanations,
+    required this.recommendedNextActions,
     required this.solidThreshold,
     required this.buildingTitle,
     required this.buildingBody,
@@ -382,6 +413,10 @@ class PracticeResultContent {
     required this.seeOnMapLabel,
   });
 
+  final bool showScore;
+  final bool showCorrectAnswers;
+  final bool showExplanations;
+  final List<String> recommendedNextActions;
   final int solidThreshold;
   final String buildingTitle;
   final String buildingBody;
@@ -393,18 +428,29 @@ class PracticeResultContent {
   final String backToTodayLabel;
   final String seeOnMapLabel;
 
-  factory PracticeResultContent.fromJson(Map<String, dynamic> json) {
+  factory PracticeResultContent.fromCompletion(
+    Map<String, dynamic> json, {
+    required int independentCheckCount,
+  }) {
     return PracticeResultContent(
-      solidThreshold: _integer(json['solid_threshold'], fallback: 3),
-      buildingTitle: _string(json['building_title'], fallback: "Not yet, and that's fine"),
-      buildingBody: _string(json['building_body']),
-      buildingPlanMessage: _string(json['building_plan_message']),
-      solidTitle: _string(json['solid_title'], fallback: 'Good work'),
-      solidBody: _string(json['solid_body']),
-      solidPlanMessage: _string(json['solid_plan_message']),
-      nextLessonLabel: _string(json['next_lesson_label'], fallback: 'Next lesson'),
-      backToTodayLabel: _string(json['back_to_today_label'], fallback: 'Back to Today'),
-      seeOnMapLabel: _string(json['see_on_map_label'], fallback: 'See it on my map'),
+      showScore: _boolean(json['show_score'], fallback: true),
+      showCorrectAnswers: _boolean(
+        json['show_correct_answers'],
+        fallback: true,
+      ),
+      showExplanations: _boolean(json['show_explanations'], fallback: true),
+      recommendedNextActions: _strings(json['recommended_next_action']),
+      solidThreshold: (independentCheckCount * 0.75).ceil(),
+      buildingTitle: "Not yet, and that's fine",
+      buildingBody:
+          'You got {score} out of {total} questions correct on {topic}.',
+      buildingPlanMessage: 'Keep practising this topic to build confidence.',
+      solidTitle: 'Good work',
+      solidBody: 'You got {score} out of {total} questions correct on {topic}.',
+      solidPlanMessage: 'Your answers show that this skill is becoming solid.',
+      nextLessonLabel: 'Continue learning {topic}',
+      backToTodayLabel: 'Back to the Map',
+      seeOnMapLabel: 'See it on my Map',
     );
   }
 }
@@ -436,6 +482,7 @@ class PracticeAnswerResult {
     required this.correctAnswer,
     required this.isCorrect,
     required this.didNotKnow,
+    required this.explanation,
   });
 
   final String question;
@@ -443,6 +490,7 @@ class PracticeAnswerResult {
   final String correctAnswer;
   final bool isCorrect;
   final bool didNotKnow;
+  final String explanation;
 }
 
 Map<String, dynamic> _object(dynamic value, String fieldName) {
@@ -452,7 +500,9 @@ Map<String, dynamic> _object(dynamic value, String fieldName) {
 
 List<Map<String, dynamic>> _objects(dynamic value, String fieldName) {
   if (value == null) return const [];
-  if (value is! List) throw FormatException('Expected "$fieldName" to be a list.');
+  if (value is! List) {
+    throw FormatException('Expected "$fieldName" to be a list.');
+  }
   return value.map((item) => _object(item, fieldName)).toList(growable: false);
 }
 
@@ -467,5 +517,5 @@ String _string(dynamic value, {String fallback = ''}) =>
 int _integer(dynamic value, {required int fallback}) =>
     value is int ? value : int.tryParse(value?.toString() ?? '') ?? fallback;
 
-bool _boolean(dynamic value, {bool fallback = false}) =>
+bool _boolean(dynamic value, {required bool fallback}) =>
     value is bool ? value : fallback;

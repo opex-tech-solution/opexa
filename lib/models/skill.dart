@@ -1,16 +1,9 @@
 /// Represents the learner's current state for a skill brick on the Map.
-enum BrickState {
-  unchecked,
-  notSure,
-  building,
-  solid,
-  mastered,
-  lockedIn,
-}
+enum BrickState { unchecked, notSure, building, solid, mastered, lockedIn }
 
 /// A skill shown on the OpexA learning Map.
 ///
-/// `contentId` is the stable identifier shared by all learning experiences
+/// `topicId` is the stable identifier shared by all learning experiences
 /// associated with this skill. Teach Me and Practice Lesson use the same ID
 /// to retrieve their own content from the topic record in the JSON content bank.
 class Skill {
@@ -18,8 +11,9 @@ class Skill {
     this.name,
     this.state, {
     this.trending = false,
-    this.contentId,
-  });
+    String? topicId,
+    String? contentId,
+  }) : topicId = topicId ?? contentId;
 
   /// Human-readable skill name displayed on the Map.
   final String name;
@@ -30,7 +24,7 @@ class Skill {
   /// Whether this skill should display the trending indicator on the Map.
   final bool trending;
 
-  /// Stable topic ID used by both Teach Me and Practice Lesson repositories.
+  /// Stable topic ID used by Teach Me and Practice Lesson repositories.
   ///
   /// Example: `two_step_equations`.
   ///
@@ -38,9 +32,11 @@ class Skill {
   /// and quick checks. The Practice Lesson repository uses the same ID to
   /// retrieve guided practice, hints, reflection prompts and independent checks.
   ///
-  /// It is nullable to preserve compatibility with skills that do not yet
-  /// have content in the JSON bank.
-  final String? contentId;
+  /// It is nullable to preserve compatibility with skills without catalog
+  /// content. [contentId] remains as a compatibility alias.
+  final String? topicId;
+
+  String? get contentId => topicId;
 }
 
 /// Organises skill bricks into the three learning sections displayed on the Map.
@@ -72,7 +68,7 @@ class WallData {
 /// Sample Mathematics wall based on the OpexA Map reference.
 ///
 /// Each skill with available learning content is connected to the JSON content
-/// bank through `contentId`. Both Teach Me and Practice Lesson resolve content
+/// bank through `topicId`. Both Teach Me and Practice Lesson resolve content
 /// through that same ID; they do not need separate Skill models or IDs.
 WallData buildWall({bool afterFirstCheck = false}) {
   const unchecked = BrickState.unchecked;
@@ -83,72 +79,50 @@ WallData buildWall({bool afterFirstCheck = false}) {
         Skill(
           'Simultaneous equations',
           unchecked,
-          contentId: 'simultaneous_equations',
+          topicId: 'simultaneous_equations',
         ),
       ],
     ],
     klass: const [
       [
-        Skill('Harder equations', unchecked, contentId: 'harder_equations'),
-        Skill('Word problems', unchecked, contentId: 'word_problems'),
-        Skill(
-          'Expanding brackets',
-          unchecked,
-          contentId: 'expanding_brackets',
-        ),
+        Skill('Harder equations', unchecked, topicId: 'harder_equations'),
+        Skill('Word problems', unchecked, topicId: 'word_problems'),
+        Skill('Expanding brackets', unchecked, topicId: 'expanding_brackets'),
       ],
-      [
-        Skill(
-          'Two-step equations',
-          unchecked,
-          contentId: 'two_step_equations',
-        ),
-      ],
+      [Skill('Two-step equations', unchecked, topicId: 'two_step_equations')],
     ],
     foundations: [
       const [
-        Skill('Substituting', unchecked, contentId: 'substitution'),
+        Skill('Substituting', unchecked, topicId: 'substitution'),
         Skill(
           'Multiply & divide integers',
           unchecked,
-          contentId: 'multiplying_dividing_integers',
+          topicId: 'multiplying_dividing_integers',
         ),
-        Skill(
-          'Simplifying',
-          unchecked,
-          contentId: 'simplifying_expressions',
-        ),
+        Skill('Simplifying', unchecked, topicId: 'simplifying_expressions'),
       ],
       [
         Skill(
           'One-step equations',
           afterFirstCheck ? BrickState.notSure : BrickState.solid,
-          contentId: 'one_step_equations',
+          topicId: 'one_step_equations',
         ),
         Skill(
           'Add & subtract integers',
           unchecked,
-          contentId: 'addition_subtraction_integers',
+          topicId: 'addition_subtraction_integers',
         ),
-        Skill(
-          'Negative numbers',
-          unchecked,
-          contentId: 'negative_numbers',
-        ),
+        Skill('Negative numbers', unchecked, topicId: 'negative_numbers'),
       ],
       const [
-        Skill(
-          'Order of operations',
-          unchecked,
-          contentId: 'order_of_operations',
-        ),
+        Skill('Order of operations', unchecked, topicId: 'order_of_operations'),
         Skill(
           'Letters for numbers',
           BrickState.solid,
           trending: true,
-          contentId: 'letters_for_numbers',
+          topicId: 'letters_for_numbers',
         ),
-        Skill('Whole numbers', unchecked, contentId: 'whole_numbers'),
+        Skill('Whole numbers', unchecked, topicId: 'whole_numbers'),
       ],
     ],
   );

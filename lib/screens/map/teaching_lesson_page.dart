@@ -72,7 +72,7 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
     try {
       final topic = await _contentRepository.getTopicForSkill(
         skillName: widget.skill.name,
-        topicId: widget.topicId ?? widget.skill.contentId,
+        topicId: widget.topicId ?? widget.skill.topicId,
       );
 
       if (!mounted) return;
@@ -829,7 +829,7 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
                                 MaterialPageRoute<void>(
                                   builder: (_) => QuickPracticeScreen(
                                     skill: widget.skill,
-                                    topicId: widget.topicId ?? widget.skill.contentId,
+                                    topicId: widget.topicId ?? widget.skill.topicId,
                                     topicContent: _topic,
                                   ),
                                 ),
@@ -1071,7 +1071,7 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
     try {
       final topic = await _contentRepository.getTopicForSkill(
         skillName: widget.skill.name,
-        topicId: widget.topicId ?? widget.skill.contentId,
+        topicId: widget.topicId ?? widget.skill.topicId,
       );
       if (!mounted) return;
       setState(() {

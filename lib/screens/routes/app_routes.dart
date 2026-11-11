@@ -58,6 +58,7 @@ class AppRoutes {
       'main-map-learning-lesson';
   static const String mainMapSkillDetails = 'main-map-skill-details';
   static const String mainMapLearningList = 'main-map-learning-list';
+  static const String mainMapPracticeLesson = 'practice-lesson';
 
   // Opened above the bottom bar, from the Map tab. It is a child of mainMap in
   // the router below, so its path starts with mainMap.
@@ -242,6 +243,12 @@ class AppRouter {
                   GoRoute(
                     path: AppRoutes.mainMapLearningList,
                     builder: (context, state) => const LearningListPage(),
+                  ),
+                  GoRoute(
+                    path: '${AppRoutes.mainMapPracticeLesson}/:topicId',
+                    builder: (context, state) => PracticeLessonPage(
+                      topicId: state.pathParameters['topicId']!,
+                    ),
                   ),
                   GoRoute(
                     path: AppRoutes.mainMapBlockDetails,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../theme/widget.dart';
+import 'widget.dart';
 
 /// One tab in [AppBottomNavBar].
 class AppNavItem {
@@ -12,24 +13,19 @@ class AppNavItem {
   final IconData? selectedIcon;
 }
 
-/// Bottom navigation bar styled like the design: a lighter surface with a thin
-/// top line, a soft grey pill behind the selected icon, a blue selected icon,
-/// and a bold label for the selected tab.
-///
-/// All colours come from the current Theme (see Styles.themeData), so changing
-/// the theme restyles the bar. It knows nothing about routing: it just reports
-/// taps through [onSelected].
 class AppBottomNavBar extends StatelessWidget {
   const AppBottomNavBar({
     super.key,
     required this.items,
     required this.currentIndex,
     required this.onSelected,
+    this.hideNavBar = false,
   });
 
   final List<AppNavItem> items;
   final int currentIndex;
   final ValueChanged<int> onSelected;
+  final bool hideNavBar;
 
   @override
   Widget build(BuildContext context) {
@@ -38,36 +34,41 @@ class AppBottomNavBar extends StatelessWidget {
     final borderColor = theme.dividerColor;
     final colors = context.colors;
 
-    return Material(
-      color: barColor,
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: borderColor)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: SizedBox(
-            height: 64,
-            child: Row(
-              children: [
-                for (var i = 0; i < items.length; i++)
-                  Expanded(
-                    child: _NavButton(
-                      item: items[i],
-                      selected: i == currentIndex,
-                      iconColor: i == currentIndex ? colors.accent : colors.textSecondary,
-                      labelColor: i == currentIndex
-                          ? colors.textPrimary
-                          : colors.textSecondary,
-                      pillColor: colors.accentContainer,
-                      onTap: () => onSelected(i),
-                    ),
-                  ),
-              ],
+    return ValueListenableBuilder(
+      valueListenable: navBarVisible,
+      builder: (context, _isNavVisible, child) {
+        return _isNavVisible == true ? Material(
+          color: barColor,
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: borderColor)),
+            ),
+            child: SafeArea(
+              top: false,
+              child: SizedBox(
+                height: 64,
+                child: Row(
+                  children: [
+                    for (var i = 0; i < items.length; i++)
+                      Expanded(
+                        child: _NavButton(
+                          item: items[i],
+                          selected: i == currentIndex,
+                          iconColor: i == currentIndex ? colors.accent : colors.textSecondary,
+                          labelColor: i == currentIndex
+                              ? colors.textPrimary
+                              : colors.textSecondary,
+                          pillColor: colors.accentContainer,
+                          onTap: () => onSelected(i),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        ) : const SizedBox.shrink();
+      }
     );
   }
 }

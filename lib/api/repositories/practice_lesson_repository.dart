@@ -4,7 +4,6 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import '../../models/model.dart';
 
-
 /// Loads a topic's optional guided-practice lesson from the shared OpexA
 /// Mathematics JSON catalog. It reads the JSON directly so the existing
 /// LessonContentCatalog model does not need to change.
@@ -20,7 +19,9 @@ class PracticeLessonRepository {
     final raw = await rootBundle.loadString(assetPath);
     final decoded = jsonDecode(raw);
     if (decoded is! Map) {
-      throw const FormatException('The content catalog root must be a JSON object.');
+      throw const FormatException(
+        'The content catalog root must be a JSON object.',
+      );
     }
     return Map<String, dynamic>.from(decoded);
   }
@@ -38,7 +39,9 @@ class PracticeLessonRepository {
     final catalog = await _catalog();
     final topics = catalog['topics'];
     if (topics is! List) {
-      throw const FormatException('The content catalog does not contain a topics list.');
+      throw const FormatException(
+        'The content catalog does not contain a topics list.',
+      );
     }
 
     for (final item in topics) {
@@ -49,24 +52,26 @@ class PracticeLessonRepository {
       final lesson = topic['practice_lesson'];
       if (lesson == null) return null;
       if (lesson is! Map) {
-        throw FormatException('The practice_lesson for "$topicId" must be an object.');
+        throw FormatException(
+          'The practice_lesson for "$topicId" must be an object.',
+        );
       }
-      return PracticeLessonContent.fromJson(
-        Map<String, dynamic>.from(lesson),
+      return PracticeLessonContent.fromTopicJson(
+        topicId: topicId,
+        topicName: _requiredString(topic, 'name', topicId),
+        topicLevel: _requiredString(topic, 'level', topicId),
+        topicSummary: _requiredString(topic, 'summary', topicId),
+        json: Map<String, dynamic>.from(lesson),
       );
     }
     return null;
   }
 
-  Future<String?> getTopicName(String topicId) async {
-    final catalog = await _catalog();
-    final topics = catalog['topics'];
-    if (topics is! List) return null;
-    for (final item in topics) {
-      if (item is Map && item['id'] == topicId) {
-        return item['name']?.toString();
-      }
+  String _requiredString(Map<String, dynamic> topic, String field, String id) {
+    final value = topic[field];
+    if (value is! String || value.trim().isEmpty) {
+      throw FormatException('Topic "$id" must have a non-empty "$field".');
     }
-    return null;
+    return value;
   }
 }

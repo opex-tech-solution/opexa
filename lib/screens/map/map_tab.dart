@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../models/practice_lesson_content.dart';
 import '../../models/skill.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/bricks.dart';
@@ -26,6 +27,71 @@ class MapTab extends StatefulWidget {
 
 class _MapTabState extends State<MapTab> {
   bool _afterFirstCheck = false;
+  final Map<String, BrickState> _practiceResults = {};
+
+  WallData _wallWithPracticeResults(WallData wall) {
+    List<List<Skill>> applyResults(List<List<Skill>> rows) => [
+      for (final row in rows)
+        [
+          for (final skill in row)
+            Skill(
+              skill.name,
+              _practiceResults[skill.topicId] ?? skill.state,
+              trending: skill.trending,
+              topicId: skill.topicId,
+            ),
+        ],
+    ];
+
+    return WallData(
+      stretch: applyResults(wall.stretch),
+      klass: applyResults(wall.klass),
+      foundations: applyResults(wall.foundations),
+    );
+  }
+
+  Skill? _nextPractice(WallData wall) {
+    final skills = [
+      ...wall.klass.expand((row) => row),
+      ...wall.foundations.expand((row) => row),
+      ...wall.stretch.expand((row) => row),
+    ].where((skill) => skill.topicId != null);
+
+    for (final state in [
+      BrickState.building,
+      BrickState.notSure,
+      BrickState.unchecked,
+      BrickState.solid,
+      BrickState.mastered,
+      BrickState.lockedIn,
+    ]) {
+      for (final skill in skills) {
+        if (skill.state == state) return skill;
+      }
+    }
+    return null;
+  }
+
+  Future<void> _startPractice(Skill skill) async {
+    final topicId = skill.topicId;
+    if (topicId == null) {
+      _openSkill(skill);
+      return;
+    }
+
+    navBarVisible.value = false;
+    final result = await context.push<PracticeLessonResult>(
+      '${AppRoutes.mainMap}/${AppRoutes.mainMapPracticeLesson}/'
+      '${Uri.encodeComponent(topicId)}',
+    );
+    if (!mounted || result == null) return;
+
+    setState(() {
+      _practiceResults[result.topicId] = result.status == 'solid'
+          ? BrickState.solid
+          : BrickState.building;
+    });
+  }
 
   void _openSkill(Skill skill) {
     context.push(
@@ -95,51 +161,104 @@ class _MapTabState extends State<MapTab> {
     );
   }
 
-  Widget _statusCard() {
+  Widget _statusCard(WallData wall) {
     final colors = context.colors;
-    if (_afterFirstCheck) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: colors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: colors.divider),
-        ),
-        child: const Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Your wall right after your first check',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
-            ),
-            SizedBox(height: 8),
-            Text(
-              '7 November. Switch to Now to see what you have built since.',
-              style: TextStyle(fontSize: 13, height: 1.4),
-            ),
-          ],
-        ),
-      );
-    }
+    final nextPractice = _nextPractice(wall);
 
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: colors.textPrimary.withOpacity(0.85)),
+    return Material(
+      color: colors.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: colors.border, width: 1.5),
       ),
-      child: const Column(
+      clipBehavior: Clip.antiAlias,
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionLabel('All in place'),
-          SizedBox(height: 10),
-          Text(
-            'Nothing to repair right now. Keep going with your class topic and quick checks.',
-            style: TextStyle(fontSize: 14, height: 1.45),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 18, 18, 0),
+            child: Text(
+              'YOUR NEXT PRACTICE',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
+                color: colors.textSecondary,
+                letterSpacing: 0.8,
+              ),
+            ),
           ),
+          if (nextPractice case final skill?) ...[
+            InkWell(
+              onTap: () => _openSkill(skill),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(18, 14, 18, 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BrickFace(skill.state, width: 44, height: 34),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            skill.name,
+                            style: TextStyle(
+                              fontSize: 16.5,
+                              fontWeight: FontWeight.bold,
+                              color: colors.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            switch (skill.state) {
+                              BrickState.building =>
+                                'Keep building this skill with a guided practice.',
+                              BrickState.notSure =>
+                                'A short practice can help check your understanding.',
+                              BrickState.unchecked =>
+                                'Start with a guided practice on this topic.',
+                              _ =>
+                                'Keep this skill fresh with another practice.',
+                            },
+                            style: TextStyle(
+                              fontSize: 13,
+                              height: 1.35,
+                              color: colors.textSecondary,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.chevron_right, color: colors.textSecondary),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 10, 18, 18),
+              child: SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: FilledButton.icon(
+                  onPressed: () => _startPractice(skill),
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('Start practice'),
+                  style: FilledButton.styleFrom(
+                    backgroundColor: colors.accent,
+                    foregroundColor: colors.onAccent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ] else
+            const Padding(
+              padding: EdgeInsets.all(18),
+              child: Text('There is no practice recommendation right now.'),
+            ),
         ],
       ),
     );
@@ -378,7 +497,9 @@ class _MapTabState extends State<MapTab> {
 
   @override
   Widget build(BuildContext context) {
-    final wall = buildWall(afterFirstCheck: _afterFirstCheck);
+    final wall = _wallWithPracticeResults(
+      buildWall(afterFirstCheck: _afterFirstCheck),
+    );
     final solid = wall.count(BrickState.solid);
     final notSure = wall.count(BrickState.notSure);
     final unchecked = wall.count(BrickState.unchecked);
@@ -433,7 +554,7 @@ class _MapTabState extends State<MapTab> {
         const SizedBox(height: 16),
         LearningListLauncherCard(),
         const SizedBox(height: 16),
-        _statusCard(),
+        _statusCard(wall),
         const SizedBox(height: 20),
         _skillSection(
           title: 'Stretch',
@@ -574,15 +695,14 @@ class _MapSkillTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: 76,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 2),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Stack(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            InkWell(
+              onTap: onTap,
+              child: Stack(
                 clipBehavior: Clip.none,
                 children: [
                   BrickFace(skill.state, width: 70, height: 40),
@@ -607,20 +727,20 @@ class _MapSkillTile extends StatelessWidget {
                     ),
                 ],
               ),
-              const SizedBox(height: 6),
-              Text(
-                skill.name,
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 11.5,
-                  height: 1.2,
-                  fontWeight: FontWeight.w600,
-                  color: context.colors.textPrimary,
-                ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              skill.name,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11.5,
+                height: 1.2,
+                fontWeight: FontWeight.w600,
+                color: context.colors.textPrimary,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
