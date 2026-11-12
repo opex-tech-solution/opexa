@@ -71,7 +71,6 @@ class TodaySamples {
     nextUp: const NextUp(
       kind: LessonKind.foundation,
       title: 'Add & subtract integers',
-        topicId: 'addition_subtraction_integers',
       topicId: 'addition_subtraction_integers',
       description:
           'Fixing this makes multiply & divide integers, simplifying and '
@@ -90,9 +89,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.klass,
         title: 'Two-step equations',
-        topicId: 'two_step_equations',
-        topicId: 'two_step_equations',
-        topicId: 'two_step_equations',
+      topicId: 'two_step_equations',
         brick: BrickState.solid,
         status: LessonStatus.todo,
         caption: 'About 8 min',
@@ -100,8 +97,6 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.stretch,
         title: 'Word problems',
-        topicId: 'word_problems',
-        topicId: 'word_problems',
         topicId: 'word_problems',
         brick: BrickState.unchecked,
         status: LessonStatus.todo,
@@ -125,6 +120,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.foundation,
         title: 'Add & subtract integers',
+        topicId: 'addition_subtraction_integers',
         brick: BrickState.building,
         status: LessonStatus.done,
         caption: 'Solid today',
@@ -132,6 +128,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.klass,
         title: 'Two-step equations',
+        topicId: 'two_step_equations',
         brick: BrickState.solid,
         status: LessonStatus.done,
         caption: 'Solid today',
@@ -139,6 +136,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.stretch,
         title: 'Word problems',
+        topicId: 'word_problems',
         brick: BrickState.unchecked,
         status: LessonStatus.done,
         caption: 'Solid today',
@@ -154,7 +152,6 @@ class TodaySamples {
   static const _quickCheck = NextUp(
     kind: LessonKind.quickCheck,
     title: 'One-step equations',
-      topicId: 'one_step_equations',
     topicId: 'one_step_equations',
     description:
         'Two quick questions from 7 days ago. If it’s still there, this block '
@@ -224,6 +221,7 @@ class TodaySamples {
     nextUp: const NextUp(
       kind: LessonKind.quickCheck,
       title: 'One-step equations',
+      topicId: 'one_step_equations',
       description:
           'Two quick questions from 7 days ago. If it’s still there, this '
           'block locks in.',
