@@ -84,6 +84,7 @@ class NextUp {
     this.badge,
     this.secondaryLabel,
     this.tone = NextUpTone.accent,
+    this.topicId,
   });
 
   final LessonKind kind;
@@ -104,6 +105,8 @@ class NextUp {
   /// e.g. "Not today". Null hides the link.
   final String? secondaryLabel;
   final NextUpTone tone;
+  /// Stable ID into assets/json/opexa_math_content.json.
+  final String? topicId;
 }
 
 /// One row of "Also today" / "Today's plan".
@@ -114,6 +117,7 @@ class PlanItem {
     required this.brick,
     required this.status,
     required this.caption,
+    this.topicId,
   });
 
   final LessonKind kind;
@@ -123,6 +127,8 @@ class PlanItem {
 
   /// Second line: "About 8 min", "Solid today", "Pick this week's topic below."
   final String caption;
+  /// Stable ID into assets/json/opexa_math_content.json.
+  final String? topicId;
 }
 
 /// "What are you working on in Maths this week?"
