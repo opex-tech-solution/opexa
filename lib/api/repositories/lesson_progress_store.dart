@@ -55,6 +55,7 @@ class LessonProgressStore extends ChangeNotifier {
   final Set<String> _learned = {};
   final Set<String> _practised = {};
   final Set<String> _completedToday = {};
+  final Set<String> _activityToday = {};
   final Map<String, String> _statusByTopic = {};
   final Map<String, InProgressLesson> _inProgress = {};
 
@@ -63,9 +64,11 @@ class LessonProgressStore extends ChangeNotifier {
 
   bool get firstCheckCompleted => _firstCheckCompleted;
   Set<String> get completedToday => Set.unmodifiable(_completedToday);
+  Set<String> get activityToday => Set.unmodifiable(_activityToday);
   bool isLearned(String topicId) => _learned.contains(topicId);
   bool isPractised(String topicId) => _practised.contains(topicId);
   bool hasCompletedToday(String topicId) => _completedToday.contains(topicId);
+  bool hasActivityToday(String topicId) => _activityToday.contains(topicId);
   InProgressLesson? inProgressFor(String topicId) => _inProgress[topicId];
 
   BrickProgressStatus? statusFor(String topicId) {
@@ -124,10 +127,10 @@ class LessonProgressStore extends ChangeNotifier {
     if (topicId.isEmpty) return;
     _ensureCurrentDay();
     final learnedChanged = _learned.add(topicId);
-    final todayChanged = _completedToday.add(topicId);
+    final activityChanged = _activityToday.add(topicId);
     final previousStatus = _statusByTopic[topicId];
     _statusByTopic.putIfAbsent(topicId, () => 'building');
-    if (learnedChanged || todayChanged || previousStatus == null) {
+    if (learnedChanged || activityChanged || previousStatus == null) {
       notifyListeners();
     }
     await _save();
@@ -143,6 +146,7 @@ class LessonProgressStore extends ChangeNotifier {
     _learned.add(topicId);
     _practised.add(topicId);
     _completedToday.add(topicId);
+    _activityToday.add(topicId);
     _statusByTopic[topicId] = status == 'solid' ? 'solid' : 'building';
     notifyListeners();
     await _save();
@@ -176,6 +180,7 @@ class LessonProgressStore extends ChangeNotifier {
     if (_activityDate == today) return;
     _activityDate = today;
     _completedToday.clear();
+    _activityToday.clear();
   }
 
   void _apply(dynamic data) {
@@ -191,6 +196,15 @@ class LessonProgressStore extends ChangeNotifier {
     _completedToday
       ..clear()
       ..addAll((data['completed_today'] as List? ?? const []).map((e) => '$e'));
+    final savedActivity = data['activity_today'];
+    _activityToday
+      ..clear()
+      ..addAll(
+        (savedActivity is List
+                ? savedActivity
+                : (data['completed_today'] as List? ?? const []))
+            .map((e) => '$e'),
+      );
     _statusByTopic
       ..clear()
       ..addAll(
@@ -237,6 +251,7 @@ class LessonProgressStore extends ChangeNotifier {
           'first_check_completed': _firstCheckCompleted,
           'activity_date': _activityDate,
           'completed_today': _completedToday.toList(),
+          'activity_today': _activityToday.toList(),
           'status_by_topic': _statusByTopic,
           'in_progress': _inProgress.values.map((e) => e.toJson()).toList(),
         }),
