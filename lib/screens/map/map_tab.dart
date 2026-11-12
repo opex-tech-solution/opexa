@@ -36,7 +36,12 @@ class _MapTabState extends State<MapTab> {
           for (final skill in row)
             Skill(
               skill.name,
-              switch (progress.statusFor(skill.topicId ?? '')) {\n                BrickProgressStatus.notSure => BrickState.notSure,\n                BrickProgressStatus.building => BrickState.building,\n                BrickProgressStatus.solid => BrickState.solid,\n                BrickProgressStatus.mastered => BrickState.mastered,\n                BrickProgressStatus.lockedIn => BrickState.lockedIn,\n                null => skill.state,\n              },
+              switch (progress.statusFor(skill.topicId ?? '')) {
+                BrickProgressStatus.notSure => BrickState.notSure,
+                BrickProgressStatus.building => BrickState.building,
+                BrickProgressStatus.solid => BrickState.solid,
+                BrickProgressStatus.mastered => BrickState.mastered,
+                BrickProgressStatus.lockedIn => BrickState.lockedIn,\n                null => skill.state,\n              },
               trending: skill.trending,
               topicId: skill.topicId,
             ),
