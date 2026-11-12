@@ -16,10 +16,8 @@ class InProgressLesson {
 
   final String topicId;
   final String topicName;
-  final String kind; // "Class", "Foundation", ...
+  final String kind;
   final DateTime savedAt;
-
-  /// Exact place to resume from; null means "start at the beginning".
   final Map<String, dynamic>? snapshot;
 
   Map<String, dynamic> toJson() => {
@@ -42,10 +40,10 @@ class InProgressLesson {
   }
 }
 
-/// What the learner has learned, practised and paused. Kept on the phone, so
-/// it works offline ("Your answers are saved on this phone").
+/// Offline-first learner progress shared by Today, Map, Teach Me and Practice.
 ///
-/// Call [load] once in main() before runApp, like ThemeController.init().
+/// This store is the common source of truth for completion. The JSON catalogue
+/// defines learning content; this store records what the learner has done.
 class LessonProgressStore extends ChangeNotifier {
   LessonProgressStore._();
 
@@ -56,11 +54,31 @@ class LessonProgressStore extends ChangeNotifier {
 
   final Set<String> _learned = {};
   final Set<String> _practised = {};
+  final Set<String> _completedToday = {};
+  final Map<String, String> _statusByTopic = {};
   final Map<String, InProgressLesson> _inProgress = {};
 
+  bool _firstCheckCompleted = false;
+  String _activityDate = _dateKey(DateTime.now());
+
+  bool get firstCheckCompleted => _firstCheckCompleted;
+  Set<String> get completedToday => Set.unmodifiable(_completedToday);
   bool isLearned(String topicId) => _learned.contains(topicId);
   bool isPractised(String topicId) => _practised.contains(topicId);
+  bool hasCompletedToday(String topicId) => _completedToday.contains(topicId);
   InProgressLesson? inProgressFor(String topicId) => _inProgress[topicId];
+
+  BrickProgressStatus? statusFor(String topicId) {
+    final status = _statusByTopic[topicId];
+    return switch (status) {
+      'solid' => BrickProgressStatus.solid,
+      'building' => BrickProgressStatus.building,
+      'mastered' => BrickProgressStatus.mastered,
+      'locked_in' => BrickProgressStatus.lockedIn,
+      'not_sure' => BrickProgressStatus.notSure,
+      _ => null,
+    };
+  }
 
   /// The most recently paused lesson, for "Carry on with it".
   InProgressLesson? get latestInProgress {
@@ -79,11 +97,20 @@ class LessonProgressStore extends ChangeNotifier {
         _apply(jsonDecode(raw));
       } else {
         await _seedFromAsset();
-        await _save();
       }
+      _ensureCurrentDay();
+      await _save();
+      notifyListeners();
     } catch (error) {
       debugPrint('Could not load lesson progress: $error');
     }
+  }
+
+  Future<void> markFirstCheckCompleted() async {
+    if (_firstCheckCompleted) return;
+    _firstCheckCompleted = true;
+    notifyListeners();
+    await _save();
   }
 
   Future<void> markLearned(String topicId) async {
@@ -92,12 +119,28 @@ class LessonProgressStore extends ChangeNotifier {
     await _save();
   }
 
-  /// Practice finished: counts as practised and is no longer "in progress".
-  Future<void> markPractised(String topicId) async {
+  /// Records the seven-stage Teach Me experience as complete.
+  Future<void> markLessonCompleted(String topicId) async {
     if (topicId.isEmpty) return;
-    _practised.add(topicId);
+    _ensureCurrentDay();
+    final changed = _learned.add(topicId) || _completedToday.add(topicId);
+    _completedToday.add(topicId);
+    _statusByTopic.putIfAbsent(topicId, () => 'building');
+    if (changed) notifyListeners();
+    await _save();
+  }
+
+  /// Records the eight-stage Practice Lesson and its resulting skill state.
+  Future<void> markPractised(
+    String topicId, {
+    String status = 'building',
+  }) async {
+    if (topicId.isEmpty) return;
+    _ensureCurrentDay();
     _learned.add(topicId);
-    _inProgress.remove(topicId);
+    _practised.add(topicId);
+    _completedToday.add(topicId);
+    _statusByTopic[topicId] = status == 'solid' ? 'solid' : 'building';
     notifyListeners();
     await _save();
   }
@@ -125,7 +168,12 @@ class LessonProgressStore extends ChangeNotifier {
     await _save();
   }
 
-  // ── storage ────────────────────────────────────────────────────────────
+  void _ensureCurrentDay() {
+    final today = _dateKey(DateTime.now());
+    if (_activityDate == today) return;
+    _activityDate = today;
+    _completedToday.clear();
+  }
 
   void _apply(dynamic data) {
     if (data is! Map) return;
@@ -135,6 +183,18 @@ class LessonProgressStore extends ChangeNotifier {
     _practised
       ..clear()
       ..addAll((data['practised'] as List? ?? const []).map((e) => '$e'));
+    _firstCheckCompleted = data['first_check_completed'] == true;
+    _activityDate = '${data['activity_date'] ?? _dateKey(DateTime.now())}';
+    _completedToday
+      ..clear()
+      ..addAll((data['completed_today'] as List? ?? const []).map((e) => '$e'));
+    _statusByTopic
+      ..clear()
+      ..addAll(
+        (data['status_by_topic'] as Map? ?? const {}).map(
+          (key, value) => MapEntry('$key', '$value'),
+        ),
+      );
     _inProgress.clear();
     for (final item in (data['in_progress'] as List? ?? const [])) {
       if (item is Map) {
@@ -171,6 +231,10 @@ class LessonProgressStore extends ChangeNotifier {
         jsonEncode({
           'learned': _learned.toList(),
           'practised': _practised.toList(),
+          'first_check_completed': _firstCheckCompleted,
+          'activity_date': _activityDate,
+          'completed_today': _completedToday.toList(),
+          'status_by_topic': _statusByTopic,
           'in_progress': _inProgress.values.map((e) => e.toJson()).toList(),
         }),
       );
@@ -178,4 +242,18 @@ class LessonProgressStore extends ChangeNotifier {
       debugPrint('Could not save lesson progress: $error');
     }
   }
+
+  static String _dateKey(DateTime date) =>
+      '${date.year.toString().padLeft(4, '0')}-'
+      '${date.month.toString().padLeft(2, '0')}-'
+      '${date.day.toString().padLeft(2, '0')}';
+}
+
+/// Neutral status type so the repository does not depend on Map presentation.
+enum BrickProgressStatus {
+  notSure,
+  building,
+  solid,
+  mastered,
+  lockedIn,
 }
