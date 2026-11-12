@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../api/repositories/lesson_progress_store.dart';
 import '../../models/practice_lesson_content.dart';
 import '../../models/skill.dart';
 import '../../theme/app_colors.dart';
@@ -27,16 +28,15 @@ class MapTab extends StatefulWidget {
 
 class _MapTabState extends State<MapTab> {
   bool _afterFirstCheck = false;
-  final Map<String, BrickState> _practiceResults = {};
-
   WallData _wallWithPracticeResults(WallData wall) {
+    final progress = LessonProgressStore.instance;
     List<List<Skill>> applyResults(List<List<Skill>> rows) => [
       for (final row in rows)
         [
           for (final skill in row)
             Skill(
               skill.name,
-              _practiceResults[skill.topicId] ?? skill.state,
+              switch (progress.statusFor(skill.topicId ?? '')) {\n                BrickProgressStatus.notSure => BrickState.notSure,\n                BrickProgressStatus.building => BrickState.building,\n                BrickProgressStatus.solid => BrickState.solid,\n                BrickProgressStatus.mastered => BrickState.mastered,\n                BrickProgressStatus.lockedIn => BrickState.lockedIn,\n                null => skill.state,\n              },
               trending: skill.trending,
               topicId: skill.topicId,
             ),
@@ -80,17 +80,14 @@ class _MapTabState extends State<MapTab> {
     }
 
     navBarVisible.value = false;
-    final result = await context.push<PracticeLessonResult>(
-      '${AppRoutes.mainMap}/${AppRoutes.mainMapPracticeLesson}/'
-      '${Uri.encodeComponent(topicId)}',
-    );
-    if (!mounted || result == null) return;
-
-    setState(() {
-      _practiceResults[result.topicId] = result.status == 'solid'
-          ? BrickState.solid
-          : BrickState.building;
-    });
+    try {
+      await context.push<PracticeLessonResult>(
+        '${AppRoutes.mainMap}/${AppRoutes.mainMapPracticeLesson}/'
+        '${Uri.encodeComponent(topicId)}',
+      );
+    } finally {
+      if (mounted) navBarVisible.value = true;
+    }
   }
 
   void _openSkill(Skill skill) {
@@ -497,14 +494,17 @@ class _MapTabState extends State<MapTab> {
 
   @override
   Widget build(BuildContext context) {
-    final wall = _wallWithPracticeResults(
-      buildWall(afterFirstCheck: _afterFirstCheck),
-    );
-    final solid = wall.count(BrickState.solid);
-    final notSure = wall.count(BrickState.notSure);
-    final unchecked = wall.count(BrickState.unchecked);
+    return ListenableBuilder(
+      listenable: LessonProgressStore.instance,
+      builder: (context, _) {
+        final wall = _wallWithPracticeResults(
+          buildWall(afterFirstCheck: _afterFirstCheck),
+        );
+        final solid = wall.count(BrickState.solid);
+        final notSure = wall.count(BrickState.notSure);
+        final unchecked = wall.count(BrickState.unchecked);
 
-    return ListView(
+        return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 26),
       children: [
         const Text(
@@ -606,7 +606,9 @@ class _MapTabState extends State<MapTab> {
           'Based on the Nigerian national curriculum.',
           style: TextStyle(fontSize: 11.5, color: context.colors.textSecondary),
         ),
-      ],
+        ],
+        );
+      },
     );
   }
 }
