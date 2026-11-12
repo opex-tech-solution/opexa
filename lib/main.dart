@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'api/repositories/lesson_progress_store.dart';
+import 'screens/home/home_widget/today_store.dart';
 import 'screens/routes/widget.dart';
 import 'theme/widget.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ThemeController.init();
+  await LessonProgressStore.instance.load();
+  await TodayStore.instance.initFromProgress();
   runApp(const OpexAApp());
 }
 
