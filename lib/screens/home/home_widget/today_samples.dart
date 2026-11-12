@@ -89,7 +89,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.klass,
         title: 'Two-step equations',
-      topicId: 'two_step_equations',
+        topicId: 'two_step_equations',
         brick: BrickState.solid,
         status: LessonStatus.todo,
         caption: 'About 8 min',
@@ -306,6 +306,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.klass,
         title: 'Two-step equations',
+        topicId: 'two_step_equations',
         brick: BrickState.solid,
         status: LessonStatus.todo,
         caption: 'About 8 min',
@@ -313,6 +314,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.stretch,
         title: 'Word problems',
+        topicId: 'word_problems',
         brick: BrickState.unchecked,
         status: LessonStatus.todo,
         caption: 'About 10 min',
