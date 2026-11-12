@@ -28,11 +28,31 @@ class MapTab extends StatefulWidget {
 
 class _MapTabState extends State<MapTab> {
   bool _afterFirstCheck = false;
+  bool _hasSyncedFirstCheck = false;
 
   @override
   void initState() {
     super.initState();
-    _afterFirstCheck = LessonProgressStore.instance.firstCheckCompleted;
+    final progress = LessonProgressStore.instance;
+    _afterFirstCheck = progress.firstCheckCompleted;
+    _hasSyncedFirstCheck = progress.firstCheckCompleted;
+    progress.addListener(_syncFirstCheckView);
+  }
+
+  void _syncFirstCheckView() {
+    if (!mounted ||
+        _hasSyncedFirstCheck ||
+        !LessonProgressStore.instance.firstCheckCompleted) {
+      return;
+    }
+    _hasSyncedFirstCheck = true;
+    setState(() => _afterFirstCheck = true);
+  }
+
+  @override
+  void dispose() {
+    LessonProgressStore.instance.removeListener(_syncFirstCheckView);
+    super.dispose();
   }
   WallData _wallWithPracticeResults(WallData wall) {
     final progress = LessonProgressStore.instance;
