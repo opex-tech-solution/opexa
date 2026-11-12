@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../api/repositories/lesson_content_repository.dart';
 import '../../models/model.dart';
 import '../../theme/widget.dart';
 import '../routes/widget.dart';
@@ -44,11 +47,46 @@ class _TodayView extends StatelessWidget {
     extra: MathFlowArgs(userName: state.userName),
   );
 
-  // TODO: there is no lesson screen yet. Replace with the lesson route.
-  void _openLesson(BuildContext context) {
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(const SnackBar(content: Text('Lessons aren’t built yet.')));
+  Future<void> _openLesson(
+    BuildContext context, {
+    required String? topicId,
+    required String title,
+    required BrickState brick,
+    required LessonKind kind,
+  }) async {
+    final resolvedId =
+        topicId ?? LessonContentRepository.topicIdForSkillName(title);
+    if (resolvedId == null || resolvedId.isEmpty) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text('Learning content for "$title" is not available yet.')),
+        );
+      return;
+    }
+
+    final skill = Skill(title, brick, topicId: resolvedId);
+    navBarVisible.value = false;
+    try {
+      if (kind == LessonKind.quickCheck) {
+        final quickPath = AppRoutes.mainHomeQuickPractice.replaceFirst(
+          ':topicId',
+          Uri.encodeComponent(resolvedId),
+        );
+        await context.push(
+          '${AppRoutes.mainHome}/$quickPath',
+          extra: skill,
+        );
+      } else {
+        await context.push(
+          '${AppRoutes.mainMap}/${AppRoutes.mainMapSkillDetails}/'
+          '${AppRoutes.mainMapLearningLearningScreen}',
+          extra: skill,
+        );
+      }
+    } finally {
+      if (context.mounted) navBarVisible.value = true;
+    }
   }
 
   // ── layout ───────────────────────────────────────────────────────────────
@@ -173,7 +211,15 @@ class _TodayView extends StatelessWidget {
         const SizedBox(height: 10),
         NextUpCard(
           nextUp: nextUp,
-          onPrimary: () => _openLesson(context),
+          onPrimary: () => unawaited(
+            _openLesson(
+              context,
+              topicId: nextUp.topicId,
+              title: nextUp.title,
+              brick: nextUp.brick,
+              kind: nextUp.kind,
+            ),
+          ),
           onSecondary: TodayStore.instance.takeTodayOff,
         ),
         const SizedBox(height: 16),
@@ -192,7 +238,18 @@ class _TodayView extends StatelessWidget {
         ],
       ],
       if (state.plan.isNotEmpty) ...[
-        PlanCard(state: state, onOpen: (_) => _openLesson(context)),
+        PlanCard(
+          state: state,
+          onOpen: (item) => unawaited(
+            _openLesson(
+              context,
+              topicId: item.topicId,
+              title: item.title,
+              brick: item.brick,
+              kind: item.kind,
+            ),
+          ),
+        ),
         const SizedBox(height: 24),
       ],
       const SectionHeading('This week'),
