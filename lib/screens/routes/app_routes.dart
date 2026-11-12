@@ -238,9 +238,7 @@ class AppRouter {
                       return SkillDetailPage(skill: skill);
                     },
                     routes: [
-                        ],
-                  ),
-                  GoRoute(
+                      GoRoute(
                         path: AppRoutes.mainMapLearningLearningScreen,
                         builder: (context, state) {
                           final skill = state.extra is Skill
@@ -254,6 +252,8 @@ class AppRouter {
                           return TeachingLessonPage(skill: skill);
                         },
                       ),
+                    ],
+                  ),
                   GoRoute(
                     path: AppRoutes.mainMapLearningList,
                     builder: (context, state) => const LearningListPage(),
