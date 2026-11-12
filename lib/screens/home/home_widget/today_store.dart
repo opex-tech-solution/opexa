@@ -60,14 +60,14 @@ class TodayStore extends ValueNotifier<TodayState> {
     final next = current.nextUp;
     final plan = [...current.plan];
 
-    if (next?.topicId == topicId) {
+    if (next != null && next.topicId == topicId) {
       // Preserve the completed card in the plan, then promote the next
       // available item into the prominent Next up card.
       if (!plan.any((item) => item.topicId == topicId)) {
         plan.insert(
           0,
           PlanItem(
-            kind: next!.kind,
+            kind: next.kind,
             title: next.title,
             brick: next.brick,
             status: LessonStatus.done,
