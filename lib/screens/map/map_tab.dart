@@ -28,6 +28,12 @@ class MapTab extends StatefulWidget {
 
 class _MapTabState extends State<MapTab> {
   bool _afterFirstCheck = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _afterFirstCheck = LessonProgressStore.instance.firstCheckCompleted;
+  }
   WallData _wallWithPracticeResults(WallData wall) {
     final progress = LessonProgressStore.instance;
     List<List<Skill>> applyResults(List<List<Skill>> rows) => [
