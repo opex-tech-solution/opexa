@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:opexa/api/repositories/lesson_progress_store.dart';
 import 'package:opexa/screens/home/home_widget/today_store.dart';
+import 'package:opexa/models/model.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
