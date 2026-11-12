@@ -255,6 +255,20 @@ class AppRouter {
                     ],
                   ),
                   GoRoute(
+                    path: AppRoutes.mainMapLearningLearningScreen,
+                    builder: (context, state) {
+                      final skill = state.extra is Skill
+                          ? state.extra as Skill
+                          : Skill(
+                              state.extra is String
+                                  ? state.extra as String
+                                  : '',
+                              BrickState.unchecked,
+                            );
+                      return TeachingLessonPage(skill: skill);
+                    },
+                  ),
+                  GoRoute(
                     path: AppRoutes.mainMapLearningList,
                     builder: (context, state) => const LearningListPage(),
                   ),
