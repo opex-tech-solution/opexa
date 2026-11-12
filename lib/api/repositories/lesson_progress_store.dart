@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../models/today_state.dart';
+
 /// A practice lesson the learner stopped part-way through.
 class InProgressLesson {
   const InProgressLesson({
@@ -56,6 +58,7 @@ class LessonProgressStore extends ChangeNotifier {
   final Set<String> _practised = {};
   final Set<String> _completedToday = {};
   final Set<String> _activityToday = {};
+  final Map<String, Set<String>> _activityHistory = {};
   final Map<String, String> _statusByTopic = {};
   final Map<String, InProgressLesson> _inProgress = {};
 
@@ -65,6 +68,21 @@ class LessonProgressStore extends ChangeNotifier {
   bool get firstCheckCompleted => _firstCheckCompleted;
   Set<String> get completedToday => Set.unmodifiable(_completedToday);
   Set<String> get activityToday => Set.unmodifiable(_activityToday);
+  Set<String> get learnedTopicIds => Set.unmodifiable(_learned);
+
+  /// Seven-day activity summary used by the Today screen.
+  WeekProgress get weekProgress {
+    final today = DateTime.now();
+    final days = List<bool>.generate(7, (index) {
+      final date = today.subtract(Duration(days: 6 - index));
+      return _activityHistory[_dateKey(date)]?.isNotEmpty ?? false;
+    });
+    final lessons = _activityHistory.values.fold<int>(
+      0,
+      (total, topics) => total + topics.length,
+    );
+    return WeekProgress(learnedDays: days, lessons: lessons);
+  }
   bool isLearned(String topicId) => _learned.contains(topicId);
   bool isPractised(String topicId) => _practised.contains(topicId);
   bool hasCompletedToday(String topicId) => _completedToday.contains(topicId);
@@ -127,7 +145,7 @@ class LessonProgressStore extends ChangeNotifier {
     if (topicId.isEmpty) return;
     _ensureCurrentDay();
     final learnedChanged = _learned.add(topicId);
-    final activityChanged = _activityToday.add(topicId);
+    final activityChanged = _recordActivity(topicId);
     final previousStatus = _statusByTopic[topicId];
     _statusByTopic.putIfAbsent(topicId, () => 'building');
     if (learnedChanged || activityChanged || previousStatus == null) {
@@ -146,7 +164,7 @@ class LessonProgressStore extends ChangeNotifier {
     _learned.add(topicId);
     _practised.add(topicId);
     _completedToday.add(topicId);
-    _activityToday.add(topicId);
+    _recordActivity(topicId);
     _statusByTopic[topicId] = status == 'solid' ? 'solid' : 'building';
     notifyListeners();
     await _save();
@@ -175,12 +193,32 @@ class LessonProgressStore extends ChangeNotifier {
     await _save();
   }
 
+  bool _recordActivity(String topicId) {
+    final addedToday = _activityToday.add(topicId);
+    final todaysTopics = _activityHistory.putIfAbsent(
+      _activityDate,
+      () => <String>{},
+    );
+    final addedToHistory = todaysTopics.add(topicId);
+    return addedToday || addedToHistory;
+  }
+
   void _ensureCurrentDay() {
-    final today = _dateKey(DateTime.now());
-    if (_activityDate == today) return;
-    _activityDate = today;
-    _completedToday.clear();
-    _activityToday.clear();
+    final now = DateTime.now();
+    final today = _dateKey(now);
+    if (_activityDate != today) {
+      _activityDate = today;
+      _completedToday.clear();
+      _activityToday.clear();
+    }
+
+    final cutoff = DateTime(now.year, now.month, now.day)
+        .subtract(const Duration(days: 6));
+    _activityHistory.removeWhere((dateKey, _) {
+      final parsed = DateTime.tryParse(dateKey);
+      return parsed == null || parsed.isBefore(cutoff);
+    });
+    _activityHistory.putIfAbsent(today, () => <String>{});
   }
 
   void _apply(dynamic data) {
@@ -205,6 +243,21 @@ class LessonProgressStore extends ChangeNotifier {
                 : (data['completed_today'] as List? ?? const []))
             .map((e) => '$e'),
       );
+
+    _activityHistory.clear();
+    final savedHistory = data['activity_history'];
+    if (savedHistory is Map) {
+      for (final entry in savedHistory.entries) {
+        if (entry.value is List) {
+          _activityHistory['${entry.key}'] =
+              (entry.value as List).map((e) => '$e').toSet();
+        }
+      }
+    } else if (_activityToday.isNotEmpty) {
+      // Migrate older progress records into the dated activity history.
+      _activityHistory[_activityDate] = Set<String>.from(_activityToday);
+    }
+
     _statusByTopic
       ..clear()
       ..addAll(
@@ -252,6 +305,10 @@ class LessonProgressStore extends ChangeNotifier {
           'activity_date': _activityDate,
           'completed_today': _completedToday.toList(),
           'activity_today': _activityToday.toList(),
+          'activity_history': {
+            for (final entry in _activityHistory.entries)
+              entry.key: entry.value.toList(),
+          },
           'status_by_topic': _statusByTopic,
           'in_progress': _inProgress.values.map((e) => e.toJson()).toList(),
         }),
