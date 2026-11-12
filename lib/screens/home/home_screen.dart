@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../api/repositories/lesson_content_repository.dart';
+import '../../api/repositories/lesson_progress_store.dart';
 import '../../models/model.dart';
 import '../../theme/widget.dart';
 import '../routes/widget.dart';
@@ -76,6 +77,11 @@ class _TodayView extends StatelessWidget {
         await context.push(
           '${AppRoutes.mainHome}/$quickPath',
           extra: skill,
+        );
+      } else if (LessonProgressStore.instance.isLearned(resolvedId)) {
+        await context.push(
+          '${AppRoutes.mainMap}/${AppRoutes.mainMapPracticeLesson}/'
+          '${Uri.encodeComponent(resolvedId)}',
         );
       } else {
         await context.push(
