@@ -530,10 +530,8 @@ class _MapTabState extends State<MapTab> {
     return ListenableBuilder(
       listenable: LessonProgressStore.instance,
       builder: (context, _) {
-        final showAfterFirstCheck =
-            _afterFirstCheck || LessonProgressStore.instance.firstCheckCompleted;
         final wall = _wallWithPracticeResults(
-          buildWall(afterFirstCheck: showAfterFirstCheck),
+          buildWall(afterFirstCheck: _afterFirstCheck),
         );
         final solid = wall.count(BrickState.solid);
         final notSure = wall.count(BrickState.notSure);
@@ -624,7 +622,7 @@ class _MapTabState extends State<MapTab> {
           style: TextStyle(fontSize: 12, color: context.colors.textSecondary),
         ),
         const SizedBox(height: 20),
-        if (!showAfterFirstCheck) ...[
+        if (!_afterFirstCheck) ...[
           _firstCheckHistory(),
           const SizedBox(height: 14),
         ],
