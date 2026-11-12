@@ -21,56 +21,45 @@ class TodayStore extends ValueNotifier<TodayState> {
     }
 
     value = TodaySamples.firstPlan.copyWith(userName: value.userName);
-    _restoreTodaysActivities(countAsNewActivity: true);
+    _restoreTodaysActivities();
   }
 
   /// Applies the first-check result and restores any activities already
   /// completed today. A first-time check starts a fresh Today plan.
   void completeFirstCheck() {
-    final isFirstCompletion = !_progress.firstCheckCompleted;
     unawaited(_progress.markFirstCheckCompleted());
 
     value = TodaySamples.firstPlan.copyWith(
       userName: value.userName,
       now: value.now,
     );
-    _restoreTodaysActivities(
-      countAsNewActivity: isFirstCompletion,
-    );
+    _restoreTodaysActivities();
   }
 
-  void _restoreTodaysActivities({required bool countAsNewActivity}) {
+  void _restoreTodaysActivities() {
     final orderedTopicIds = <String>[];
     final initial = TodaySamples.firstPlan;
+    final firstTopicId = initial.nextUp?.topicId;
+    if (firstTopicId != null) orderedTopicIds.add(firstTopicId);
 
-    if (initial.nextUp?.topicId case final id?) {
-      orderedTopicIds.add(id);
+    for (final item in initial.plan) {
+      final topicId = item.topicId;
+      if (topicId != null && !orderedTopicIds.contains(topicId)) {
+        orderedTopicIds.add(topicId);
+      }
     }
-    orderedTopicIds.addAll(
-      initial.plan
-          .map((item) => item.topicId)
-          .whereType<String>()
-          .where((id) => !orderedTopicIds.contains(id)),
-    );
 
-    final remaining = _progress.activityToday
+    final remaining = _progress.learnedTopicIds
         .where((id) => !orderedTopicIds.contains(id))
         .toList()
       ..sort();
 
-    for (final id in [...orderedTopicIds, ...remaining]) {
-      if (!_progress.hasActivityToday(id)) continue;
+    for (final topicId in [...orderedTopicIds, ...remaining]) {
+      if (!_progress.isLearned(topicId)) continue;
 
-      _applyLessonCompletion(
-        id,
-        countAsNewActivity: countAsNewActivity,
-      );
-
-      if (_progress.hasCompletedToday(id)) {
-        _applyPracticeCompletion(
-          id,
-          countAsNewActivity: false,
-        );
+      _applyLessonCompletion(topicId);
+      if (_progress.isPractised(topicId)) {
+        _applyPracticeCompletion(topicId);
       }
     }
   }
@@ -79,38 +68,24 @@ class TodayStore extends ValueNotifier<TodayState> {
   /// It must not mark the topic as fully completed or advance the plan yet.
   void completeLesson(String topicId) {
     if (topicId.isEmpty) return;
-    final isNewActivity = !_progress.hasActivityToday(topicId);
     unawaited(_progress.markLessonCompleted(topicId));
-    _applyLessonCompletion(
-      topicId,
-      countAsNewActivity: isNewActivity,
-    );
+    _applyLessonCompletion(topicId);
   }
 
   /// The independent Practice Lesson completes the topic and advances Today.
   void completePractice(String topicId, {required String status}) {
     if (topicId.isEmpty) return;
-    final isNewActivity = !_progress.hasActivityToday(topicId);
     unawaited(_progress.markPractised(topicId, status: status));
-    _applyPracticeCompletion(
-      topicId,
-      countAsNewActivity: isNewActivity,
-    );
+    _applyPracticeCompletion(topicId);
   }
 
-  void _applyLessonCompletion(
-    String topicId, {
-    required bool countAsNewActivity,
-  }) {
+  void _applyLessonCompletion(String topicId) {
     final current = value;
     if (!current.firstCheckDone) return;
 
     final updated = current.copyWith(
       map: _mapCountsFromProgress(),
-      week: _weekAfterActivity(
-        current.week,
-        countAsNewActivity: countAsNewActivity,
-      ),
+      week: _progress.weekProgress,
     );
 
     // Re-teaching a topic that has already been practised must not put it
@@ -170,20 +145,14 @@ class TodayStore extends ValueNotifier<TodayState> {
   }
 
   /// Marks a topic as done and advances Next Up only after practice.
-  void _applyPracticeCompletion(
-    String topicId, {
-    required bool countAsNewActivity,
-  }) {
+  void _applyPracticeCompletion(String topicId) {
     final current = value;
     if (!current.firstCheckDone) return;
 
     final plan = [...current.plan];
     final updated = current.copyWith(
       map: _mapCountsFromProgress(),
-      week: _weekAfterActivity(
-        current.week,
-        countAsNewActivity: countAsNewActivity,
-      ),
+      week: _progress.weekProgress,
     );
 
     if (current.nextUp?.topicId == topicId) {
@@ -202,7 +171,9 @@ class TodayStore extends ValueNotifier<TodayState> {
             title: next.title,
             brick: next.brick,
             status: LessonStatus.done,
-            caption: 'Completed today',
+            caption: _progress.hasCompletedToday(topicId)
+                ? 'Completed today'
+                : 'Completed',
             topicId: topicId,
           ),
         );
@@ -213,7 +184,9 @@ class TodayStore extends ValueNotifier<TodayState> {
           title: existing.title,
           brick: existing.brick,
           status: LessonStatus.done,
-          caption: 'Completed today',
+          caption: _progress.hasCompletedToday(topicId)
+              ? 'Completed today'
+              : 'Completed',
           topicId: existing.topicId,
         );
       }
@@ -248,7 +221,9 @@ class TodayStore extends ValueNotifier<TodayState> {
       title: item.title,
       brick: item.brick,
       status: LessonStatus.done,
-      caption: 'Completed today',
+      caption: _progress.hasCompletedToday(topicId)
+          ? 'Completed today'
+          : 'Completed',
       topicId: item.topicId,
     );
 
@@ -310,28 +285,6 @@ class TodayStore extends ValueNotifier<TodayState> {
     );
   }
 
-  WeekProgress _weekAfterActivity(
-    WeekProgress previous, {
-    required bool countAsNewActivity,
-  }) {
-    if (!countAsNewActivity) return previous;
-
-    final days = [...previous.learnedDays];
-    if (days.length == 7) {
-      days[6] = true;
-    } else {
-      days.add(true);
-      while (days.length > 7) {
-        days.removeAt(0);
-      }
-    }
-
-    return WeekProgress(
-      learnedDays: days,
-      lessons: previous.lessons + 1,
-      blocksMovedUp: previous.blocksMovedUp,
-    );
-  }
 
   NextUp _toNextUp(PlanItem item) {
     final minuteMatch = RegExp(r'(\d+)').firstMatch(item.caption);
