@@ -10,6 +10,7 @@ import '../map/widget.dart';
 import '../me/widget.dart';
 import '../readiness/widget.dart';
 import 'main_shell.dart' as main_shell;
+import 'nav_visibility.dart';
 import '../on_boarding/widget.dart';
 
 /// Every route path in the app. Use these constants, never string literals.
@@ -276,9 +277,18 @@ class AppRouter {
                     path: '${AppRoutes.mainMapPracticeLesson}/:topicId',
                     builder: (context, state) => PracticeLessonPage(
                       topicId: state.pathParameters['topicId']!,
-                      onBackToToday: () => context.go(AppRoutes.mainHome),
-                      onSeeOnMap: () => context.go(AppRoutes.mainMap),
-                      onNextLesson: () => context.go(AppRoutes.mainHome),
+                      onBackToToday: () {
+                        navBarVisible.value = true;
+                        context.go(AppRoutes.mainHome);
+                      },
+                      onSeeOnMap: () {
+                        navBarVisible.value = true;
+                        context.go(AppRoutes.mainMap);
+                      },
+                      onNextLesson: () {
+                        navBarVisible.value = true;
+                        context.go(AppRoutes.mainHome);
+                      },
                     ),
                   ),
                   GoRoute(
