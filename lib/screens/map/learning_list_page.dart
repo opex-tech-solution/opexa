@@ -32,10 +32,13 @@ class _LearningListPageState extends State<LearningListPage> {
   }
 
   void _practise(String topicId) {
+    navBarVisible.value = false;
     context.push<PracticeLessonResult>(
       '${AppRoutes.mainMap}/${AppRoutes.mainMapPracticeLesson}/'
       '${Uri.encodeComponent(topicId)}',
-    );
+    ).whenComplete(() {
+      if (mounted) navBarVisible.value = true;
+    });
   }
 
   /// Learned topics go straight to practice; everything else starts with the
