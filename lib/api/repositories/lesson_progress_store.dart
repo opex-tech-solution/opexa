@@ -135,8 +135,11 @@ class LessonProgressStore extends ChangeNotifier {
   }
 
   Future<void> markLearned(String topicId) async {
-    if (topicId.isEmpty || !_learned.add(topicId)) return;
-    notifyListeners();
+    if (topicId.isEmpty) return;
+    _ensureCurrentDay();
+    final learnedChanged = _learned.add(topicId);
+    final activityChanged = _recordActivity(topicId);
+    if (learnedChanged || activityChanged) notifyListeners();
     await _save();
   }
 
