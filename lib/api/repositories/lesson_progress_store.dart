@@ -123,10 +123,13 @@ class LessonProgressStore extends ChangeNotifier {
   Future<void> markLessonCompleted(String topicId) async {
     if (topicId.isEmpty) return;
     _ensureCurrentDay();
-    final changed = _learned.add(topicId) || _completedToday.add(topicId);
-    _completedToday.add(topicId);
+    final learnedChanged = _learned.add(topicId);
+    final todayChanged = _completedToday.add(topicId);
+    final previousStatus = _statusByTopic[topicId];
     _statusByTopic.putIfAbsent(topicId, () => 'building');
-    if (changed) notifyListeners();
+    if (learnedChanged || todayChanged || previousStatus == null) {
+      notifyListeners();
+    }
     await _save();
   }
 
