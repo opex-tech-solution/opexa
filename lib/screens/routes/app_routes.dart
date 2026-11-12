@@ -39,6 +39,7 @@ class AppRoutes {
   static const String mainMe = '/main-me';
   // Children of mainHome (relative, like the other child routes below).
   static const String mainHomeNotifications = 'main-notifications';
+  static const String mainHomeQuickPractice = 'quick-practice/:topicId';
   static const String mainHomeNotificationSettings =
       'main-home-notification-settings';
   static const String mainMeWhatOpexAKnows = 'main-what-opexa-knows';
@@ -190,6 +191,19 @@ class AppRouter {
                       ),
                     ],
                   ),
+                  GoRoute(
+                    path: AppRoutes.mainHomeQuickPractice,
+                    builder: (context, state) {
+                      final topicId = state.pathParameters['topicId']!;
+                      final skill = state.extra is Skill
+                          ? state.extra as Skill
+                          : Skill(topicId, BrickState.unchecked, topicId: topicId);
+                      return QuickPracticeScreen(
+                        skill: skill,
+                        topicId: topicId,
+                      );
+                    },
+                  ),
                 ],
               ),
             ],
@@ -224,21 +238,7 @@ class AppRouter {
                       return SkillDetailPage(skill: skill);
                     },
                     routes: [
-                      GoRoute(
-                        path: AppRoutes.mainMapLearningLearningScreen,
-                        builder: (context, state) {
-                          final skill = state.extra is Skill
-                              ? state.extra as Skill
-                              : Skill(
-                                  state.extra is String
-                                      ? state.extra as String
-                                      : '',
-                                  BrickState.unchecked,
-                                );
-                          return TeachingLessonPage(skill: skill);
-                        },
-                      ),
-                    ],
+                        ],
                   ),
                   GoRoute(
                         path: AppRoutes.mainMapLearningLearningScreen,
@@ -262,6 +262,9 @@ class AppRouter {
                     path: '${AppRoutes.mainMapPracticeLesson}/:topicId',
                     builder: (context, state) => PracticeLessonPage(
                       topicId: state.pathParameters['topicId']!,
+                      onBackToToday: () => context.go(AppRoutes.mainHome),
+                      onSeeOnMap: () => context.go(AppRoutes.mainMap),
+                      onNextLesson: () => context.go(AppRoutes.mainHome),
                     ),
                   ),
                   GoRoute(
