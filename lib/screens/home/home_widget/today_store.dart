@@ -29,6 +29,7 @@ class TodayStore extends ValueNotifier<TodayState> {
 
   /// Applies the first-check result and restores today's completed activities.
   void completeFirstCheck() {
+    final isFirstCompletion = !_progress.firstCheckCompleted;
     unawaited(_progress.markFirstCheckCompleted());
     value = TodaySamples.firstPlan.copyWith(
       userName: value.userName,
@@ -36,7 +37,10 @@ class TodayStore extends ValueNotifier<TodayState> {
     );
     final completed = _progress.completedToday.toList()..sort();
     for (final topicId in completed) {
-      _applyCompletion(topicId);
+      _applyCompletion(
+        topicId,
+        countAsNewActivity: isFirstCompletion,
+      );
     }
   }
 
@@ -153,16 +157,22 @@ class TodayStore extends ValueNotifier<TodayState> {
       switch (state) {
         case BrickState.mastered:
           mastered++;
+          break;
         case BrickState.lockedIn:
           lockedIn++;
+          break;
         case BrickState.solid:
           solid++;
+          break;
         case BrickState.building:
           building++;
+          break;
         case BrickState.notSure:
           notSure++;
+          break;
         case BrickState.unchecked:
           notChecked++;
+          break;
       }
     }
 
