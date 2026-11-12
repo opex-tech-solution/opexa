@@ -275,7 +275,7 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
   }
 
   void _selectQuickCheckOption(String optionId) {
-    if (_selectedQuickCheckOptionId != null) return;
+    if (_selectedQuickCheckOptionId == optionId) return;
     if (_isSpeaking) unawaited(_stopSpeech());
     setState(() => _selectedQuickCheckOptionId = optionId);
   }
@@ -730,44 +730,19 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
               height: 126,
               alignment: Alignment.center,
               decoration: BoxDecoration(
-                color: context.colors.accentContainer,
-                borderRadius: BorderRadius.circular(60),
+                image: DecorationImage(
+                  image: AssetImage('assets/images/Illustration.png'),
+                  fit: BoxFit.contain,
+                ),
               ),
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Positioned(
-                    left: 30,
-                    bottom: 20,
-                    child: Icon(
-                      Icons.auto_awesome,
-                      color: context.colors.accent,
-                      size: 24,
-                    ),
-                  ),
-                  Positioned(
-                    right: 28,
-                    top: 20,
-                    child: Icon(
-                      Icons.star_outline,
-                      color: context.colors.accent,
-                      size: 24,
-                    ),
-                  ),
-                  Icon(
-                    Icons.menu_book_rounded,
-                    color: context.colors.accent,
-                    size: 48,
-                  ),
-                ],
-              ),
+              //child: Image.asset('assets/images/Illustration.png'),
             ),
             const SizedBox(height: 28),
             Text(
               'You have learned ${topic.name.toLowerCase()}',
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 22,
+                fontSize: 18,
                 fontWeight: FontWeight.w800,
                 height: 1.2,
               ),
@@ -1094,11 +1069,13 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
   }
 
   void _select(String optionId) {
-    if (_selectedOptionId != null) return;
+    if (_selectedOptionId == optionId) return;
     if (_isSpeaking) unawaited(_stopSpeech());
     setState(() {
+      final question = _questions[_index];
+      if (question.isCorrect(_selectedOptionId)) _correct--;
       _selectedOptionId = optionId;
-      if (_questions[_index].isCorrect(optionId)) _correct++;
+      if (question.isCorrect(optionId)) _correct++;
     });
   }
 
@@ -1219,7 +1196,18 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Practice · ${_index + 1} of ${_questions.length}'),
+        elevation: 0,
+        leading: IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+            navBarVisible.value = true;
+          },
+          icon: const Icon(Icons.arrow_back, size: 18),
+        ),
+        title: Text(
+          'Practice · ${_index + 1} of ${_questions.length}',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -1341,11 +1329,13 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
           ],
           const SizedBox(height: 22),
           SizedBox(
+            height: 50,
             width: double.infinity,
             child: FilledButton(
               onPressed: selectedOption == null ? null : _next,
               child: Text(
                 _index == _questions.length - 1 ? 'Finish practice' : 'Next',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17),
               ),
             ),
           ),
