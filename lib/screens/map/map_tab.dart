@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:opexa/screens/home/home_widget/home_widget.dart';
 
 import '../../api/repositories/lesson_progress_store.dart';
-import '../../models/practice_lesson_content.dart';
-import '../../models/skill.dart';
+import '../../models/model.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/bricks.dart';
 import '../../widgets/cards.dart';
@@ -30,15 +30,6 @@ class _MapTabState extends State<MapTab> {
   bool _afterFirstCheck = false;
   bool _hasSyncedFirstCheck = false;
 
-  @override
-  void initState() {
-    super.initState();
-    final progress = LessonProgressStore.instance;
-    _afterFirstCheck = progress.firstCheckCompleted;
-    _hasSyncedFirstCheck = progress.firstCheckCompleted;
-    progress.addListener(_syncFirstCheckView);
-  }
-
   void _syncFirstCheckView() {
     if (!mounted ||
         _hasSyncedFirstCheck ||
@@ -50,10 +41,20 @@ class _MapTabState extends State<MapTab> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    final progress = LessonProgressStore.instance;
+    _afterFirstCheck = progress.firstCheckCompleted;
+    _hasSyncedFirstCheck = progress.firstCheckCompleted;
+    progress.addListener(_syncFirstCheckView);
+  }
+
+  @override
   void dispose() {
     LessonProgressStore.instance.removeListener(_syncFirstCheckView);
     super.dispose();
   }
+
   WallData _wallWithPracticeResults(WallData wall) {
     final progress = LessonProgressStore.instance;
     List<List<Skill>> applyResults(List<List<Skill>> rows) => [
@@ -528,8 +529,20 @@ class _MapTabState extends State<MapTab> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: LessonProgressStore.instance,
+      listenable: Listenable.merge([
+        LessonProgressStore.instance,
+        TodayStore.instance,
+      ]),
       builder: (context, _) {
+        final learningList = TodayStore.instance.value.learningList;
+        final learningListCard = learningList == null
+            ? null
+            : LearningListCard(
+                summary: learningList,
+                onTap: () => context.push(
+                  '${AppRoutes.mainMap}/${AppRoutes.mainMapLearningList}',
+                ),
+              );
         final wall = _wallWithPracticeResults(
           buildWall(afterFirstCheck: _afterFirstCheck),
         );
@@ -538,108 +551,118 @@ class _MapTabState extends State<MapTab> {
         final unchecked = wall.count(BrickState.unchecked);
 
         return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 26),
-      children: [
-        const Text(
-          'Map',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 14),
-        _subjectSelector(),
-        const SizedBox(height: 12),
-        _timeSelector(),
-        const SizedBox(height: 18),
-        Text(
-          [
-            '$solid solid',
-            if (notSure > 0) '$notSure not sure yet',
-            '$unchecked not checked yet',
-          ].join(' · '),
-          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 10),
-        InkWell(
-          onTap: _showHowMapWorks,
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  size: 16,
-                  color: context.colors.accent,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  'How your map works',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: context.colors.accent,
-                  ),
-                ),
-              ],
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 26),
+          children: [
+            const Text(
+              'Map',
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.w800),
             ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        LearningListLauncherCard(),
-        const SizedBox(height: 16),
-        _statusCard(wall),
-        const SizedBox(height: 20),
-        _skillSection(
-          title: 'Stretch',
-          subtitle: 'Blocks above your class',
-          rows: wall.stretch,
-        ),
-        const SizedBox(height: 8),
-        _skillSection(
-          title: 'Your class',
-          subtitle: 'JSS2 blocks',
-          rows: wall.klass,
-          shaded: true,
-        ),
-        const SizedBox(height: 18),
-        _skillSection(
-          title: 'Foundations',
-          subtitle: 'Blocks from earlier years',
-          rows: wall.foundations,
-          staggerSecondRow: true,
-        ),
-        const SizedBox(height: 8),
-        Container(
-          height: 6,
-          decoration: BoxDecoration(
-            color: context.colors.divider,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Your foundations start here',
-          style: TextStyle(fontSize: 12, color: context.colors.textSecondary),
-        ),
-        const SizedBox(height: 20),
-        if (!_afterFirstCheck) ...[
-          _firstCheckHistory(),
-          const SizedBox(height: 14),
-        ],
-        _legendCard(),
-        const SizedBox(height: 22),
-        const Text(
-          'Your JSS2 topics',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
-        ),
-        const SizedBox(height: 12),
-        _topicList(),
-        const SizedBox(height: 12),
-        Text(
-          'Based on the Nigerian national curriculum.',
-          style: TextStyle(fontSize: 11.5, color: context.colors.textSecondary),
-        ),
-        ],
+            const SizedBox(height: 14),
+            _subjectSelector(),
+            const SizedBox(height: 12),
+            _timeSelector(),
+            const SizedBox(height: 18),
+            Text(
+              [
+                '$solid solid',
+                if (notSure > 0) '$notSure not sure yet',
+                '$unchecked not checked yet',
+              ].join(' · '),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 10),
+            InkWell(
+              onTap: _showHowMapWorks,
+              borderRadius: BorderRadius.circular(8),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 5),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 16,
+                      color: context.colors.accent,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'How your map works',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: context.colors.accent,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (learningListCard != null) ...[
+              learningListCard,
+              const SizedBox(height: 16),
+            ],
+            //LearningListLauncherCard(),
+            const SizedBox(height: 16),
+            _statusCard(wall),
+            const SizedBox(height: 20),
+            _skillSection(
+              title: 'Stretch',
+              subtitle: 'Blocks above your class',
+              rows: wall.stretch,
+            ),
+            const SizedBox(height: 8),
+            _skillSection(
+              title: 'Your class',
+              subtitle: 'JSS2 blocks',
+              rows: wall.klass,
+              shaded: true,
+            ),
+            const SizedBox(height: 18),
+            _skillSection(
+              title: 'Foundations',
+              subtitle: 'Blocks from earlier years',
+              rows: wall.foundations,
+              staggerSecondRow: true,
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 6,
+              decoration: BoxDecoration(
+                color: context.colors.divider,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Your foundations start here',
+              style: TextStyle(
+                fontSize: 12,
+                color: context.colors.textSecondary,
+              ),
+            ),
+            const SizedBox(height: 20),
+            if (!_afterFirstCheck) ...[
+              _firstCheckHistory(),
+              const SizedBox(height: 14),
+            ],
+            _legendCard(),
+            const SizedBox(height: 22),
+            const Text(
+              'Your JSS2 topics',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+            ),
+            const SizedBox(height: 12),
+            _topicList(),
+            const SizedBox(height: 12),
+            Text(
+              'Based on the Nigerian national curriculum.',
+              style: TextStyle(
+                fontSize: 11.5,
+                color: context.colors.textSecondary,
+              ),
+            ),
+          ],
         );
       },
     );

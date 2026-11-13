@@ -117,8 +117,9 @@ class _NotificationSettingsScreenState
                               selectedValue: _reminderTime,
                               items: _timeOptions,
                               onChanged: (val) {
-                                if (val != null)
+                                if (val != null) {
                                   setState(() => _reminderTime = val);
+                                }
                               },
                               isDark: isDark,
                             ),
@@ -174,8 +175,9 @@ class _NotificationSettingsScreenState
                               selectedValue: _quietFromTime,
                               items: _timeOptions,
                               onChanged: (val) {
-                                if (val != null)
+                                if (val != null) {
                                   setState(() => _quietFromTime = val);
+                                }
                               },
                               isDark: isDark,
                             ),
@@ -185,8 +187,9 @@ class _NotificationSettingsScreenState
                               selectedValue: _quietToTime,
                               items: _timeOptions,
                               onChanged: (val) {
-                                if (val != null)
+                                if (val != null) {
                                   setState(() => _quietToTime = val);
+                                }
                               },
                               isDark: isDark,
                             ),

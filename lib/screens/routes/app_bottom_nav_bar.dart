@@ -36,8 +36,8 @@ class AppBottomNavBar extends StatelessWidget {
 
     return ValueListenableBuilder(
       valueListenable: navBarVisible,
-      builder: (context, _isNavVisible, child) {
-        return _isNavVisible == true ? Material(
+      builder: (context, isNavVisible, child) {
+        return isNavVisible == true ? Material(
           color: barColor,
           child: Container(
             decoration: BoxDecoration(

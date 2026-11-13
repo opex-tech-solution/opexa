@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +8,7 @@ import '../../models/model.dart';
 import '../../theme/widget.dart';
 import '../routes/widget.dart';
 import 'home_widget/home_widget.dart';
+
 /// The "Today" tab.
 ///
 /// It draws a [TodayState]: before the first check it shows the starting card
@@ -39,9 +39,8 @@ class _TodayView extends StatelessWidget {
 
   // ── actions ──────────────────────────────────────────────────────────────
 
-  void _openNotifications(BuildContext context) => context.push(
-    '${AppRoutes.mainHome}/${AppRoutes.mainHomeNotifications}',
-  );
+  void _openNotifications(BuildContext context) =>
+      context.push('${AppRoutes.mainHome}/${AppRoutes.mainHomeNotifications}');
 
   void _openFirstCheck(BuildContext context) => context.push(
     AppRoutes.mathDiagnostic,
@@ -61,7 +60,11 @@ class _TodayView extends StatelessWidget {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(
-          SnackBar(content: Text('Learning content for "$title" is not available yet.')),
+          SnackBar(
+            content: Text(
+              'Learning content for "$title" is not available yet.',
+            ),
+          ),
         );
       return;
     }
@@ -74,10 +77,7 @@ class _TodayView extends StatelessWidget {
           ':topicId',
           Uri.encodeComponent(resolvedId),
         );
-        await context.push(
-          '${AppRoutes.mainHome}/$quickPath',
-          extra: skill,
-        );
+        await context.push('${AppRoutes.mainHome}/$quickPath', extra: skill);
       } else if (LessonProgressStore.instance.isLearned(resolvedId)) {
         await context.push(
           '${AppRoutes.mainMap}/${AppRoutes.mainMapPracticeLesson}/'
@@ -135,7 +135,10 @@ class _TodayView extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           formatLongDate(today),
-                          style: TextStyle(fontSize: 13, color: c.textSecondary),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: c.textSecondary,
+                          ),
                         ),
                         const SizedBox(height: 20),
                         ..._content(context, today),
@@ -162,13 +165,17 @@ class _TodayView extends StatelessWidget {
     final started = state.stage == FirstCheckStage.inProgress;
     return [
       ResumeCard(
-        title: started ? 'Pick up where you left off' : 'Let’s find your starting point',
+        title: started
+            ? 'Pick up where you left off'
+            : 'Let’s find your starting point',
         body: started
             ? 'You’re part way through your first check. We’ll start at the '
                   'exact question where you stopped.'
             : 'Take a quick check so OpexA can see what you already know, spot '
                   'the next block to work on, and guide you on what to do today.',
-        buttonLabel: started ? 'Continue my first check' : 'Start my first check',
+        buttonLabel: started
+            ? 'Continue my first check'
+            : 'Start my first check',
         // push (not go): leaving the check returns to Today.
         onPressed: () => _openFirstCheck(context),
       ),
@@ -197,7 +204,7 @@ class _TodayView extends StatelessWidget {
         ? null
         : LearningListCard(
             summary: learningList,
-            onTap: () => context.push(AppRoutes.mathLearningList),
+            onTap: () => context.push('${AppRoutes.mainMap}/${AppRoutes.mainMapLearningList}'),
           );
 
     return [
@@ -213,6 +220,10 @@ class _TodayView extends StatelessWidget {
         const SizedBox(height: 24),
       ],
       if (nextUp != null) ...[
+        if (learningListCard != null) ...[
+          learningListCard,
+          const SizedBox(height: 24),
+        ],
         const SectionHeading('Next up'),
         const SizedBox(height: 10),
         NextUpCard(
@@ -228,11 +239,7 @@ class _TodayView extends StatelessWidget {
           ),
           onSecondary: TodayStore.instance.takeTodayOff,
         ),
-        const SizedBox(height: 16),
-        if (learningListCard != null) ...[
-          learningListCard,
-          const SizedBox(height: 24),
-        ],
+        const SizedBox(height: 10),
       ] else ...[
         if (learningListCard != null) ...[
           learningListCard,
