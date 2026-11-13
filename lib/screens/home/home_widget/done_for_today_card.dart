@@ -89,7 +89,7 @@ class DoneForTodayCard extends StatelessWidget {
           ] else ...[
             const SizedBox(height: 7),
             const Text(
-              'You have wrapped up your learning for today.',
+              'You have reached a good stopping point for today.',
               style: TextStyle(color: _muted, fontSize: 12.5, height: 1.4),
             ),
           ],
@@ -122,10 +122,9 @@ class DoneForTodayCard extends StatelessWidget {
 
     // A moved-up block is a separate map-level achievement, not another
     // duplicate of a completed lesson.
-    for (final block in state.week.blocksMovedUp) {
-      final message = block.name.toLowerCase().contains('core maths')
-          ? 'One more Core Maths block in place, for every stream.'
-          : '${block.name} moved up on your Maths map.';
+    if (state.week.blocksMovedUp.isNotEmpty) {
+      const message =
+          'One more Core Maths block in place, for every stream.';
       if (seen.add(message)) changes.add(message);
     }
 
