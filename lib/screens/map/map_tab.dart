@@ -27,33 +27,9 @@ class MapTab extends StatefulWidget {
 }
 
 class _MapTabState extends State<MapTab> {
+  // The live "Now" map is the default. Learners can switch to the
+  // first-check snapshot whenever they want to compare their progress.
   bool _afterFirstCheck = false;
-  bool _hasSyncedFirstCheck = false;
-
-  void _syncFirstCheckView() {
-    if (!mounted ||
-        _hasSyncedFirstCheck ||
-        !LessonProgressStore.instance.firstCheckCompleted) {
-      return;
-    }
-    _hasSyncedFirstCheck = true;
-    setState(() => _afterFirstCheck = true);
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    final progress = LessonProgressStore.instance;
-    _afterFirstCheck = progress.firstCheckCompleted;
-    _hasSyncedFirstCheck = progress.firstCheckCompleted;
-    progress.addListener(_syncFirstCheckView);
-  }
-
-  @override
-  void dispose() {
-    LessonProgressStore.instance.removeListener(_syncFirstCheckView);
-    super.dispose();
-  }
 
   WallData _wallWithPracticeResults(WallData wall) {
     final progress = LessonProgressStore.instance;
