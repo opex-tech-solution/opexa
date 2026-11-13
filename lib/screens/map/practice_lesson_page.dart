@@ -876,13 +876,15 @@ class _PracticeLessonPageState extends State<PracticeLessonPage> {
                       ),
                     ),
                   ],
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 20),
                   SizedBox(
+                    height: 60,
                     width: double.infinity,
                     child: FilledButton(
                       onPressed: _goNextLesson,
                       style: _primaryButtonStyle(),
                       child: Text(
+                        textAlign: TextAlign.center,
                         _content.result.nextLessonLabel.replaceAll(
                           '{topic}',
                           _topicName ?? _content.title,
@@ -890,12 +892,14 @@ class _PracticeLessonPageState extends State<PracticeLessonPage> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 8),
                   Center(
                     child: TextButton(
                       onPressed: _goBackToToday,
                       child: Text(_content.result.backToTodayLabel),
                     ),
                   ),
+                  const SizedBox(height: 8),
                   Center(
                     child: TextButton(
                       onPressed: _goSeeOnMap,

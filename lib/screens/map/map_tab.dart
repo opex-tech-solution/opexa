@@ -467,55 +467,35 @@ class _MapTabState extends State<MapTab> {
       child: Column(
         children: [
           for (var index = 0; index < topics.length; index++) ...[
-            InkWell(
-              borderRadius: BorderRadius.vertical(
-                top: index == 0 ? const Radius.circular(16) : Radius.zero,
-                bottom: index == topics.length - 1
-                    ? const Radius.circular(16)
-                    : Radius.zero,
-              ),
-              onTap: widget.onOpenLearningList,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 14,
-                ),
-                child: Row(
-                  children: [
-                    const BrickFace(
-                      BrickState.unchecked,
-                      width: 28,
-                      height: 24,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            topics[index].$1,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              child: Row(
+                children: [
+                  const BrickFace(BrickState.unchecked, width: 28, height: 24),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          topics[index].$1,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w800,
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            topics[index].$2,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: context.colors.textSecondary,
-                            ),
+                        ),
+                        const SizedBox(height: 3),
+                        Text(
+                          topics[index].$2,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: context.colors.textSecondary,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    Icon(
-                      Icons.chevron_right,
-                      color: context.colors.textSecondary,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             if (index != topics.length - 1)

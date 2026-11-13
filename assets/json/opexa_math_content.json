@@ -3733,6 +3733,29 @@
                     "label": "Nothing was difficult"
                   }
                 ]
+              },
+              {
+                "id": "try_next",
+                "question": "What would you try next?",
+                "type": "single_choice",
+                "options": [
+                  {
+                    "id": "more_practice",
+                    "label": "More practice like this"
+                  },
+                  {
+                    "id": "different_explanation",
+                    "label": "A different explanation"
+                  },
+                  {
+                    "id": "something_harder",
+                    "label": "Something harder"
+                  },
+                  {
+                    "id": "ask_teacher",
+                    "label": "Ask my teacher"
+                  }
+                ]
               }
             ]
           },
