@@ -122,7 +122,8 @@ class DoneForTodayCard extends StatelessWidget {
 
     // A moved-up block is a separate map-level achievement, not another
     // duplicate of a completed lesson.
-    if (state.week.blocksMovedUp.isNotEmpty) {
+    if (state.week.blocksMovedUp.isNotEmpty ||
+        state.plan.any((item) => item.status == LessonStatus.done)) {
       const message =
           'One more Core Maths block in place, for every stream.';
       if (seen.add(message)) changes.add(message);
