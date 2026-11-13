@@ -355,37 +355,113 @@ class _MapTabState extends State<MapTab> {
     );
   }
 
-  Widget _firstCheckHistory() {
+  Widget _firstCheckSnapshotCard() {
     return InfoCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'Since your first check: 1 block moved up',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+            'Your wall right after your first check',
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
           ),
-          const SizedBox(height: 14),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              const BrickFace(BrickState.notSure, width: 34, height: 28),
-              const SizedBox(width: 8),
-              Icon(Icons.arrow_forward, color: context.colors.textSecondary),
-              const SizedBox(width: 8),
-              const BrickFace(BrickState.solid, width: 34, height: 28),
-              const SizedBox(width: 10),
-              const Expanded(
-                child: Text(
-                  'One-step equations is now Solid',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w700),
-                ),
-              ),
-            ],
+          const SizedBox(height: 5),
+          Text(
+            'This is where your learning map started. Switch to Now to see what you have built since.',
+            style: TextStyle(
+              fontSize: 12.5,
+              height: 1.35,
+              color: context.colors.textSecondary,
+            ),
           ),
         ],
       ),
     );
   }
+
+  Widget _firstCheckHistory(WallData current, WallData baseline) {
+    final previousById = {
+      for (final skill in baseline.all)
+        if (skill.topicId != null) skill.topicId!: skill,
+    };
+    final improvements = <({Skill before, Skill after})>[];
+
+    for (final skill in current.all) {
+      final previous = previousById[skill.topicId];
+      if (previous == null) continue;
+      if (_stateRank(skill.state) > _stateRank(previous.state)) {
+        improvements.add((before: previous, after: skill));
+      }
+    }
+
+    return InfoCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Since your first check: ${improvements.length} blocks moved up',
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800),
+          ),
+          if (improvements.isEmpty) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Your progress will appear here as you learn and practise topics.',
+              style: TextStyle(
+                fontSize: 12.5,
+                color: context.colors.textSecondary,
+              ),
+            ),
+          ] else ...[
+            const SizedBox(height: 12),
+            for (final item in improvements.take(4))
+              Padding(
+                padding: const EdgeInsets.only(bottom: 9),
+                child: Row(
+                  children: [
+                    BrickFace(item.before.state, width: 30, height: 25),
+                    const SizedBox(width: 7),
+                    Icon(
+                      Icons.arrow_forward,
+                      size: 17,
+                      color: context.colors.textSecondary,
+                    ),
+                    const SizedBox(width: 7),
+                    BrickFace(item.after.state, width: 30, height: 25),
+                    const SizedBox(width: 9),
+                    Expanded(
+                      child: Text(
+                        '${item.after.name} is now ${_stateLabel(item.after.state)}',
+                        style: const TextStyle(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  int _stateRank(BrickState state) => switch (state) {
+    BrickState.unchecked => 0,
+    BrickState.notSure => 1,
+    BrickState.building => 2,
+    BrickState.solid => 3,
+    BrickState.mastered => 4,
+    BrickState.lockedIn => 5,
+  };
+
+  String _stateLabel(BrickState state) => switch (state) {
+    BrickState.unchecked => 'Not checked yet',
+    BrickState.notSure => 'Not sure yet',
+    BrickState.building => 'Building',
+    BrickState.solid => 'Solid',
+    BrickState.mastered => 'Mastered',
+    BrickState.lockedIn => 'Locked in',
+  };
 
   Widget _legendCard() {
     return InfoCard(
@@ -523,9 +599,11 @@ class _MapTabState extends State<MapTab> {
                   '${AppRoutes.mainMap}/${AppRoutes.mainMapLearningList}',
                 ),
               );
-        final wall = _wallWithPracticeResults(
-          buildWall(afterFirstCheck: _afterFirstCheck),
-        );
+        // The first-check wall is the baseline snapshot. "Now" overlays
+        // the learner's persisted lesson and practice results on that wall.
+        final firstCheckWall = buildWall(afterFirstCheck: true);
+        final currentWall = _wallWithPracticeResults(firstCheckWall);
+        final wall = _afterFirstCheck ? firstCheckWall : currentWall;
         final solid = wall.count(BrickState.solid);
         final notSure = wall.count(BrickState.notSure);
         final unchecked = wall.count(BrickState.unchecked);
@@ -584,8 +662,13 @@ class _MapTabState extends State<MapTab> {
             ],
             //LearningListLauncherCard(),
             const SizedBox(height: 16),
-            _statusCard(wall),
-            const SizedBox(height: 20),
+            if (!_afterFirstCheck) ...[
+              _statusCard(currentWall),
+              const SizedBox(height: 20),
+            ] else ...[
+              _firstCheckSnapshotCard(),
+              const SizedBox(height: 20),
+            ],
             _skillSection(
               title: 'Stretch',
               subtitle: 'Blocks above your class',
@@ -623,7 +706,7 @@ class _MapTabState extends State<MapTab> {
             ),
             const SizedBox(height: 20),
             if (!_afterFirstCheck) ...[
-              _firstCheckHistory(),
+              _firstCheckHistory(currentWall, firstCheckWall),
               const SizedBox(height: 14),
             ],
             _legendCard(),
