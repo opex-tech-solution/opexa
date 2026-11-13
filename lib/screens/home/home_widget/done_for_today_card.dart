@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'package:opexa/theme/app_colors.dart';
 import '../../../models/model.dart';
 
 /// Displays a summary of the learner's achievements
@@ -9,11 +9,6 @@ class DoneForTodayCard extends StatelessWidget {
 
   final TodayState state;
 
-  static const _background = Color(0xFF38291D);
-  static const _border = Color(0xFF5B4734);
-  static const _muted = Color(0xFFE0D0BC);
-  static const _blue = Color(0xFF8DBBFF);
-
   @override
   Widget build(BuildContext context) {
     final changes = _buildChanges(state);
@@ -22,9 +17,9 @@ class DoneForTodayCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 16),
       decoration: BoxDecoration(
-        color: _background,
+        color: context.colors.surface,
         borderRadius: BorderRadius.circular(15),
-        border: Border.all(color: _border, width: 1),
+        border: Border.all(color: context.colors.divider, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -44,7 +39,6 @@ class DoneForTodayCard extends StatelessWidget {
           const Text(
             'Done for today',
             style: TextStyle(
-              color: Colors.white,
               fontSize: 18,
               height: 1.2,
               fontWeight: FontWeight.w800,
@@ -58,7 +52,6 @@ class DoneForTodayCard extends StatelessWidget {
             const Text(
               'WHAT CHANGED TODAY',
               style: TextStyle(
-                color: _blue,
                 fontSize: 10,
                 height: 1.2,
                 fontWeight: FontWeight.w800,
@@ -76,11 +69,7 @@ class DoneForTodayCard extends StatelessWidget {
                   children: [
                     const Padding(
                       padding: EdgeInsets.only(top: 1),
-                      child: Icon(
-                        Icons.check_circle_outline,
-                        size: 13,
-                        color: _muted,
-                      ),
+                      child: Icon(Icons.check_circle_outline, size: 13),
                     ),
 
                     const SizedBox(width: 6),
@@ -89,7 +78,6 @@ class DoneForTodayCard extends StatelessWidget {
                       child: Text(
                         change,
                         style: const TextStyle(
-                          color: Colors.white,
                           fontSize: 12.5,
                           height: 1.35,
                           fontWeight: FontWeight.w500,
@@ -104,7 +92,7 @@ class DoneForTodayCard extends StatelessWidget {
 
             const Text(
               'You have reached a good stopping point for today.',
-              style: TextStyle(color: _muted, fontSize: 12.5, height: 1.4),
+              style: TextStyle(fontSize: 12.5, height: 1.4),
             ),
           ],
 
@@ -113,7 +101,6 @@ class DoneForTodayCard extends StatelessWidget {
           const Text(
             'Come back tomorrow for your next plan.',
             style: TextStyle(
-              color: Colors.white,
               fontSize: 12.5,
               height: 1.4,
               fontWeight: FontWeight.w500,

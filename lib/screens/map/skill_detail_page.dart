@@ -170,6 +170,7 @@ class SkillDetailPage extends StatelessWidget {
   }
 
   void _openTeaching(BuildContext context) {
+    navBarVisible.value = false;
     context.push(
       '${AppRoutes.mainMap}/${AppRoutes.mainMapSkillDetails}/${AppRoutes.mainMapLearningLearningScreen}',
       extra: skill,

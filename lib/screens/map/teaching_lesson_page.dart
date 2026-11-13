@@ -11,6 +11,7 @@ import '../home/home_widget/today_store.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/info_widgets.dart';
 import '../routes/widget.dart';
+import 'take_break_sheet.dart';
 
 String _makeSymbolsSpeakable(String text) {
   return text
@@ -272,7 +273,10 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
 
   Future<void> _closeLesson() async {
     await _stopSpeech();
-    if (mounted) {
+    if (!mounted) return;
+
+    final stop = await showTakeBreakSheet(context);
+    if (stop && mounted) {
       navBarVisible.value = true;
       Navigator.of(context).pop();
     }
@@ -803,7 +807,8 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
                           width: double.infinity,
                           child: FilledButton(
                             onPressed: () async {
-                              final topicId = widget.topicId ??
+                              final topicId =
+                                  widget.topicId ??
                                   widget.skill.topicId ??
                                   _topic?.id;
                               if (topicId == null || topicId.isEmpty) {
