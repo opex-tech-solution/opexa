@@ -32,10 +32,13 @@ class _LearningListPageState extends State<LearningListPage> {
   }
 
   void _practise(String topicId) {
+    navBarVisible.value = false;
     context.push<PracticeLessonResult>(
       '${AppRoutes.mainMap}/${AppRoutes.mainMapPracticeLesson}/'
       '${Uri.encodeComponent(topicId)}',
-    );
+    ).whenComplete(() {
+      if (mounted) navBarVisible.value = true;
+    });
   }
 
   /// Learned topics go straight to practice; everything else starts with the
@@ -251,10 +254,15 @@ class _LearningListPageState extends State<LearningListPage> {
   Widget _topicRow(BuildContext context, LearningListTopic topic, int number) {
     final c = context.colors;
     final learned = _progress.isLearned(topic.topicId);
+    final practised = _progress.isPractised(topic.topicId);
 
     final subtitle = [
       if (topic.startHere) 'Start here',
-      learned ? 'Learned. Practise next' : 'About ${topic.minutes} min',
+      practised
+          ? 'Practised'
+          : learned
+              ? 'Learned. Practise next'
+              : 'About ${topic.minutes} min',
     ].join(' · ');
 
     return Material(
@@ -314,7 +322,11 @@ class _LearningListPageState extends State<LearningListPage> {
                 ),
               ),
               const SizedBox(width: 8),
-              _pill(context, learned ? 'Practise' : 'Learn', primary: learned),
+              _pill(
+                context,
+                practised ? 'Practise again' : learned ? 'Practise' : 'Learn',
+                primary: learned,
+              ),
             ],
           ),
         ),

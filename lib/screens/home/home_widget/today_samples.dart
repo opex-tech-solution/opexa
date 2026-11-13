@@ -71,6 +71,7 @@ class TodaySamples {
     nextUp: const NextUp(
       kind: LessonKind.foundation,
       title: 'Add & subtract integers',
+      topicId: 'addition_subtraction_integers',
       description:
           'Fixing this makes multiply & divide integers, simplifying and '
           'one-step equations easier.',
@@ -88,6 +89,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.klass,
         title: 'Two-step equations',
+        topicId: 'two_step_equations',
         brick: BrickState.solid,
         status: LessonStatus.todo,
         caption: 'About 8 min',
@@ -95,6 +97,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.stretch,
         title: 'Word problems',
+        topicId: 'word_problems',
         brick: BrickState.unchecked,
         status: LessonStatus.todo,
         caption: 'About 10 min',
@@ -117,6 +120,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.foundation,
         title: 'Add & subtract integers',
+        topicId: 'addition_subtraction_integers',
         brick: BrickState.building,
         status: LessonStatus.done,
         caption: 'Solid today',
@@ -124,6 +128,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.klass,
         title: 'Two-step equations',
+        topicId: 'two_step_equations',
         brick: BrickState.solid,
         status: LessonStatus.done,
         caption: 'Solid today',
@@ -131,6 +136,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.stretch,
         title: 'Word problems',
+        topicId: 'word_problems',
         brick: BrickState.unchecked,
         status: LessonStatus.done,
         caption: 'Solid today',
@@ -146,6 +152,7 @@ class TodaySamples {
   static const _quickCheck = NextUp(
     kind: LessonKind.quickCheck,
     title: 'One-step equations',
+    topicId: 'one_step_equations',
     description:
         'Two quick questions from 7 days ago. If it’s still there, this block '
         'locks in.',
@@ -160,6 +167,7 @@ class TodaySamples {
     PlanItem(
       kind: LessonKind.foundation,
       title: 'Harder equations',
+      topicId: 'harder_equations',
       brick: BrickState.unchecked,
       status: LessonStatus.todo,
       caption: 'About 10 min',
@@ -174,6 +182,7 @@ class TodaySamples {
     PlanItem(
       kind: LessonKind.stretch,
       title: 'Simultaneous equations',
+      topicId: 'simultaneous_equations',
       brick: BrickState.unchecked,
       status: LessonStatus.todo,
       caption: 'About 10 min',
@@ -212,6 +221,7 @@ class TodaySamples {
     nextUp: const NextUp(
       kind: LessonKind.quickCheck,
       title: 'One-step equations',
+      topicId: 'one_step_equations',
       description:
           'Two quick questions from 7 days ago. If it’s still there, this '
           'block locks in.',
@@ -235,6 +245,7 @@ class TodaySamples {
     nextUp: const NextUp(
       kind: LessonKind.foundation,
       title: 'One more look',
+      topicId: 'letters_for_numbers',
       description:
           'Your answers on letters for numbers pointed different ways. Three '
           'quick questions help us be fair to you.',
@@ -258,6 +269,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.stretch,
         title: 'Expanding brackets',
+        topicId: 'expanding_brackets',
         brick: BrickState.unchecked,
         status: LessonStatus.locked,
         caption:
@@ -276,6 +288,7 @@ class TodaySamples {
     nextUp: const NextUp(
       kind: LessonKind.foundation,
       title: 'Quick look: Whole numbers',
+      topicId: 'whole_numbers',
       description:
           'Your block to build is fixed. Three quick questions show if this '
           'earlier block is in place too.',
@@ -293,6 +306,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.klass,
         title: 'Two-step equations',
+        topicId: 'two_step_equations',
         brick: BrickState.solid,
         status: LessonStatus.todo,
         caption: 'About 8 min',
@@ -300,6 +314,7 @@ class TodaySamples {
       PlanItem(
         kind: LessonKind.stretch,
         title: 'Word problems',
+        topicId: 'word_problems',
         brick: BrickState.unchecked,
         status: LessonStatus.todo,
         caption: 'About 10 min',

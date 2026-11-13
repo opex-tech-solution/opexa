@@ -10,6 +10,7 @@ import '../map/widget.dart';
 import '../me/widget.dart';
 import '../readiness/widget.dart';
 import 'main_shell.dart' as main_shell;
+import 'nav_visibility.dart';
 import '../on_boarding/widget.dart';
 
 /// Every route path in the app. Use these constants, never string literals.
@@ -39,6 +40,7 @@ class AppRoutes {
   static const String mainMe = '/main-me';
   // Children of mainHome (relative, like the other child routes below).
   static const String mainHomeNotifications = 'main-notifications';
+  static const String mainHomeQuickPractice = 'quick-practice/:topicId';
   static const String mainHomeNotificationSettings =
       'main-home-notification-settings';
   static const String mainMeWhatOpexAKnows = 'main-what-opexa-knows';
@@ -190,6 +192,19 @@ class AppRouter {
                       ),
                     ],
                   ),
+                  GoRoute(
+                    path: AppRoutes.mainHomeQuickPractice,
+                    builder: (context, state) {
+                      final topicId = state.pathParameters['topicId']!;
+                      final skill = state.extra is Skill
+                          ? state.extra as Skill
+                          : Skill(topicId, BrickState.unchecked, topicId: topicId);
+                      return QuickPracticeScreen(
+                        skill: skill,
+                        topicId: topicId,
+                      );
+                    },
+                  ),
                 ],
               ),
             ],
@@ -241,19 +256,19 @@ class AppRouter {
                     ],
                   ),
                   GoRoute(
-                        path: AppRoutes.mainMapLearningLearningScreen,
-                        builder: (context, state) {
-                          final skill = state.extra is Skill
-                              ? state.extra as Skill
-                              : Skill(
-                                  state.extra is String
-                                      ? state.extra as String
-                                      : '',
-                                  BrickState.unchecked,
-                                );
-                          return TeachingLessonPage(skill: skill);
-                        },
-                      ),
+                    path: AppRoutes.mainMapLearningLearningScreen,
+                    builder: (context, state) {
+                      final skill = state.extra is Skill
+                          ? state.extra as Skill
+                          : Skill(
+                              state.extra is String
+                                  ? state.extra as String
+                                  : '',
+                              BrickState.unchecked,
+                            );
+                      return TeachingLessonPage(skill: skill);
+                    },
+                  ),
                   GoRoute(
                     path: AppRoutes.mainMapLearningList,
                     builder: (context, state) => const LearningListPage(),
@@ -262,6 +277,18 @@ class AppRouter {
                     path: '${AppRoutes.mainMapPracticeLesson}/:topicId',
                     builder: (context, state) => PracticeLessonPage(
                       topicId: state.pathParameters['topicId']!,
+                      onBackToToday: () {
+                        navBarVisible.value = true;
+                        context.go(AppRoutes.mainHome);
+                      },
+                      onSeeOnMap: () {
+                        navBarVisible.value = true;
+                        context.go(AppRoutes.mainMap);
+                      },
+                      onNextLesson: () {
+                        navBarVisible.value = true;
+                        context.go(AppRoutes.mainHome);
+                      },
                     ),
                   ),
                   GoRoute(

@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../models/today_state.dart';
+
 /// A practice lesson the learner stopped part-way through.
 class InProgressLesson {
   const InProgressLesson({
@@ -16,10 +18,8 @@ class InProgressLesson {
 
   final String topicId;
   final String topicName;
-  final String kind; // "Class", "Foundation", ...
+  final String kind;
   final DateTime savedAt;
-
-  /// Exact place to resume from; null means "start at the beginning".
   final Map<String, dynamic>? snapshot;
 
   Map<String, dynamic> toJson() => {
@@ -42,10 +42,10 @@ class InProgressLesson {
   }
 }
 
-/// What the learner has learned, practised and paused. Kept on the phone, so
-/// it works offline ("Your answers are saved on this phone").
+/// Offline-first learner progress shared by Today, Map, Teach Me and Practice.
 ///
-/// Call [load] once in main() before runApp, like ThemeController.init().
+/// This store is the common source of truth for completion. The JSON catalogue
+/// defines learning content; this store records what the learner has done.
 class LessonProgressStore extends ChangeNotifier {
   LessonProgressStore._();
 
@@ -56,11 +56,50 @@ class LessonProgressStore extends ChangeNotifier {
 
   final Set<String> _learned = {};
   final Set<String> _practised = {};
+  final Set<String> _completedToday = {};
+  final Set<String> _activityToday = {};
+  final Map<String, Set<String>> _activityHistory = {};
+  final Map<String, String> _statusByTopic = {};
   final Map<String, InProgressLesson> _inProgress = {};
 
+  bool _firstCheckCompleted = false;
+  String _activityDate = _dateKey(DateTime.now());
+
+  bool get firstCheckCompleted => _firstCheckCompleted;
+  Set<String> get completedToday => Set.unmodifiable(_completedToday);
+  Set<String> get activityToday => Set.unmodifiable(_activityToday);
+  Set<String> get learnedTopicIds => Set.unmodifiable(_learned);
+
+  /// Seven-day activity summary used by the Today screen.
+  WeekProgress get weekProgress {
+    final today = DateTime.now();
+    final days = List<bool>.generate(7, (index) {
+      final date = today.subtract(Duration(days: 6 - index));
+      return _activityHistory[_dateKey(date)]?.isNotEmpty ?? false;
+    });
+    final lessons = _activityHistory.values.fold<int>(
+      0,
+      (total, topics) => total + topics.length,
+    );
+    return WeekProgress(learnedDays: days, lessons: lessons);
+  }
   bool isLearned(String topicId) => _learned.contains(topicId);
   bool isPractised(String topicId) => _practised.contains(topicId);
+  bool hasCompletedToday(String topicId) => _completedToday.contains(topicId);
+  bool hasActivityToday(String topicId) => _activityToday.contains(topicId);
   InProgressLesson? inProgressFor(String topicId) => _inProgress[topicId];
+
+  BrickProgressStatus? statusFor(String topicId) {
+    final status = _statusByTopic[topicId];
+    return switch (status) {
+      'solid' => BrickProgressStatus.solid,
+      'building' => BrickProgressStatus.building,
+      'mastered' => BrickProgressStatus.mastered,
+      'locked_in' => BrickProgressStatus.lockedIn,
+      'not_sure' => BrickProgressStatus.notSure,
+      _ => null,
+    };
+  }
 
   /// The most recently paused lesson, for "Carry on with it".
   InProgressLesson? get latestInProgress {
@@ -79,25 +118,57 @@ class LessonProgressStore extends ChangeNotifier {
         _apply(jsonDecode(raw));
       } else {
         await _seedFromAsset();
-        await _save();
       }
+      _ensureCurrentDay();
+      await _save();
+      notifyListeners();
     } catch (error) {
       debugPrint('Could not load lesson progress: $error');
     }
   }
 
-  Future<void> markLearned(String topicId) async {
-    if (topicId.isEmpty || !_learned.add(topicId)) return;
+  Future<void> markFirstCheckCompleted() async {
+    if (_firstCheckCompleted) return;
+    _firstCheckCompleted = true;
     notifyListeners();
     await _save();
   }
 
-  /// Practice finished: counts as practised and is no longer "in progress".
-  Future<void> markPractised(String topicId) async {
+  Future<void> markLearned(String topicId) async {
     if (topicId.isEmpty) return;
-    _practised.add(topicId);
+    _ensureCurrentDay();
+    final learnedChanged = _learned.add(topicId);
+    final activityChanged = _recordActivity(topicId);
+    if (learnedChanged || activityChanged) notifyListeners();
+    await _save();
+  }
+
+  /// Records the seven-stage Teach Me experience as complete.
+  Future<void> markLessonCompleted(String topicId) async {
+    if (topicId.isEmpty) return;
+    _ensureCurrentDay();
+    final learnedChanged = _learned.add(topicId);
+    final activityChanged = _recordActivity(topicId);
+    final previousStatus = _statusByTopic[topicId];
+    _statusByTopic.putIfAbsent(topicId, () => 'building');
+    if (learnedChanged || activityChanged || previousStatus == null) {
+      notifyListeners();
+    }
+    await _save();
+  }
+
+  /// Records the eight-stage Practice Lesson and its resulting skill state.
+  Future<void> markPractised(
+    String topicId, {
+    String status = 'building',
+  }) async {
+    if (topicId.isEmpty) return;
+    _ensureCurrentDay();
     _learned.add(topicId);
-    _inProgress.remove(topicId);
+    _practised.add(topicId);
+    _completedToday.add(topicId);
+    _recordActivity(topicId);
+    _statusByTopic[topicId] = status == 'solid' ? 'solid' : 'building';
     notifyListeners();
     await _save();
   }
@@ -125,7 +196,33 @@ class LessonProgressStore extends ChangeNotifier {
     await _save();
   }
 
-  // ── storage ────────────────────────────────────────────────────────────
+  bool _recordActivity(String topicId) {
+    final addedToday = _activityToday.add(topicId);
+    final todaysTopics = _activityHistory.putIfAbsent(
+      _activityDate,
+      () => <String>{},
+    );
+    final addedToHistory = todaysTopics.add(topicId);
+    return addedToday || addedToHistory;
+  }
+
+  void _ensureCurrentDay() {
+    final now = DateTime.now();
+    final today = _dateKey(now);
+    if (_activityDate != today) {
+      _activityDate = today;
+      _completedToday.clear();
+      _activityToday.clear();
+    }
+
+    final cutoff = DateTime(now.year, now.month, now.day)
+        .subtract(const Duration(days: 6));
+    _activityHistory.removeWhere((dateKey, _) {
+      final parsed = DateTime.tryParse(dateKey);
+      return parsed == null || parsed.isBefore(cutoff);
+    });
+    _activityHistory.putIfAbsent(today, () => <String>{});
+  }
 
   void _apply(dynamic data) {
     if (data is! Map) return;
@@ -135,6 +232,42 @@ class LessonProgressStore extends ChangeNotifier {
     _practised
       ..clear()
       ..addAll((data['practised'] as List? ?? const []).map((e) => '$e'));
+    _firstCheckCompleted = data['first_check_completed'] == true;
+    _activityDate = '${data['activity_date'] ?? _dateKey(DateTime.now())}';
+    _completedToday
+      ..clear()
+      ..addAll((data['completed_today'] as List? ?? const []).map((e) => '$e'));
+    final savedActivity = data['activity_today'];
+    _activityToday
+      ..clear()
+      ..addAll(
+        (savedActivity is List
+                ? savedActivity
+                : (data['completed_today'] as List? ?? const []))
+            .map((e) => '$e'),
+      );
+
+    _activityHistory.clear();
+    final savedHistory = data['activity_history'];
+    if (savedHistory is Map) {
+      for (final entry in savedHistory.entries) {
+        if (entry.value is List) {
+          _activityHistory['${entry.key}'] =
+              (entry.value as List).map((e) => '$e').toSet();
+        }
+      }
+    } else if (_activityToday.isNotEmpty) {
+      // Migrate older progress records into the dated activity history.
+      _activityHistory[_activityDate] = Set<String>.from(_activityToday);
+    }
+
+    _statusByTopic
+      ..clear()
+      ..addAll(
+        (data['status_by_topic'] as Map? ?? const {}).map(
+          (key, value) => MapEntry('$key', '$value'),
+        ),
+      );
     _inProgress.clear();
     for (final item in (data['in_progress'] as List? ?? const [])) {
       if (item is Map) {
@@ -171,6 +304,15 @@ class LessonProgressStore extends ChangeNotifier {
         jsonEncode({
           'learned': _learned.toList(),
           'practised': _practised.toList(),
+          'first_check_completed': _firstCheckCompleted,
+          'activity_date': _activityDate,
+          'completed_today': _completedToday.toList(),
+          'activity_today': _activityToday.toList(),
+          'activity_history': {
+            for (final entry in _activityHistory.entries)
+              entry.key: entry.value.toList(),
+          },
+          'status_by_topic': _statusByTopic,
           'in_progress': _inProgress.values.map((e) => e.toJson()).toList(),
         }),
       );
@@ -178,4 +320,18 @@ class LessonProgressStore extends ChangeNotifier {
       debugPrint('Could not save lesson progress: $error');
     }
   }
+
+  static String _dateKey(DateTime date) =>
+      '${date.year.toString().padLeft(4, '0')}-'
+      '${date.month.toString().padLeft(2, '0')}-'
+      '${date.day.toString().padLeft(2, '0')}';
+}
+
+/// Neutral status type so the repository does not depend on Map presentation.
+enum BrickProgressStatus {
+  notSure,
+  building,
+  solid,
+  mastered,
+  lockedIn,
 }

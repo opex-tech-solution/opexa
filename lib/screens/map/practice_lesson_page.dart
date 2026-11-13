@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../api/repositories/widget.dart';
 import '../../models/practice_lesson_content.dart';
+import '../home/home_widget/today_store.dart';
 import '../../theme/app_colors.dart';
 import '../routes/widget.dart';
 import 'widget.dart';
@@ -264,6 +265,7 @@ class _PracticeLessonPageState extends State<PracticeLessonPage> {
     );
 
     _result = result;
+    TodayStore.instance.completePractice(widget.topicId, status: status);
     setState(() => _showResult = true);
     if (!_completionReported) {
       _completionReported = true;

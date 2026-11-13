@@ -1,28 +1,311 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
+
+import '../../../api/repositories/lesson_progress_store.dart';
 import '../../../models/model.dart';
 import 'today_samples.dart';
 
-/// Holds the [TodayState] the Today tab shows, and the few things the learner
-/// can change from it. Other screens (the diagnostic, the lessons) will update
-/// it when the learner makes progress.
-///
-/// TODO: the starting value is a sample. Replace it with the real learner state
-/// (from the check results and the lessons) once that exists.
+/// Shared Home state. Lesson and practice screens report completion here so
+/// the Today cards update immediately and can be rebuilt after app restart.
 class TodayStore extends ValueNotifier<TodayState> {
   TodayStore(super.value);
 
   static final TodayStore instance = TodayStore(TodaySamples.startingPoint);
+  final LessonProgressStore _progress = LessonProgressStore.instance;
 
-  /// Shows another state (used by the debug picker).
-  void show(TodayState state) => value = state;
+  Future<void> initFromProgress() async {
+    if (!_progress.firstCheckCompleted) {
+      value = TodaySamples.startingPoint.copyWith(userName: value.userName);
+      return;
+    }
 
-  /// Applies the first-check result and reveals the learner's first plan.
+    value = TodaySamples.firstPlan.copyWith(userName: value.userName);
+    _restoreTodaysActivities();
+  }
+
+  /// Applies the first-check result and restores any activities already
+  /// completed today. A first-time check starts a fresh Today plan.
   void completeFirstCheck() {
+    unawaited(_progress.markFirstCheckCompleted());
+
     value = TodaySamples.firstPlan.copyWith(
       userName: value.userName,
       now: value.now,
     );
+    _restoreTodaysActivities();
   }
+
+  void _restoreTodaysActivities() {
+    final orderedTopicIds = <String>[];
+    final initial = TodaySamples.firstPlan;
+    final firstTopicId = initial.nextUp?.topicId;
+    if (firstTopicId != null) orderedTopicIds.add(firstTopicId);
+
+    for (final item in initial.plan) {
+      final topicId = item.topicId;
+      if (topicId != null && !orderedTopicIds.contains(topicId)) {
+        orderedTopicIds.add(topicId);
+      }
+    }
+
+    final remaining = _progress.learnedTopicIds
+        .where((id) => !orderedTopicIds.contains(id))
+        .toList()
+      ..sort();
+
+    for (final topicId in [...orderedTopicIds, ...remaining]) {
+      if (!_progress.isLearned(topicId)) continue;
+
+      _applyLessonCompletion(topicId);
+      if (_progress.isPractised(topicId)) {
+        _applyPracticeCompletion(topicId);
+      }
+    }
+  }
+
+  /// A completed Teach Me lesson means the learner is ready to practise.
+  /// It must not mark the topic as fully completed or advance the plan yet.
+  void completeLesson(String topicId) {
+    if (topicId.isEmpty) return;
+    unawaited(_progress.markLessonCompleted(topicId));
+    _applyLessonCompletion(topicId);
+  }
+
+  /// The independent Practice Lesson completes the topic and advances Today.
+  void completePractice(String topicId, {required String status}) {
+    if (topicId.isEmpty) return;
+    unawaited(_progress.markPractised(topicId, status: status));
+    _applyPracticeCompletion(topicId);
+  }
+
+  void _applyLessonCompletion(String topicId) {
+    final current = value;
+    if (!current.firstCheckDone) return;
+
+    final updated = current.copyWith(
+      map: _mapCountsFromProgress(),
+      week: _progress.weekProgress,
+    );
+
+    // Re-teaching a topic that has already been practised must not put it
+    // back into the "Practise next" state or disturb the current queue.
+    if (_progress.isPractised(topicId)) {
+      value = updated;
+      return;
+    }
+
+    final next = current.nextUp;
+    if (next != null && next.topicId == topicId) {
+      value = updated.copyWith(
+        nextUp: NextUp(
+          kind: next.kind,
+          title: next.title,
+          description:
+              'You have learned ${next.title.toLowerCase()}. Practise it to complete this block.',
+          brick: next.brick,
+          minutes: next.minutes,
+          reasons: next.reasons,
+          worksOffline: next.worksOffline,
+          downloadSize: next.downloadSize,
+          badge: 'Practise next',
+          primaryLabel: 'Start practice',
+          secondaryLabel: next.secondaryLabel,
+          tone: next.tone,
+          topicId: topicId,
+        ),
+      );
+      return;
+    }
+
+    final index = current.plan.indexWhere(
+      (item) => item.topicId == topicId,
+    );
+    if (index < 0) {
+      value = updated;
+      return;
+    }
+
+    final plan = [...current.plan];
+    final item = plan[index];
+    if (item.status == LessonStatus.done) {
+      value = updated;
+      return;
+    }
+
+    plan[index] = PlanItem(
+      kind: item.kind,
+      title: item.title,
+      brick: item.brick,
+      status: item.status,
+      caption: 'Learned · practise next',
+      topicId: item.topicId,
+    );
+    value = updated.copyWith(plan: plan);
+  }
+
+  /// Marks a topic as done and advances Next Up only after practice.
+  void _applyPracticeCompletion(String topicId) {
+    final current = value;
+    if (!current.firstCheckDone) return;
+
+    final plan = [...current.plan];
+    final updated = current.copyWith(
+      map: _mapCountsFromProgress(),
+      week: _progress.weekProgress,
+    );
+
+    if (current.nextUp?.topicId == topicId) {
+      final next = current.nextUp!;
+
+      // Keep a completed history row when the Next Up item wasn't already
+      // part of the visible plan.
+      final existingIndex = plan.indexWhere(
+        (item) => item.topicId == topicId,
+      );
+      if (existingIndex < 0) {
+        plan.insert(
+          0,
+          PlanItem(
+            kind: next.kind,
+            title: next.title,
+            brick: next.brick,
+            status: LessonStatus.done,
+            caption: _progress.hasCompletedToday(topicId)
+                ? 'Completed today'
+                : 'Completed',
+            topicId: topicId,
+          ),
+        );
+      } else {
+        final existing = plan[existingIndex];
+        plan[existingIndex] = PlanItem(
+          kind: existing.kind,
+          title: existing.title,
+          brick: existing.brick,
+          status: LessonStatus.done,
+          caption: _progress.hasCompletedToday(topicId)
+              ? 'Completed today'
+              : 'Completed',
+          topicId: existing.topicId,
+        );
+      }
+
+      final promoteIndex = plan.indexWhere(
+        (item) =>
+            item.status == LessonStatus.todo && item.topicId != null,
+      );
+      final promoted = promoteIndex < 0 ? null : plan.removeAt(promoteIndex);
+      final nextUp = promoted == null ? null : _toNextUp(promoted);
+      final allDone = nextUp == null &&
+          plan.every((item) => item.status == LessonStatus.done);
+
+      value = updated.copyWith(
+        clearNextUp: nextUp == null,
+        nextUp: nextUp,
+        plan: plan,
+        doneForToday: allDone,
+      );
+      return;
+    }
+
+    final index = plan.indexWhere((item) => item.topicId == topicId);
+    if (index < 0 || plan[index].status == LessonStatus.done) {
+      value = updated;
+      return;
+    }
+
+    final item = plan[index];
+    plan[index] = PlanItem(
+      kind: item.kind,
+      title: item.title,
+      brick: item.brick,
+      status: LessonStatus.done,
+      caption: _progress.hasCompletedToday(topicId)
+          ? 'Completed today'
+          : 'Completed',
+      topicId: item.topicId,
+    );
+
+    value = updated.copyWith(
+      plan: plan,
+      doneForToday: updated.nextUp == null &&
+          plan.every((item) => item.status == LessonStatus.done),
+    );
+  }
+
+  MapCounts _mapCountsFromProgress() {
+    var mastered = 0;
+    var lockedIn = 0;
+    var solid = 0;
+    var building = 0;
+    var notSure = 0;
+    var notChecked = 0;
+
+    final wall = buildWall(afterFirstCheck: true);
+    for (final skill in wall.all) {
+      final state = switch (_progress.statusFor(skill.topicId ?? '')) {
+        BrickProgressStatus.notSure => BrickState.notSure,
+        BrickProgressStatus.building => BrickState.building,
+        BrickProgressStatus.solid => BrickState.solid,
+        BrickProgressStatus.mastered => BrickState.mastered,
+        BrickProgressStatus.lockedIn => BrickState.lockedIn,
+        null => skill.state,
+      };
+
+      switch (state) {
+        case BrickState.mastered:
+          mastered++;
+          break;
+        case BrickState.lockedIn:
+          lockedIn++;
+          break;
+        case BrickState.solid:
+          solid++;
+          break;
+        case BrickState.building:
+          building++;
+          break;
+        case BrickState.notSure:
+          notSure++;
+          break;
+        case BrickState.unchecked:
+          notChecked++;
+          break;
+      }
+    }
+
+    return MapCounts(
+      mastered: mastered,
+      lockedIn: lockedIn,
+      solid: solid,
+      building: building,
+      notSure: notSure,
+      notChecked: notChecked,
+    );
+  }
+
+
+  NextUp _toNextUp(PlanItem item) {
+    final minuteMatch = RegExp(r'(\d+)').firstMatch(item.caption);
+    final minutes = int.tryParse(minuteMatch?.group(1) ?? '') ?? 5;
+    final learned = _progress.isLearned(item.topicId ?? '');
+    return NextUp(
+      kind: item.kind,
+      title: item.title,
+      description: learned
+          ? 'You have learned ${item.title.toLowerCase()}. Practise it to complete this block.'
+          : 'Continue learning ${item.title.toLowerCase()} with a short guided lesson.',
+      brick: item.brick,
+      minutes: minutes,
+      badge: learned ? 'Practise next' : null,
+      primaryLabel: learned ? 'Start practice' : 'Start',
+      topicId: item.topicId,
+    );
+  }
+
+  /// Shows another state (used by the debug picker).
+  void show(TodayState state) => value = state;
 
   /// "Not today": drop the next lesson and show "Done for today".
   void takeTodayOff() =>

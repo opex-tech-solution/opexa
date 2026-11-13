@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../api/repositories/widget.dart';
 import '../../api/services/widget.dart';
 import '../../models/lesson_content.dart';
 import '../../models/skill.dart';
+import '../home/home_widget/today_store.dart';
 import '../../theme/app_colors.dart';
 import '../../widgets/info_widgets.dart';
 import '../routes/widget.dart';
@@ -240,6 +242,8 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
     if (!mounted) return;
 
     if (_stepIndex >= _steps.length - 1) {
+      final topicId = widget.topicId ?? widget.skill.topicId ?? _topic?.id;
+      if (topicId != null) TodayStore.instance.completeLesson(topicId);
       setState(() => _isComplete = true);
       return;
     }
@@ -798,17 +802,31 @@ class _TeachingLessonPageState extends State<TeachingLessonPage> {
                         SizedBox(
                           width: double.infinity,
                           child: FilledButton(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (_) => QuickPracticeScreen(
-                                    skill: widget.skill,
-                                    topicId:
-                                        widget.topicId ?? widget.skill.topicId,
-                                    topicContent: _topic,
+                            onPressed: () async {
+                              final topicId = widget.topicId ??
+                                  widget.skill.topicId ??
+                                  _topic?.id;
+                              if (topicId == null || topicId.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                      'Practice content is not available for this topic.',
+                                    ),
                                   ),
-                                ),
-                              );
+                                );
+                                return;
+                              }
+
+                              navBarVisible.value = false;
+                              try {
+                                await context.push(
+                                  '${AppRoutes.mainMap}/'
+                                  '${AppRoutes.mainMapPracticeLesson}/'
+                                  '${Uri.encodeComponent(topicId)}',
+                                );
+                              } finally {
+                                if (mounted) navBarVisible.value = true;
+                              }
                             },
                             style: FilledButton.styleFrom(
                               minimumSize: const Size.fromHeight(52),
@@ -1084,6 +1102,14 @@ class _QuickPracticeScreenState extends State<QuickPracticeScreen> {
     await _stopSpeech();
     if (!mounted) return;
     if (_index == _questions.length - 1) {
+      final topicId = widget.topicId ?? widget.skill.topicId;
+      if (topicId != null) {
+        final threshold = (_questions.length * 0.7).ceil();
+        TodayStore.instance.completePractice(
+          topicId,
+          status: _correct >= threshold ? 'solid' : 'building',
+        );
+      }
       setState(() => _complete = true);
     } else {
       setState(() {
