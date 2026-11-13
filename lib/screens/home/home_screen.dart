@@ -246,7 +246,7 @@ class _TodayView extends StatelessWidget {
           const SizedBox(height: 16),
         ],
         if (state.doneForToday) ...[
-          const DoneForTodayCard(),
+          DoneForTodayCard(state: state),
           const SizedBox(height: 24),
         ],
       ],
