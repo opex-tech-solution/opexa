@@ -33,7 +33,7 @@ class _WelcomeBackScreenState extends State<WelcomeBackScreen> {
                   Icons.arrow_back,
                   color: isDark ? Colors.white70 : Colors.black87,
                 ),
-                onPressed: () => Navigator.of(context).pop(),
+                onPressed: () => context.go(AppRoutes.onboarding),
               ),
             ),
             Expanded(

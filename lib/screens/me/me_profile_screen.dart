@@ -596,7 +596,7 @@ class _MeProfileScreenState extends State<MeProfileScreen> {
                       Navigator.of(context).pop();
                       GoRouter.of(
                         context,
-                      ).push(AppRoutes.welcomeScreen);
+                      ).go(AppRoutes.welcomeScreen);
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Theme.of(
